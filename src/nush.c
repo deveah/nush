@@ -145,6 +145,16 @@ static int curses_clear( lua_State *L )
 	return 0;
 }
 
+static int curses_clearline( lua_State *L )
+{
+	int y = lua_tointeger(L, -1);
+	
+	move( y, 0 );
+	clrtoeol();
+
+	return 0;
+}
+
 static int curses_refresh( lua_State *L )
 {
 	(void) L;
@@ -231,6 +241,7 @@ luaL_Reg curses[] = {
 	{	"getch",		curses_getch },
 	{	"attr",			curses_attr },
 	{	"clear",		curses_clear },
+	{ "clearLine",	curses_clearline },
 	{	"refresh",		curses_refresh },
 	{	"move",			curses_move },
 	{	"cursor",		curses_cursor },

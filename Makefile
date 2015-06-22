@@ -4,8 +4,8 @@ CFLAGS = -Wall -Wextra -g
 LUA52_LIBS = -lcurses -llua
 LUAJIT_LIBS = -lcurses -lluajit-5.1
 
-SOURCE = src/mazga.c
-EXECUTABLE = mazga
+SOURCE = src/nush.c
+EXECUTABLE = nush
 
 all:
 	make lua52
