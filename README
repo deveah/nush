@@ -1,48 +1,16 @@
 
-	Mazga
-	a barebones lua roguelike framework
+	Nush, a coffeebreak roguelike
+	(c) 2015, Vlad Dumitru
+	Please consult LICENCE for licensing information.
 	--
 
-	Mazga is a a base for lua roguelikes, containing only a wrapper for the
-	most basic of curses functions. It serves as a starting point for any
-	future projects I may need something alike.
+	Requires either Lua or LuaJIT (most recent versions preferred), and curses.
 
-	The framework can be built using either Lua >=5.2, or LuaJIT >=2.0.2.
-	Use the provided Makefile in order to build both modes, but be wary that
-	you may need to alter the libs in each case.
+	Compile with:
+	$ make
 
-	Build with Lua 5.2:
-	$ make lua52
+	Run with:
+	$ ./nush
 
-	Build with LuaJIT:
-	$ make luajit
-
-	All curses-related functions belong inside the 'curses' global table,
-	and are as following:
-
-	*	init() - initializes the window, returning its width and height; you
-		may need to alter the initialization procedures it calls
-	*	terminate() - closes the window
-	*	write( x, y, string ) - writes the provided string at the provided
-		coordinates; be wary that the coordinates start from 0, not 1.
-	*	getch() - waits for a keypress, and then returns it; the function
-		may return a specific string for non-printable characters
-	*	attr( a ) - sets the current attributes; see below
-	*	clear()
-	*	refresh()
-	*	move( x, y ) - positions the cursor at the specified position
-	*	cursor( c ) - toggles the state of the cursor; see curs_set of the
-		curses manual for a more detailed explanation
-	*	getstr() - returns a string provided from the keyboard; when the
-		string is input, echoing is toggled on; before returning the string,
-		it toggles the echoing off again
-
-	Attributes are as following:
-	*	colors: black, red, green, yellow, blue, magenta, cyan, white
-	*	bold
-	*	inverse
-	*	normal
-
-	In any case, please read the source code before using, since it contains
-	behaviour (very) specific to my needs related to roguelike development.
+	Have fun and contribute if possible!
 
