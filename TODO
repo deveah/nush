@@ -2,8 +2,8 @@
 	TODO
 	--
 
+	*	concatenate messages within the same turn into one big message
 	*	complete using stairs - how to place actor on next map?
-	*	actor death
 	*	melee damage
 	*	ranged damage
 	*	dungeon generators

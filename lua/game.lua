@@ -169,10 +169,12 @@ function Game:drawScreen()
 	end
 
 	--	draw the actors on the same map as the player, who are visible from
-	--	the player character's point of view
+	--	the player character's point of view; only actors who are alive
+	--	can be seen
 	for i = 1, #(self.actorList) do
 		if self.actorList[i].map == map
-			and self.player.sightMap[self.actorList[i].x][self.actorList[i].y] then
+			and self.player.sightMap[self.actorList[i].x][self.actorList[i].y]
+			and self.actorList[i].alive then
 			curses.attr(self.actorList[i].color)
 			curses.write(self.actorList[i].x + xOffset, self.actorList[i].y + yOffset,
 				self.actorList[i].face)

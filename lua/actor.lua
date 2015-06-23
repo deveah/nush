@@ -11,6 +11,7 @@
 --	* x, y (integers) - the position of the Actor on the map
 --	*	sightMap (two-dimensional boolean table) - a map showing the tiles
 --			currently visible to the actor
+--	*	alive (boolean) - true if the actor can act
 --
 
 local Global = require "lua/global"
@@ -31,6 +32,7 @@ function Actor.new()
 	a.map = nil
 	a.x = 0	--	although 0 is not a valid coordinate for the Actor to be on,
 	a.y = 0	--	the value signifies that an actual position has not been set
+	a.alive = true	--	by default, a newly created Actor is alive
 
 	a.sightMap = {}
 	for i = 1, Global.mapWidth do
@@ -104,6 +106,15 @@ function Actor:setPosition(x, y)
 	self:updateSight()
 end
 
+--	Actor:die() - kills the given actor, making it unavailible to act
+function Actor:die()
+	if self.gameInstance then
+		self.gameInstance.log:write("Actor " .. self:toString() ..
+			" has died.")
+	end
+	self.alive = false
+end
+
 --	Actor:updateSight() - calculates the given actor's sight map;
 --	does not return anything
 function Actor:updateSight()
@@ -175,16 +186,29 @@ function Actor:move(x, y)
 		return false
 	end
 
-	--	the actor cannot move onto a tile that is occupied by another actor
+	--	the actor cannot move onto a tile that is occupied by another actor;
+	--	instead, the actor who occupies that certain tile is attacked
 	local actor = self.map:isOccupied(x, y)
-	if actor then
-		self.gameInstance.log:write("Actor " .. self:toString() ..
-			" bumped into actor " .. actor:toString() .. ".")
-		return false
+	if actor and actor.alive then
+		if self == self.gameInstance.player then
+			self.gameInstance:message("You attack the " .. actor.name .. ".")
+		end
+		return self:meleeAttack(actor)
 	end
 
 	--	if all is well, update the actor's position
 	self:setPosition(x, y)
+	return true
+end
+
+--	Actor:meleeAttack() - makes the given actor attack another actor via
+--	melee, killing the defending actor in the process; always returns true,
+--	even if the hit was a miss
+function Actor:meleeAttack(defender)
+	if self == self.gameInstance.player then
+		self.gameInstance:message("The " .. defender.name .. " dies!")
+	end
+	defender:die()
 	return true
 end
 
