@@ -54,6 +54,11 @@ function Game:start()
 	self.log = Log.new(Global.logFilename)
 	self.log:write("Started logging.")
 
+	--	set the random seed
+	self.randomSeed = os.time()
+	math.randomseed(self.randomSeed)
+	self.log:write("Random seed is " .. self.randomSeed)
+
 	--	create the dungeon
 	self.log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
