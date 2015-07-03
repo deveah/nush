@@ -280,19 +280,19 @@ function Actor:handleKey(key)
 	end
 
 	--	movement
-	if key == "h" then	--	move left
+	if key == "h" or key == "left" then	--	move left
 		return self:move(self.x - 1, self.y)
 	end
 
-	if key == "j" then	--	move down
+	if key == "j" or key == "down" then	--	move down
 		return self:move(self.x, self.y + 1)
 	end
 
-	if key == "k" then	--	move up
+	if key == "k" or key == "up"  then	--	move up
 		return self:move(self.x, self.y - 1)
 	end
 
-	if key == "l" then	--	move right
+	if key == "l" or key == "right" then	--	move right
 		return self:move(self.x + 1, self.y)
 	end
 
