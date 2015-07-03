@@ -228,7 +228,7 @@ function Actor:takeStairs()
 	if self.map.tile[self.x][self.y].name == "Stairs up" then
 		--	signal that the stairs have been ascended
 		if self == self.gameInstance.player then
-			self.gameInstance:message("You descend the stairs.")
+			self.gameInstance:message("You ascend the stairs.")
 		end
 		return true
 	end
@@ -296,7 +296,7 @@ function Actor:handleKey(key)
 		return self:move(self.x + 1, self.y)
 	end
 
-	--	use of staris
+	--	use of stairs
 	if key == ">" then
 		return self:takeStairs()
 	end

@@ -75,7 +75,7 @@ function Game:start()
 			actor:setFace("b")
 			actor:setColor(curses.red)
 			actor:setMap(map)
-			actor:setPosition(math.random(2, 79), math.random(2, 19))
+			actor:setPosition(math.random(2, Global.mapWidth - 1), math.random(2, Global.mapHeight - 1))
 		end
 	end
 

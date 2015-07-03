@@ -10,7 +10,7 @@ local Log = {}
 Log.__index = Log
 
 --	Log.new() - creates a new Log object, initializing its members with default
---	data; does not return anything
+--	data; returns the Log object
 function Log.new(filename)
 	local l = {}
 	setmetatable(l, Log)
