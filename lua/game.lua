@@ -206,6 +206,7 @@ function Game:drawScreen()
 	end
 
 	--	draw the status line
+	curses.clearLine(23)
 	curses.write(0, 23, "Placeholder status line.")
 
 	--	position the cursor on the player, so it may be easily seen
@@ -268,6 +269,57 @@ end
 function Game:message(text)
 	self.log:write("Message logged: " .. text)
 	table.insert(self.messageList, text)
+end
+
+--  Game:messageLogScreen() - display message log with interactive scrolling;
+--  does not return anything
+function Game:messageLogScreen()
+	--  number of message that can be shown at once
+	local windowHeight = Global.screenHeight - 2
+	--  maximum 'scroll' value (fully scrolled to end)
+	local maxScroll = math.max(1, #(self.messageList) - (windowHeight - 1))
+	--  index of scroll-back buffer at top of window
+	local scroll = maxScroll
+
+	--  writeCentered() - Draw a string at the center of a line
+	function writeCentered(y, str)
+		curses.write((Global.screenWidth - #str - 1) / 2, y, " " .. str .. " ")
+	end
+
+	function drawMessageLog()
+		for i = 0, windowHeight - 1 do
+			curses.clearLine(1 + i)
+			local messageLine = i + scroll
+			if messageLine >= 1 and messageLine <= #(self.messageList) then
+				curses.write(0, 1 + i, self.messageList[messageLine])
+			end
+		end
+
+		--  draw the window decoration
+		local banner = string.rep("-", Global.screenWidth)
+		curses.write(0, 0, banner)
+		writeCentered(0, "Previous messages")
+		curses.write(0, Global.screenHeight - 1, banner)
+		writeCentered(Global.screenHeight - 1, "Press any key")
+		if scroll > 1 then
+			curses.write(Global.screenWidth - 5, 0, " ^ ")
+		end
+		if scroll < maxScroll then
+			curses.write(Global.screenWidth - 5, Global.screenHeight - 1, " v ")
+		end
+	end
+
+	while true do
+		drawMessageLog()
+		key = curses.getch()
+		if key == "j" or key == "down" then
+			scroll = math.min(scroll + 1, maxScroll)
+		elseif key == "k" or key == "up" then
+			scroll = math.max(scroll - 1, 1)
+		else
+			break
+		end
+	end
 end
 
 return Game

@@ -279,6 +279,12 @@ function Actor:handleKey(key)
 		end
 	end
 
+	--  message log
+	if key == "p" then
+		self.gameInstance:messageLogScreen()
+		return false  -- no time taken.
+	end
+
 	--	movement
 	if key == "h" or key == "left" then	--	move left
 		return self:move(self.x - 1, self.y)
