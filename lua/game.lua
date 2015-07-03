@@ -91,7 +91,9 @@ function Game:start()
 
 	--	initialize the curses interface
 	self.log:write("Initializing curses interface...")
+	--Global.screenWidth, Global.screenHeight = curses.init()
 	curses.init()
+	self.log:write("Screen w/h: " .. Global.screenWidth .. "x" .. Global.screenHeight)
 
 	--	allow the event loop to run
 	self.running = true
