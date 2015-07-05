@@ -200,7 +200,7 @@ function Game:drawScreen()
 	local offset = 0
 	for i = #(self.messageList) - 2, #(self.messageList) do
 		if i > 0 then
-			curses.write(0, offset, self.messageList[i])
+			curses.write(0, offset, self:getMessage(i))
 			offset = offset + 1
 		end
 	end
@@ -265,10 +265,34 @@ function Game:halt(reason)
 end
 
 --	Game:message() - pushes a message onto the message list, so the player
---	may see it in-game; does not return anything
+--	may see it in-game; handles repeating messages by counting the times
+--	a message was logged; does not return anything
 function Game:message(text)
+	--	if there are no messages, there's no purpose in testing for repeats
+	if #self.messageList == 0 then
+		table.insert(self.messageList, {text = text, times = 1})
+		return
+	end
+
+	--	last message shown, used to compare with current message
+	local lastmsg = self.messageList[#self.messageList]
+	if lastmsg.text == text then
+		lastmsg.times = lastmsg.times + 1
+	else
+		table.insert(self.messageList, {text = text, times = 1})
+	end
 	self.log:write("Message logged: " .. text)
-	table.insert(self.messageList, text)
+end
+
+--	Game:getMessage() - returns the message at a given index, mentioning the
+--	times the message has been repeated
+function Game:getMessage(index)
+	local msg = self.messageList[index]
+	if msg.times == 1 then
+		return msg.text
+	else
+		return msg.text .. " (x" .. msg.times .. ")"
+	end
 end
 
 --  Game:messageLogScreen() - display message log with interactive scrolling;
@@ -291,7 +315,7 @@ function Game:messageLogScreen()
 			curses.clearLine(1 + i)
 			local messageLine = i + scroll
 			if messageLine >= 1 and messageLine <= #(self.messageList) then
-				curses.write(0, 1 + i, self.messageList[messageLine])
+				curses.write(0, 1 + i, self:getMessage(messageLine))
 			end
 		end
 
