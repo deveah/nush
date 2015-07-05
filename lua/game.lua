@@ -333,6 +333,9 @@ function Game:messageLogScreen()
 		end
 	end
 
+	--	hide the cursor while showing the message log screen
+	curses.cursor(0)
+
 	while true do
 		drawMessageLog()
 		key = curses.getch()
@@ -344,6 +347,9 @@ function Game:messageLogScreen()
 			break
 		end
 	end
+
+	--	restore the state of the cursor
+	curses.cursor(1)
 end
 
 return Game
