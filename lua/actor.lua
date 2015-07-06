@@ -99,7 +99,7 @@ function Actor:setPosition(x, y)
 
 	--	some tiles may trigger special messages for the player when being walked on
 	if self.map.tile[self.x][self.y]["walk-message"] and self == self.gameInstance.player then
-		self.gameInstance:message(self.map.tile[self.x][self.y]["walk-message"])
+		self.gameInstance.UI:message(self.map.tile[self.x][self.y]["walk-message"])
 	end
 
 	--	each repositioning triggers the recalculation of the sight map
@@ -191,7 +191,7 @@ function Actor:move(x, y)
 	local actor = self.map:isOccupied(x, y)
 	if actor and actor.alive then
 		if self == self.gameInstance.player then
-			self.gameInstance:message("You attack the " .. actor.name .. ".")
+			self.gameInstance.UI:message("You attack the " .. actor.name .. ".")
 		end
 		return self:meleeAttack(actor)
 	end
@@ -206,7 +206,7 @@ end
 --	even if the hit was a miss
 function Actor:meleeAttack(defender)
 	if self == self.gameInstance.player then
-		self.gameInstance:message("The " .. defender.name .. " dies!")
+		self.gameInstance.UI:message("The " .. defender.name .. " dies!")
 	end
 	defender:die()
 	return true
@@ -220,7 +220,7 @@ function Actor:takeStairs()
 	if self.map.tile[self.x][self.y].name == "Stairs down" then
 		--	signal that the stairs have been descended
 		if self == self.gameInstance.player then
-			self.gameInstance:message("You descend the stairs.")
+			self.gameInstance.UI:message("You descend the stairs.")
 		end
 		return true
 	end
@@ -228,14 +228,14 @@ function Actor:takeStairs()
 	if self.map.tile[self.x][self.y].name == "Stairs up" then
 		--	signal that the stairs have been ascended
 		if self == self.gameInstance.player then
-			self.gameInstance:message("You ascend the stairs.")
+			self.gameInstance.UI:message("You ascend the stairs.")
 		end
 		return true
 	end
 
 	--	signal that there are no stairs to take
 	if self == self.gameInstance.player then
-		self.gameInstance:message("There are no stairs here.")
+		self.gameInstance.UI:message("There are no stairs here.")
 	end
 
 	--	no action has been taken, so return false
@@ -251,7 +251,7 @@ function Actor:act()
 	if self == self.gameInstance.player then
 		--	the actor is player controlled, so first inform the player of the
 		--	current state of the game
-		self.gameInstance:drawScreen()
+		self.gameInstance.UI:drawScreen()
 
 		--	and then request for input
 		local k = curses.getch()
@@ -271,7 +271,7 @@ end
 function Actor:handleKey(key)
 	--	system keys
 	if key == "Q" then	--	quit
-		if self.gameInstance:prompt("Are you sure you want to exit?") then
+		if self.gameInstance.UI:prompt("Are you sure you want to exit?") then
 			self.gameInstance:halt("Player requested game termination.")
 			return true	--	an exit request still spends a turn
 		else
@@ -281,7 +281,7 @@ function Actor:handleKey(key)
 
 	--  message log
 	if key == "p" then
-		self.gameInstance:messageLogScreen()
+		self.gameInstance.UI:messageLogScreen()
 		return false  -- no time taken.
 	end
 

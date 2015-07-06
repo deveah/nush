@@ -13,7 +13,6 @@
 --	*	itemList (table) - a list of all objects found on the dungeon floor;
 --			all other objects must belong to actors, and are managed by themselves
 --	*	mapList (table) - a list of all maps (levels) of the dungeon
---	* messageList (table) - a list of in-game messages
 --	*	player (Actor object) - a shortcut to the player-controlled character;
 --			although it also resides in the actorList table
 --	* turnCount (integer) - the number of turns taken since the beginning of
@@ -26,6 +25,7 @@ local Global = require "lua/global"
 local Map = require "lua/map"
 local Actor = require "lua/actor"
 local Log = require "lua/log"
+local UI = require "lua/ui"
 
 local Game = {}
 Game.__index = Game
@@ -41,7 +41,6 @@ function Game.new()
 	g.actorList = {}
 	g.itemList = {}
 	g.mapList = {}
-	g.messageList = {}
 	g.turnCount = 0
 
 	return g
@@ -89,17 +88,15 @@ function Game:start()
 	self.player:setMap(self.mapList[1])
 	self.player:setPosition(40, 10)
 
-	--	initialize the curses interface
-	self.log:write("Initializing curses interface...")
-	--Global.screenWidth, Global.screenHeight = curses.init()
-	curses.init()
+	--	initialize the interface
+	self.UI = UI.new(self)
 	self.log:write("Screen w/h: " .. Global.screenWidth .. "x" .. Global.screenHeight)
 
 	--	allow the event loop to run
 	self.running = true
 
 	--	show a friendly welcome message
-	self:message("Welcome to Nush! Please do not die often.")
+	self.UI:message("Welcome to Nush! Please do not die often.")
 
 	self.log:write("Game initialization successfully completed.")
 end
@@ -144,94 +141,11 @@ end
 function Game:terminate()
 	self.log:write("Terminating game instance...")
 	curses.terminate()
+	self.UI:terminate()
 	self.log:terminate()
 	io.write("Bye! Please submit any bugs you may have encountered!\n")
 end
 
---	Game:drawScreen() - draws the main screen, which includes the map, HUD, and
---	message bars; does not return anything
-function Game:drawScreen()
-	--	the offsets from array indices to screen coordinates
-	local xOffset, yOffset = -1, 2
-
-	--	the map that we want to draw is the map the player-controlled character
-	--	is currently on
-	local map = self.player.map
-
-	--	draw the terrain
-	for i = 1, Global.mapWidth do
-		for j = 1, Global.mapHeight do
-			--	draw only tiles visible by the player, or in the player's memory
-			if self.player.sightMap[i][j] then
-				curses.attr(map.tile[i][j].color)
-				curses.write(i + xOffset, j + yOffset, map.tile[i][j].face)
-			elseif map.memory[i][j] ~= " " then
-				curses.attr(curses.white)
-				curses.write(i + xOffset, j + yOffset, map.memory[i][j])
-			else
-				curses.attr(curses.black)
-				curses.write(i + xOffset, j + yOffset, " ")
-			end
-		end
-	end
-
-	--	draw the actors on the same map as the player, who are visible from
-	--	the player character's point of view; only actors who are alive
-	--	can be seen
-	for i = 1, #(self.actorList) do
-		if self.actorList[i].map == map
-			and self.player.sightMap[self.actorList[i].x][self.actorList[i].y]
-			and self.actorList[i].alive then
-			curses.attr(self.actorList[i].color)
-			curses.write(self.actorList[i].x + xOffset, self.actorList[i].y + yOffset,
-				self.actorList[i].face)
-		end
-	end
-
-	--	set the default color back
-	curses.attr(curses.white)
-
-	--	clear the message lines
-	for i = 0, 2 do
-		curses.clearLine(i)
-	end
-
-	--	draw the most recent 3 messages (if any)
-	local offset = 0
-	for i = #(self.messageList) - 2, #(self.messageList) do
-		if i > 0 then
-			curses.write(0, offset, self:getMessage(i))
-			offset = offset + 1
-		end
-	end
-
-	--	draw the status line
-	curses.clearLine(23)
-	curses.write(0, 23, "Placeholder status line.")
-
-	--	position the cursor on the player, so it may be easily seen
-	curses.move(self.player.x + xOffset, self.player.y + yOffset)
-end
-
---	Game:prompt() - prompts the player with a ok/cancel question, returning
---	true if the player has responded "ok", and false for every other reason
-function Game:prompt(reason)
-	--	show the user the reason for prompting
-	self:message(reason .. " (ok/cancel)")
-
-	--	update the screen so the prompt is visible
-	self:drawScreen()
-
-	--	read user input and act accordingly
-	local k = curses.getch()
-	if k == "o" then
-		return true
-	else
-		--	show the user that the action has been cancelled
-		self:message("Okay, then.")
-		return false
-	end
-end
 
 --	Game:addActor() - adds an Actor object into the list of living actors, and
 --	attaches it to the game instance; does not return anything
@@ -262,94 +176,6 @@ end
 function Game:halt(reason)
 	self.log:write("Halt: " .. reason)
 	self.running = false
-end
-
---	Game:message() - pushes a message onto the message list, so the player
---	may see it in-game; handles repeating messages by counting the times
---	a message was logged; does not return anything
-function Game:message(text)
-	--	if there are no messages, there's no purpose in testing for repeats
-	if #self.messageList == 0 then
-		table.insert(self.messageList, {text = text, times = 1})
-		return
-	end
-
-	--	last message shown, used to compare with current message
-	local lastmsg = self.messageList[#self.messageList]
-	if lastmsg.text == text then
-		lastmsg.times = lastmsg.times + 1
-	else
-		table.insert(self.messageList, {text = text, times = 1})
-	end
-	self.log:write("Message logged: " .. text)
-end
-
---	Game:getMessage() - returns the message at a given index, mentioning the
---	times the message has been repeated
-function Game:getMessage(index)
-	local msg = self.messageList[index]
-	if msg.times == 1 then
-		return msg.text
-	else
-		return msg.text .. " (x" .. msg.times .. ")"
-	end
-end
-
---  Game:messageLogScreen() - display message log with interactive scrolling;
---  does not return anything
-function Game:messageLogScreen()
-	--  number of message that can be shown at once
-	local windowHeight = Global.screenHeight - 2
-	--  maximum 'scroll' value (fully scrolled to end)
-	local maxScroll = math.max(1, #(self.messageList) - (windowHeight - 1))
-	--  index of scroll-back buffer at top of window
-	local scroll = maxScroll
-
-	--  writeCentered() - Draw a string at the center of a line
-	function writeCentered(y, str)
-		curses.write((Global.screenWidth - #str - 1) / 2, y, " " .. str .. " ")
-	end
-
-	function drawMessageLog()
-		for i = 0, windowHeight - 1 do
-			curses.clearLine(1 + i)
-			local messageLine = i + scroll
-			if messageLine >= 1 and messageLine <= #(self.messageList) then
-				curses.write(0, 1 + i, self:getMessage(messageLine))
-			end
-		end
-
-		--  draw the window decoration
-		local banner = string.rep("-", Global.screenWidth)
-		curses.write(0, 0, banner)
-		writeCentered(0, "Previous messages")
-		curses.write(0, Global.screenHeight - 1, banner)
-		writeCentered(Global.screenHeight - 1, "Press any key")
-		if scroll > 1 then
-			curses.write(Global.screenWidth - 5, 0, " ^ ")
-		end
-		if scroll < maxScroll then
-			curses.write(Global.screenWidth - 5, Global.screenHeight - 1, " v ")
-		end
-	end
-
-	--	hide the cursor while showing the message log screen
-	curses.cursor(0)
-
-	while true do
-		drawMessageLog()
-		key = curses.getch()
-		if key == "j" or key == "down" then
-			scroll = math.min(scroll + 1, maxScroll)
-		elseif key == "k" or key == "up" then
-			scroll = math.max(scroll - 1, 1)
-		else
-			break
-		end
-	end
-
-	--	restore the state of the cursor
-	curses.cursor(1)
 end
 
 return Game
