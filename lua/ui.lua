@@ -183,7 +183,8 @@ function UI:messageLogScreen()
 		curses.write(0, 0, banner)
 		writeCentered(0, "Previous messages")
 		curses.write(0, Global.screenHeight - 1, banner)
-		writeCentered(Global.screenHeight - 1, "Press any key")
+		--writeCentered(Global.screenHeight - 1, "Press any key")
+		self:colorWrite(1, Global.screenHeight - 1, "&cyan jk &white navigate &cyan other &white exit")
 		if scroll > 1 then
 			curses.write(Global.screenWidth - 5, 0, " ^ ")
 		end
@@ -209,6 +210,28 @@ function UI:messageLogScreen()
 
 	--	restore the state of the cursor
 	curses.cursor(1)
+end
+
+--	UI:colorWrite() - draws a string of text at a given position on-screen,
+--	allowing the use of in-text color changing; colors are preceded by an
+--	ampersand; does not return anything
+--	TODO fix this later
+function UI:colorWrite(x, y, text)
+	local currentX = x
+
+	for word in text:gmatch("%S+") do
+		if		 word == "&white" then		curses.attr(curses.white)
+		elseif word == "&red" then			curses.attr(curses.red)
+		elseif word == "&green" then		curses.attr(curses.green)
+		elseif word == "&blue" then			curses.attr(curses.blue)
+		elseif word == "&yellow" then		curses.attr(curses.yellow)
+		elseif word == "&magenta" then	curses.attr(curses.magenta)
+		elseif word == "&cyan" then			curses.attr(curses.cyan)
+		else
+			curses.write(currentX, y, word .. " ")
+			currentX = currentX + word:len() + 1
+		end
+	end
 end
 
 return UI
