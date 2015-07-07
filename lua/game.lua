@@ -91,7 +91,7 @@ function Game:start()
 	self.running = true
 
 	--	show a friendly welcome message
-	UI:message("Welcome to Nush! Please do not die often.")
+	UI:message("Welcome to {{green}}Nush{{white}}! Please do not die often.")
 
 	self.log:write("Game initialization successfully completed.")
 end
