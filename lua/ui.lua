@@ -158,11 +158,11 @@ function UI:messageLogScreen()
 	local scroll = maxScroll
 
 	--  writeCentered() - Draw a string at the center of a line
-	function writeCentered(y, str)
+	local function writeCentered(y, str)
 		curses.write((Global.screenWidth - #str - 1) / 2, y, " " .. str .. " ")
 	end
 
-	function drawMessageLog()
+	local function drawMessageLog()
 		for i = 0, windowHeight - 1 do
 			curses.clearLine(1 + i)
 			local messageLine = i + scroll
