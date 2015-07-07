@@ -128,12 +128,22 @@ function Actor:updateSight()
 		while self.map:isInBounds(math.floor(currentX), math.floor(currentY))
 			and not self.map:isOpaque(math.floor(currentX), math.floor(currentY)) 
 			and currentLength < maxLength do
-			currentX = currentX + xOffset
-			currentY = currentY + yOffset
-			currentLength = currentLength + 1
 			self.sightMap[math.floor(currentX)][math.floor(currentY)] = true
 
 			--	update the map memory for the player character
+			if self == Game.player then
+				self.map.memory[math.floor(currentX)][math.floor(currentY)] =
+					self.map.tile[math.floor(currentX)][math.floor(currentY)].face
+			end
+
+			currentX = currentX + xOffset
+			currentY = currentY + yOffset
+			currentLength = currentLength + 1
+		end
+
+		--	make sure the final point in the ray's path is visible
+		if self.map:isInBounds(math.floor(currentX), math.floor(currentY)) then
+			self.sightMap[math.floor(currentX)][math.floor(currentY)] = true
 			if self == Game.player then
 				self.map.memory[math.floor(currentX)][math.floor(currentY)] =
 					self.map.tile[math.floor(currentX)][math.floor(currentY)].face
@@ -303,6 +313,15 @@ function Actor:handleKey(key)
 	--	use of stairs
 	if key == ">" then
 		return self:takeStairs()
+	end
+
+	--	debug: make the whole map visible to the player
+	if key == "1" then
+		for i = 1, 80 do
+			for j = 1, 20 do
+				self.sightMap[i][j] = true
+			end
+		end
 	end
 
 	--	there was no known action corresponding to the given key, so signal that

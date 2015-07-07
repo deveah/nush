@@ -31,6 +31,7 @@ local Map = require "lua/map"
 local Actor = require "lua/actor"
 local Log = require "lua/log"
 local UI = require "lua/ui"
+local Tile = require "lua/tile"
 
 
 --	Game:init() - initialize members of a Game object with default data
@@ -58,7 +59,8 @@ function Game:start()
 	self.log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
 		local map = Map.new()
-		map:generateDummy()
+		--map:generateDummy()
+		map:generateRoomsAndCorridors(10, 4)
 		self:addMap(map)
 
 		--	populate each map with other actors
@@ -70,7 +72,7 @@ function Game:start()
 			actor:setFace("b")
 			actor:setColor(curses.red)
 			actor:setMap(map)
-			actor:setPosition(math.random(2, Global.mapWidth - 1), math.random(2, Global.mapHeight - 1))
+			actor:setPosition(actor.map:findRandomEmptySpace())
 		end
 	end
 
@@ -82,7 +84,7 @@ function Game:start()
 	self.player:setFace("@")
 	self.player:setColor(curses.white)
 	self.player:setMap(self.mapList[1])
-	self.player:setPosition(40, 10)
+	self.player:setPosition(self.player.map:findRandomEmptySpace())
 
 	--	initialize the interface
 	UI:init()
