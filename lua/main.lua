@@ -6,13 +6,13 @@
 
 local Game = require "lua/game"
 
---	a new Game object is instantiated
-local G = Game.new()
-G:start()
+--	the Game object is instantiated
+Game:init()
+Game:start()
 
 --	the Game object will now take control of all user interactions
-G:loop()
+Game:loop()
 
 --	terminate the game
-G:terminate()
+Game:terminate()
 

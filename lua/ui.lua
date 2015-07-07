@@ -4,55 +4,48 @@
 --	functions related to UI
 --	
 --	The UI object has the following members:
---	*	gameInstance (Game object) - the Game instance the UI object is attached to
 --	*	width and height (integers) - size of the terminal window
 --	* messageList (table) - a list of in-game messages
 --
 
-local Global = require 'lua/global'
-
+--	The singleton UI object
 local UI = {}
-UI.__index = UI
+--	This allows recursively requiring ui.lua
+package.loaded['lua/ui'] = UI
 
---	UI.new() - creates a new UI object, attaching it to a given Game instance;
---	also initializes the curses interface; returns the created UI object
-function UI.new(gameInstance)
-	local u = {}
-	setmetatable(u, UI)
+local Global = require 'lua/global'
+local Game = require "lua/game"
 
-	u.gameInstance = gameInstance
-	u.width, u.height = curses.init()
-	u.messageList = {}
-	
-	u.gameInstance.log:write("Initialized curses interface.")
-
-	return u
+--	UI.init() - initialises a new UI object, and also initializes the curses
+--	interface; returns nothing
+function UI:init()
+	self.width, self.height = curses.init()
+	self.messageList = {}
+	Game.log:write("Initialized curses interface.")
+	Game.log:write("Screen w/h: " .. Global.screenWidth .. "x" .. Global.screenHeight)
 end
 
 --	UI:terminate() - terminates the interface object; does not return anything
 function UI:terminate()
 	curses.terminate()
-	self.gameInstance.log:write("Terminated curses interface.")
+	Game.log:write("Terminated curses interface.")
 end
 
 --	UI.drawScreen() - draws the main screen, which includes the map, HUD, and
 --	message bars; does not return anything
 function UI:drawScreen()
-	--	shortcut to the game instance
-	local game = self.gameInstance
-
 	--	the offsets from array indices to screen coordinates
 	local xOffset, yOffset = -1, 2
 
 	--	the map that we want to draw is the map the player-controlled character
 	--	is currently on
-	local map = game.player.map
+	local map = Game.player.map
 
 	--	draw the terrain
 	for i = 1, Global.mapWidth do
 		for j = 1, Global.mapHeight do
 			--	draw only tiles visible by the player, or in the player's memory
-			if game.player.sightMap[i][j] then
+			if Game.player.sightMap[i][j] then
 				curses.attr(map.tile[i][j].color)
 				curses.write(i + xOffset, j + yOffset, map.tile[i][j].face)
 			elseif map.memory[i][j] ~= " " then
@@ -68,13 +61,13 @@ function UI:drawScreen()
 	--	draw the actors on the same map as the player, who are visible from
 	--	the player character's point of view; only actors who are alive
 	--	can be seen
-	for i = 1, #(game.actorList) do
-		if game.actorList[i].map == map
-			and game.player.sightMap[game.actorList[i].x][game.actorList[i].y]
-			and game.actorList[i].alive then
-			curses.attr(game.actorList[i].color)
-			curses.write(game.actorList[i].x + xOffset, game.actorList[i].y + yOffset,
-				game.actorList[i].face)
+	for i = 1, #(Game.actorList) do
+		if Game.actorList[i].map == map
+			and Game.player.sightMap[Game.actorList[i].x][Game.actorList[i].y]
+			and Game.actorList[i].alive then
+			curses.attr(Game.actorList[i].color)
+			curses.write(Game.actorList[i].x + xOffset, Game.actorList[i].y + yOffset,
+				Game.actorList[i].face)
 		end
 	end
 
@@ -100,7 +93,7 @@ function UI:drawScreen()
 	curses.write(0, 23, "Placeholder status line.")
 
 	--	position the cursor on the player, so it may be easily seen
-	curses.move(game.player.x + xOffset, game.player.y + yOffset)
+	curses.move(Game.player.x + xOffset, Game.player.y + yOffset)
 end
 
 --	UI:prompt() - prompts the player with a ok/cancel question, returning
@@ -140,7 +133,7 @@ function UI:message(text)
 	else
 		table.insert(self.messageList, {text = text, times = 1})
 	end
-	self.gameInstance.log:write("Message logged: " .. text)
+	Game.log:write("Message logged: " .. text)
 end
 
 --	UI:getMessage() - returns the message at a given index, mentioning the

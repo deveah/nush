@@ -21,33 +21,29 @@
 --	*	log (Log object) - used for logging debug data
 --
 
+--	The singleton Game object
+local Game = {}
+--	This allows recursively requiring game.lua
+package.loaded['lua/game'] = Game
+
 local Global = require "lua/global"
 local Map = require "lua/map"
 local Actor = require "lua/actor"
 local Log = require "lua/log"
 local UI = require "lua/ui"
 
-local Game = {}
-Game.__index = Game
 
---	Game.new() - creates a new Game object, initializing its members with
---	default data; returns the created Game object
-function Game.new()
-	local g = {}
-	setmetatable(g, Game)
-
-	--	initialize members
-	g.running = false
-	g.actorList = {}
-	g.itemList = {}
-	g.mapList = {}
-	g.turnCount = 0
-
-	return g
+--	Game:init() - initialize members of a Game object with default data
+function Game:init()
+	self.running = false
+	self.actorList = {}
+	self.itemList = {}
+	self.mapList = {}
+	self.turnCount = 0
 end
 
 --	Game:start() - starts the given Game object, creating the world of
---	the game; does not return anything
+--	the game and initialising everything; does not return anything
 function Game:start()
 	--	initialize logging
 	self.log = Log.new(Global.logFilename)
@@ -89,14 +85,13 @@ function Game:start()
 	self.player:setPosition(40, 10)
 
 	--	initialize the interface
-	self.UI = UI.new(self)
-	self.log:write("Screen w/h: " .. Global.screenWidth .. "x" .. Global.screenHeight)
+	UI:init()
 
 	--	allow the event loop to run
 	self.running = true
 
 	--	show a friendly welcome message
-	self.UI:message("Welcome to Nush! Please do not die often.")
+	UI:message("Welcome to Nush! Please do not die often.")
 
 	self.log:write("Game initialization successfully completed.")
 end
@@ -141,32 +136,29 @@ end
 function Game:terminate()
 	self.log:write("Terminating game instance...")
 	curses.terminate()
-	self.UI:terminate()
+	UI:terminate()
 	self.log:terminate()
 	io.write("Bye! Please submit any bugs you may have encountered!\n")
 end
 
 
---	Game:addActor() - adds an Actor object into the list of living actors, and
---	attaches it to the game instance; does not return anything
+--	Game:addActor() - adds an Actor object into the list of living actors;
+--	does not return anything
 function Game:addActor(actor)
-	actor.gameInstance = self
 	table.insert(self.actorList, actor)
 	self.log:write("Added actor " .. actor:toString() .. " to actorList.")
 end
 
 --	Game:addItem() - adds an Item object into the list of items on the dungeon
---	floor, and attaches it to the game instance; does not return anything
+--	floor; does not return anything
 function Game:addItem(item)
-	item.gameInstance = self
 	table.insert(self.itemList, item)
 	self.log:write("Added item " .. item:toString() .. " to itemList.")
 end
 
---	Game:addMap() - adds a Map object into the list of dungeon levels, and
---	attaches it to the game instance; does not return anything
+--	Game:addMap() - adds a Map object into the list of dungeon levels;
+--	does not return anything
 function Game:addMap(map)
-	map.gameInstance = self
 	table.insert(self.mapList, map)
 	self.log:write("Added map " .. map:toString() .. " to mapList.")
 end
@@ -179,4 +171,3 @@ function Game:halt(reason)
 end
 
 return Game
-

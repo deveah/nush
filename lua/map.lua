@@ -12,6 +12,7 @@
 --
 
 local Global = require "lua/global"
+local Game = require "lua/game"
 local Tile = require "lua/tile"
 
 local Map = {}
@@ -77,8 +78,8 @@ end
 --	Map:isOccupied() - returns the actor at the coordinates (x, y) of the given
 --	map (if any), or false if the specified tile is not occupied
 function Map:isOccupied(x, y)
-	for i = 1, #(self.gameInstance.actorList) do
-		local actor = self.gameInstance.actorList[i]
+	for i = 1, #(Game.actorList) do
+		local actor = Game.actorList[i]
 		if actor.map == self and actor.x == x and actor.y == y then
 			return actor
 		end

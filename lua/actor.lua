@@ -15,6 +15,8 @@
 --
 
 local Global = require "lua/global"
+local Game = require "lua/game"
+local UI = require "lua/ui"
 
 local Actor = {}
 Actor.__index = Actor
@@ -53,7 +55,7 @@ end
 --	Actor:setName() - sets the name of the given Actor object; does not
 --	return anything
 function Actor:setName(name)
-	self.gameInstance.log:write("Actor " .. self:toString() ..
+	Game.log:write("Actor " .. self:toString() ..
 		" was renamed to " .. name .. ".")
 	
 	self.name = name
@@ -62,7 +64,7 @@ end
 --	Actor:setFace() - sets the face of the given Actor object; does not
 --	return anything
 function Actor:setFace(face)
-	self.gameInstance.log:write("Actor " .. self:toString() ..
+	Game.log:write("Actor " .. self:toString() ..
 		" has changed its face to '" .. face .. "'.")
 
 	self.face = face
@@ -71,7 +73,7 @@ end
 --	Actor:setColor() - sets the color of the given Actor object; does not
 --	return anything
 function Actor:setColor(color)
-	self.gameInstance.log:write("Actor " .. self:toString() ..
+	Game.log:write("Actor " .. self:toString() ..
 		" has changed its color to '" .. color .. "'.")
 	
 	self.color = color
@@ -80,7 +82,7 @@ end
 --	Actor:setMap() - sets the map of the given Actor object; does not
 --	return anything
 function Actor:setMap(map)
-	self.gameInstance.log:write("Actor " .. self:toString() ..
+	Game.log:write("Actor " .. self:toString() ..
 		" has been placed on " .. map:toString() .. ".")
 
 	self.map = map
@@ -89,29 +91,25 @@ end
 --	Actor:setPosition() - sets the (x, y) position of the given Actor object;
 --	does not return anything
 function Actor:setPosition(x, y)
-	if self.gameInstance then
-		self.gameInstance.log:write("Actor " .. self:toString() ..
-			" has been placed at (" .. x .. ", " .. y .. ").")
-	end
+	Game.log:write("Actor " .. self:toString() ..
+		" has been placed at (" .. x .. ", " .. y .. ").")
 
 	self.x = x
 	self.y = y
 
 	--	some tiles may trigger special messages for the player when being walked on
-	if self.map.tile[self.x][self.y]["walk-message"] and self == self.gameInstance.player then
-		self.gameInstance.UI:message(self.map.tile[self.x][self.y]["walk-message"])
+	if self.map.tile[self.x][self.y]["walk-message"] and self == Game.player then
+		UI:message(self.map.tile[self.x][self.y]["walk-message"])
 	end
 
 	--	each repositioning triggers the recalculation of the sight map
 	self:updateSight()
 end
 
---	Actor:die() - kills the given actor, making it unavailible to act
+--	Actor:die() - kills the given actor, making it unable to act
 function Actor:die()
-	if self.gameInstance then
-		self.gameInstance.log:write("Actor " .. self:toString() ..
-			" has died.")
-	end
+	Game.log:write("Actor " .. self:toString() ..
+		" has died.")
 	self.alive = false
 end
 
@@ -136,7 +134,7 @@ function Actor:updateSight()
 			self.sightMap[math.floor(currentX)][math.floor(currentY)] = true
 
 			--	update the map memory for the player character
-			if self == self.gameInstance.player then
+			if self == Game.player then
 				self.map.memory[math.floor(currentX)][math.floor(currentY)] =
 					self.map.tile[math.floor(currentX)][math.floor(currentY)].face
 			end
@@ -157,7 +155,7 @@ function Actor:updateSight()
 		traceRay(xOffset, yOffset, 5)
 	end
 
-	self.gameInstance.log:write("Sight map calculated for " .. self:toString())
+	Game.log:write("Sight map calculated for " .. self:toString())
 end
 
 --	Actor:move() - attempts to move the given Actor object onto the tile
@@ -167,21 +165,21 @@ end
 function Actor:move(x, y)
 	--	the actor must have a map to move on
 	if not self.map then
-		self.gameInstance.log:write("Actor " .. self:toString() ..
+		Game.log:write("Actor " .. self:toString() ..
 			" attempted to move without an attached map!")
 		return false
 	end
 
 	--	the actor's movements must keep it inside the boundaries of the map
 	if not self.map:isInBounds(x, y) then
-		self.gameInstance.log:write("Actor " .. self:toString() ..
+		Game.log:write("Actor " .. self:toString() ..
 			" attempted to move to an out-of-bounds location!")
 		return false
 	end
 
 	--	the actor cannot move onto a solid tile
 	if self.map:isSolid(x, y) then
-		self.gameInstance.log:write("Actor " .. self:toString() ..
+		Game.log:write("Actor " .. self:toString() ..
 			" attempted to move onto a solid tile!")
 		return false
 	end
@@ -190,8 +188,8 @@ function Actor:move(x, y)
 	--	instead, the actor who occupies that certain tile is attacked
 	local actor = self.map:isOccupied(x, y)
 	if actor and actor.alive then
-		if self == self.gameInstance.player then
-			self.gameInstance.UI:message("You attack the " .. actor.name .. ".")
+		if self == Game.player then
+			UI:message("You attack the " .. actor.name .. ".")
 		end
 		return self:meleeAttack(actor)
 	end
@@ -205,8 +203,8 @@ end
 --	melee, killing the defending actor in the process; always returns true,
 --	even if the hit was a miss
 function Actor:meleeAttack(defender)
-	if self == self.gameInstance.player then
-		self.gameInstance.UI:message("The " .. defender.name .. " dies!")
+	if self == Game.player then
+		UI:message("The " .. defender.name .. " dies!")
 	end
 	defender:die()
 	return true
@@ -219,23 +217,23 @@ end
 function Actor:takeStairs()
 	if self.map.tile[self.x][self.y].name == "Stairs down" then
 		--	signal that the stairs have been descended
-		if self == self.gameInstance.player then
-			self.gameInstance.UI:message("You descend the stairs.")
+		if self == Game.player then
+			UI:message("You descend the stairs.")
 		end
 		return true
 	end
 
 	if self.map.tile[self.x][self.y].name == "Stairs up" then
 		--	signal that the stairs have been ascended
-		if self == self.gameInstance.player then
-			self.gameInstance.UI:message("You ascend the stairs.")
+		if self == Game.player then
+			UI:message("You ascend the stairs.")
 		end
 		return true
 	end
 
 	--	signal that there are no stairs to take
-	if self == self.gameInstance.player then
-		self.gameInstance.UI:message("There are no stairs here.")
+	if self == Game.player then
+		UI:message("There are no stairs here.")
 	end
 
 	--	no action has been taken, so return false
@@ -248,14 +246,14 @@ end
 --	dispatches the reasoning to the AI functions; returns true or false,
 --	depending on whether or not the turn was spent
 function Actor:act()
-	if self == self.gameInstance.player then
+	if self == Game.player then
 		--	the actor is player controlled, so first inform the player of the
 		--	current state of the game
-		self.gameInstance.UI:drawScreen()
+		UI:drawScreen()
 
 		--	and then request for input
 		local k = curses.getch()
-		self.gameInstance.log:write("Read character: " .. k)
+		Game.log:write("Read character: " .. k)
 
 		return self:handleKey(k)
 	else
@@ -271,8 +269,8 @@ end
 function Actor:handleKey(key)
 	--	system keys
 	if key == "Q" then	--	quit
-		if self.gameInstance.UI:prompt("Are you sure you want to exit?") then
-			self.gameInstance:halt("Player requested game termination.")
+		if UI:prompt("Are you sure you want to exit?") then
+			Game:halt("Player requested game termination.")
 			return true	--	an exit request still spends a turn
 		else
 			return false
@@ -281,7 +279,7 @@ function Actor:handleKey(key)
 
 	--  message log
 	if key == "p" then
-		self.gameInstance.UI:messageLogScreen()
+		UI:messageLogScreen()
 		return false  -- no time taken.
 	end
 
