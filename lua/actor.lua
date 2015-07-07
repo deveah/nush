@@ -219,7 +219,7 @@ end
 --	even if the hit was a miss
 function Actor:meleeAttack(defender)
 	if self == Game.player then
-		UI:message("The " .. defender.name .. " dies!")
+		UI:message("{{red}}The " .. defender.name .. " dies!")
 	end
 	defender:die()
 	return true
