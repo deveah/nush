@@ -263,6 +263,16 @@ function Actor:act()
 	end
 end
 
+--	dumpGlobals() - print to log all the global variables, useful for finding
+--	missing 'local's
+local function dumpGlobals()
+	UI:message("{{red}}(DEBUG) Dumped globals to logfile.")
+	Game.log:write("Contents of _G:")
+	for k,v in pairs(_G) do
+		Game.log:write("  " .. k)
+	end
+end
+
 --	Actor:handleKey() - makes the given actor spend its turn with a command
 --	specified by the given key; returns true or false, depending on whether
 --	the action was successful or not
@@ -303,6 +313,13 @@ function Actor:handleKey(key)
 	--	use of stairs
 	if key == ">" then
 		return self:takeStairs()
+	end
+
+
+	--	debug keys
+	if key == "#" then
+		dumpGlobals()
+		return false
 	end
 
 	--	there was no known action corresponding to the given key, so signal that
