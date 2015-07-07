@@ -32,6 +32,7 @@ local Actor = require "lua/actor"
 local Log = require "lua/log"
 local UI = require "lua/ui"
 local Tile = require "lua/tile"
+local Item = require "lua/item"
 
 
 --	Game:init() - initialize members of a Game object with default data
@@ -72,7 +73,18 @@ function Game:start()
 			actor:setFace("b")
 			actor:setColor(curses.red)
 			actor:setMap(map)
-			actor:setPosition(actor.map:findRandomEmptySpace())
+			actor:setPosition(map:findRandomEmptySpace())
+		end
+
+		--	populate each map with a few items
+		for j = 1, 10 do
+			local item = Item.new()
+			self:addItem(item)
+			item:setName("Sugar Bombs")
+			item:setFace("&")
+			item:setColor(curses.cyan + curses.bold)
+			item:setMap(map)
+			item:setPosition(map:findRandomEmptySpace())
 		end
 	end
 
