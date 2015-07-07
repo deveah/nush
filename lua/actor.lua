@@ -17,6 +17,7 @@
 local Global = require "lua/global"
 local Game = require "lua/game"
 local UI = require "lua/ui"
+local Tile = require "lua/tile"
 
 local Actor = {}
 Actor.__index = Actor
@@ -187,6 +188,10 @@ function Actor:move(x, y)
 		return false
 	end
 
+	if self.map.tile[x][y] == Tile.closedDoor then
+		return self:openDoor(x, y)
+	end
+
 	--	the actor cannot move onto a solid tile
 	if self.map:isSolid(x, y) then
 		Game.log:write("Actor " .. self:toString() ..
@@ -343,6 +348,32 @@ function Actor:handleKey(key)
 	--	there was no known action corresponding to the given key, so signal that
 	--	there hasn't been taken any action to spend the turn with
 	return false
+end
+
+--	Actor:openDoor() - makes the given actor open a door at a given location;
+--	returns true if the action has been successfully completed, and false
+--	otherwise
+function Actor:openDoor(x, y)
+	if not self.map:isInBounds(x, y) then
+		return false
+	end
+
+	--	only closed doors can be opened
+	if self.map.tile[x][y] ~= Tile.closedDoor then
+		return false
+	end
+
+	if self == Game.player then
+		UI:message("You open the door.")
+	end
+
+	self.map.tile[x][y] = Tile.openDoor
+
+	--	force the update of the field of view
+	self:updateSight()
+
+	--	the action has been completed successfully
+	return true
 end
 
 return Actor

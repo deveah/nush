@@ -312,6 +312,27 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops)
 			end
 		end
 	end
+
+	--	postprocess: add rooms between rooms and corridors
+	for i = 1, #rooms do
+		for j = rooms[i].x, rooms[i].x + rooms[i].w - 1 do
+			if self.tile[j][rooms[i].y] == Tile.floor then
+				self.tile[j][rooms[i].y] = Tile.closedDoor
+			end
+			if self.tile[j][rooms[i].y + rooms[i].h - 1] == Tile.floor then
+				self.tile[j][rooms[i].y + rooms[i].h - 1] = Tile.closedDoor
+			end
+		end
+
+		for j = rooms[i].y, rooms[i].y + rooms[i].h - 1 do
+			if self.tile[rooms[i].x][j] == Tile.floor then
+				self.tile[rooms[i].x][j] = Tile.closedDoor
+			end
+			if self.tile[rooms[i].x + rooms[i].w - 1][j] == Tile.floor then
+				self.tile[rooms[i].x + rooms[i].w - 1][j] = Tile.closedDoor
+			end
+		end
+	end
 end
 
 --	Map:findRandomEmptySpace() - searches for a random empty space;

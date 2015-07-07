@@ -84,5 +84,21 @@ Tile.stairsUp = {
 	["opaque"] = false
 }
 
+Tile.openDoor = {
+	["name"] = "Open door",
+	["face"] = "/",
+	["color"] = "white",
+	["solid"] = false,
+	["opaque"] = false
+}
+
+Tile.closedDoor = {
+	["name"] = "Closed door",
+	["face"] = "+",
+	["color"] = "white",
+	["solid"] = true,
+	["opaque"] = true
+}
+
 return Tile
 
