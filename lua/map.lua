@@ -217,9 +217,9 @@ function Map:countNeighbours(x, y, tile)
 end
 
 --	Map:generateRoomsAndCorridors() - generates a rooms-and-corridors map
---	with a given number of rooms, and a given number of redundant links
---	between rooms; does not return anything
-function Map:generateRoomsAndCorridors(nRooms, nLoops)
+--	with a given number of rooms, a given number of redundant links
+--	between rooms, and a given number of locker rooms; does not return anything
+function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 	local rooms = {}
 
 	--	roomDistance() - calculates the distance between two rooms
@@ -277,6 +277,44 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops)
 			if dx % 2 == 1 then dx = dx + 1 end
 			if dy % 2 == 1 then dy = dy + 1 end
 			self:digLink(sx, sy, dx, dy, Tile.floor)
+		end
+	end
+
+	--	postprocess: add 'lockers' (little 1x1 rooms next to regular rooms,
+	--	which should hidden and/or locked)
+	for i = 1, nLockers do
+		local x, y
+		repeat
+			x = math.random(1, 80)
+			y = math.random(1, 20)
+		until self.tile[x][y] == Tile.wall
+
+		if	self:isInBounds(x-1, y) and
+				self:isInBounds(x+1, y) and
+				self.tile[x-1][y] == Tile.floor then
+			self.tile[x+1][y] = Tile.floor
+			self.tile[x][y] = Tile.closedDoor
+		end
+
+		if	self:isInBounds(x-1, y) and
+				self:isInBounds(x+1, y) and
+				self.tile[x+1][y] == Tile.floor then
+			self.tile[x-1][y] = Tile.floor
+			self.tile[x][y] = Tile.closedDoor
+		end
+
+		if	self:isInBounds(x, y-1) and
+				self:isInBounds(x, y+1) and
+				self.tile[x][y-1] == Tile.floor then
+			self.tile[x][y+1] = Tile.floor
+			self.tile[x][y] = Tile.closedDoor
+		end
+
+		if	self:isInBounds(x, y-1) and
+				self:isInBounds(x, y+1) and
+				self.tile[x][y+1] == Tile.floor then
+			self.tile[x][y-1] = Tile.floor
+			self.tile[x][y] = Tile.closedDoor
 		end
 	end
 
