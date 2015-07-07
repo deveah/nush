@@ -287,7 +287,9 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 		repeat
 			x = math.random(1, 80)
 			y = math.random(1, 20)
-		until self.tile[x][y] == Tile.wall
+		until	self.tile[x][y] == Tile.wall and
+					((x % 2 == 0 and y % 2 == 1) or
+					(x % 2 == 1 and y % 2 == 0))
 
 		if	self:isInBounds(x-1, y) and
 				self:isInBounds(x+1, y) and
