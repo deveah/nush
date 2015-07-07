@@ -28,7 +28,13 @@ end
 
 --	Item:toString() - returns a string describing the Item object
 function Item:toString()
-	return "<actor " .. tostring(self) .. " (" .. self.name .. ")>"
+	local location
+	if self.map then
+		location = "on " .. self.map:toString() .. " at " .. self.x .. "," .. self.y
+	else
+		location = "not on a map"
+	end
+	return "<item " .. tostring(self) .. " (" .. self.name .. ") " .. location .. ">"
 end
 
 --	Item:setName() - sets the name of the given Item object; does not return

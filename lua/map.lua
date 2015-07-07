@@ -20,10 +20,11 @@ Map.__index = Map
 
 --	Map.new() - creates a new Map object and initializes its members with
 --	default data; returns the created Map object
-function Map.new()
+function Map.new(mapnum)
 	local m = {}
 	setmetatable(m, Map)
 
+	m.num = mapnum
 	m.tile = {}
 	m.memory = {}
 
@@ -42,7 +43,7 @@ end
 
 --	Map:toString() - returns a string describing the Map object
 function Map:toString()
-	return "<map " .. tostring(self) .. ">"
+	return "<map " .. self.num .. " " .. tostring(self) .. ">"
 end
 
 --	Map:isInBounds() - returns true if the given pair of coordinates (x, y)
