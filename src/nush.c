@@ -34,7 +34,7 @@ int curses_running = 0;
 static int curses_init( lua_State *L )
 {
 	initscr();
-	raw();
+	cbreak();
 	noecho();
 	keypad( stdscr, TRUE );
 
