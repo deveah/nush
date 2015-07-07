@@ -58,6 +58,17 @@ function UI:drawScreen()
 		end
 	end
 
+	--	draw the items on the same map as the player, who are visible from the
+	--	player character's point of view
+	for i = 1, #(Game.itemList) do
+		if	Game.itemList[i].map == map
+				and Game.player.sightMap[Game.itemList[i].x][Game.itemList[i].y] then
+			curses.attr(Game.itemList[i].color)
+			curses.write(Game.itemList[i].x + xOffset, Game.itemList[i].y + yOffset,
+				Game.itemList[i].face)
+		end
+	end
+
 	--	draw the actors on the same map as the player, who are visible from
 	--	the player character's point of view; only actors who are alive
 	--	can be seen
@@ -68,17 +79,6 @@ function UI:drawScreen()
 			curses.attr(Game.actorList[i].color)
 			curses.write(Game.actorList[i].x + xOffset, Game.actorList[i].y + yOffset,
 				Game.actorList[i].face)
-		end
-	end
-
-	--	draw the items on the same map as the player, who are visible from the
-	--	player character's point of view
-	for i = 1, #(Game.itemList) do
-		if	Game.itemList[i].map == map
-				and Game.player.sightMap[Game.itemList[i].x][Game.itemList[i].y] then
-			curses.attr(Game.itemList[i].color)
-			curses.write(Game.itemList[i].x + xOffset, Game.itemList[i].y + yOffset,
-				Game.itemList[i].face)
 		end
 	end
 
