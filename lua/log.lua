@@ -31,6 +31,7 @@ function Log:write(data)
 	end
 
 	self.file:write(os.date() .. ": " .. data .. "\n")
+	self.file:flush()
 end
 
 --	Log:terminate() - terminates the resources allocated by the creation of
