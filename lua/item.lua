@@ -19,8 +19,8 @@ function Item.new()
 	i.name = ""
 	i.face = ""
 	i.color = ""
-	i.map = nil
-	i.x = 0
+	i.map = nil     --  map is nil if the item has been picked up or not on a map
+	i.x = 0         --  x/y meaningless if not a the map
 	i.y = 0
 
 	return i
@@ -58,11 +58,15 @@ function Item:setColor(color)
 	self.color = color
 end
 
---	Item:setMap() - sets the map of the given Item object; does not return
---	anything
+--	Item:setMap() - sets the map of the given Item object, possibly to nil;
+--	does not return anything
 function Item:setMap(map)
-	Game.log:write("Item " .. self:toString() .. " has been placed on " ..
-		map:toString() .. ".")
+	if map then
+		Game.log:write("Item " .. self:toString() .. " has been placed on " ..
+			map:toString() .. ".")
+	else
+		Game.log:write("Item " .. self:toString() .. " no longer on any map")
+	end
 	
 	self.map = map
 end

@@ -10,8 +10,8 @@
 --			and informing the user accordingly
 --	*	actorList (table) - a list of all living actors that have the ability to
 --			take their turns
---	*	itemList (table) - a list of all objects found on the dungeon floor;
---			all other objects must belong to actors, and are managed by themselves
+--	*	itemList (table) - a list of all items whether on the floor or owned by
+--			an actor
 --	*	mapList (table) - a list of all maps (levels) of the dungeon
 --	*	player (Actor object) - a shortcut to the player-controlled character;
 --			although it also resides in the actorList table
@@ -27,6 +27,7 @@ local Game = {}
 package.loaded['lua/game'] = Game
 
 local Global = require "lua/global"
+local Util = require "lua/util"
 local Map = require "lua/map"
 local Actor = require "lua/actor"
 local Log = require "lua/log"
@@ -164,11 +165,31 @@ function Game:addActor(actor)
 	self.log:write("Added actor " .. actor:toString() .. " to actorList.")
 end
 
---	Game:addItem() - adds an Item object into the list of items on the dungeon
---	floor; does not return anything
+--	Game:removeActor() - removes an item from the global actorList in case it
+--	is destroyed. Do NOT call this to delete an actor, call actor:destroy().
+--	Does not return anything
+function Game:removeActor(actor)
+	if not Util.seqRemove(self.actorList, actor) then
+		error("bad call Game:removeActor(" .. actor .. ")")
+	end
+	self.log:write("Remove actor " .. actor:toString() .. " from actorList.")
+end
+
+--	Game:addItem() - adds an Item object into the global list of items;
+--	does not return anything
 function Game:addItem(item)
 	table.insert(self.itemList, item)
 	self.log:write("Added item " .. item:toString() .. " to itemList.")
+end
+
+--	Game:removeItem() - removes an item from the global itemList in case it is
+--	destroyed. Do NOT call this to destroy an item, call item:destroy().
+--	Does not return anything
+function Game:removeItem(item)
+	if not Util.seqRemove(self.itemList, item) then
+		error("bad call Game:removeItem(" .. item .. ")")
+	end
+	self.log:write("Remove item " .. item:toString() .. " from itemList.")
 end
 
 --	Game:addMap() - adds a Map object into the list of dungeon levels;
