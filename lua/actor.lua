@@ -331,6 +331,15 @@ function Actor:handleKey(key)
 		return false
 	end
 
+	if key == "$" then
+		--	make the whole map temporarily visible to the player
+		for i = 1, 80 do
+			for j = 1, 20 do
+				Game.player.sightMap[i][j] = true
+			end
+		end
+	end
+
 	--	there was no known action corresponding to the given key, so signal that
 	--	there hasn't been taken any action to spend the turn with
 	return false
