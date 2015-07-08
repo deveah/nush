@@ -131,6 +131,7 @@ end
 --	may see it in-game; handles repeating messages by counting the times
 --	a message was logged; does not return anything
 function UI:message(text)
+	Game.log:write("Message logged: " .. text)
 	--	if there are no messages, there's no purpose in testing for repeats
 	if #self.messageList == 0 then
 		table.insert(self.messageList, {text = text, times = 1})
@@ -144,7 +145,6 @@ function UI:message(text)
 	else
 		table.insert(self.messageList, {text = text, times = 1})
 	end
-	Game.log:write("Message logged: " .. text)
 end
 
 --	UI:getMessage() - returns the message at a given index, mentioning the

@@ -360,7 +360,7 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 		end
 	end
 
-	--	postprocess: add rooms between rooms and corridors
+	--	postprocess: add doors between rooms and corridors
 	for i = 1, #rooms do
 		for j = rooms[i].x, rooms[i].x + rooms[i].w - 1 do
 			if self.tile[j][rooms[i].y] == Tile.floor then
