@@ -195,6 +195,17 @@ function Game:removeItem(item)
 	self.log:write("Remove item " .. item:toString() .. " from itemList.")
 end
 
+--	Game:itemsAtTile() - Returns sequence of items on some tile of a map
+function Game:itemsAtTile(map, x, y)
+	local ret = {}
+	for _, item in ipairs(Game.itemList) do
+		if item.map == map and item.x == x and item.y == y then
+			table.insert(ret, item)
+		end
+	end
+	return ret
+end
+
 --	Game:addMap() - adds a Map object into the list of dungeon levels;
 --	does not return anything
 function Game:addMap(map)

@@ -170,6 +170,10 @@ function Actor:die()
 	Game.log:write("Actor " .. self:toString() ..
 		" has died.")
 	self.alive = false
+	--	By default, everything they were carrying is dropped.
+	for _, item in pairs(self.inventory) do
+		self:dropItem(item)
+	end
 end
 
 --	Actor:updateSight() - calculates the given actor's sight map;
@@ -226,6 +230,9 @@ function Actor:updateSight()
 
 	Game.log:write("Sight map calculated for " .. self:toString())
 end
+
+
+------------------------------ Actor actions ----------------------------------
 
 --	Actor:move() - attempts to move the given Actor object onto the tile
 --	at the given pair of coordinates (x, y) of the same map it is currently
@@ -324,6 +331,38 @@ function Actor:takeStairs()
 	return false
 end
 
+--	Actor:tryPickupItem() - Transfers an item to this actor's inventory if
+--	there is room; returns true on success, else false
+function Actor:tryPickupItem(item)
+	local slot = self:addItem(item)
+	if slot then
+		Game.log:write(self:toString() .. " picked up " .. item:toString())
+		if self == Game.player then
+			UI:message("Picked up {{yellow}}" .. slot .. "{{white}} - " .. item:toString())
+		end
+		return true
+	end
+	Game.log:write(self:toString() .. " failed to pickup " .. item:toString())
+	if self == Game.player then
+		UI:message("Your inventory is already full!")
+	end
+	return false
+end
+
+--	Actor:dropItem() - Removes an item from the inventory, places it on the
+--	floor below the actor; returns nothing
+function Actor:dropItem(item)
+	self:removeItem(item)
+	item:setMap(self.map)
+	item:setPosition(self.x, self.y)
+	if self == Game.player and self.alive then
+		UI:message("You drop the " .. item)
+	end
+end
+
+
+---------------------------- Actor AI and control -----------------------------
+
 --	Actor:act() - makes the given Actor object spend its turn; if the actor
 --	is player-controlled, it requests input from the player and acts according
 --	to the command(s) given; if the actor is not player-controlled, it
@@ -397,6 +436,19 @@ function Actor:handleKey(key)
 	--	use of stairs
 	if key == ">" then
 		return self:takeStairs()
+	end
+
+	--	pick up
+	if key == "," or key == "g" then
+		local items = Game:itemsAtTile(self.map, self.x, self.y)
+		Game.log:write("Trying to pickup: items:" .. tostring(items))
+		if #items == 0 then
+			UI:message("There's nothing here to pick up!")
+			return false
+		else
+			--	TODO: handle more than one item
+			self:tryPickupItem(items[1])
+		end
 	end
 
 	--	debug keys
