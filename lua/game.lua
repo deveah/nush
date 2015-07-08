@@ -57,6 +57,12 @@ function Game:start()
 	math.randomseed(self.randomSeed)
 	self.log:write("Random seed is " .. self.randomSeed)
 
+	--	initialize the interface
+	UI:init()
+
+	--	draw the title screen
+	local playerName = UI:drawTitleScreen()
+
 	--	create the dungeon
 	self.log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
@@ -94,14 +100,11 @@ function Game:start()
 	self.log:write("Creating the player character...")
 	self.player = Actor.new()
 	self:addActor(self.player)
-	self.player:setName("Player")
+	self.player:setName(playerName)
 	self.player:setFace("@")
 	self.player:setColor(curses.white)
 	self.player:setMap(self.mapList[1])
 	self.player:setPosition(self.player.map:findRandomEmptySpace())
-
-	--	initialize the interface
-	UI:init()
 
 	--	allow the event loop to run
 	self.running = true

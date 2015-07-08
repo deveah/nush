@@ -260,5 +260,41 @@ function UI:colorWrite(x, y, text)
 	curses.attr(curses.white)
 end
 
+--	UI:drawTitleScreen() - draws the title screen, asking the player for a
+--	character name; returns the name given by the player, or a default name
+--	taken from the Global table
+function UI:drawTitleScreen()
+	local logo = 
+	{	".--. .  . .--. .  .",
+		"|  | |  | '--. |--|",
+		"'  ' '--' '--' '  '" }
+
+	curses.clear()
+	curses.cursor(0)
+
+	--	draw the logo
+	curses.attr(curses.cyan + curses.bold)
+	curses.write(10, 3, logo[1])
+	curses.write(10, 4, logo[2])
+	curses.write(10, 5, logo[3])
+	curses.attr(curses.cyan)
+	curses.write(10, 6, "A coffeebreak roguelike")
+	curses.attr(curses.white)
+	curses.write(10, 7, "http://github.com/deveah/nush")
+
+	--	ask the player for a name
+	curses.write(10, 10, "Please type a name (default is '" .. Global.defaultName .. "'):")
+	curses.cursor(1)
+	curses.move(10, 11)
+	local name = curses.getstr()
+	curses.cursor(0)
+
+	if name == "" then
+		return Global.defaultName
+	else
+		return name
+	end
+end
+
 return UI
 

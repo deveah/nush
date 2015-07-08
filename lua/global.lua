@@ -10,6 +10,9 @@ local Global = {}
 --	into the file designated by the `Global.logFilename` variable
 Global.debug = true
 
+--	the default name of the player character
+Global.defaultName = "Player"
+
 --	Name of the file used for logging
 Global.logFilename = "log.txt"
 
