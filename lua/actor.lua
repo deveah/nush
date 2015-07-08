@@ -33,6 +33,7 @@ function Actor.new()
 	a.face = ""
 	a.color = ""
 	a.map = nil
+	a.inventory = {}  --	mapping from inventory letter to Item
 	a.x = 0	--	although 0 is not a valid coordinate for the Actor to be on,
 	a.y = 0	--	the value signifies that an actual position has not been set
 	a.alive = true	--	by default, a newly created Actor is alive
@@ -105,6 +106,63 @@ function Actor:setPosition(x, y)
 
 	--	each repositioning triggers the recalculation of the sight map
 	self:updateSight()
+end
+
+--	Actor:unusedInventSlot() - returns the first unused inventory slot, or nil
+--	none are free.
+function Actor:unusedInventSlot()
+	--	First try a-z, excluding jk for scrolling
+	for i = 0, 25 do
+		local char = string.char(97 + i)
+		if char ~= "j" and char ~= "k" and not self.inventory[char] then
+			return char
+		end
+	end
+	--	Try A-Z
+	for i = 0, 25 do
+		local char = string.char(65 + i)
+		if not self.inventory[char] then
+			return char
+		end
+	end
+	return nil
+end
+
+--	Actor:findItem() - Given an item, return the inventory slot it is in, or
+--	nil if none. Also accepts an inventory slot for convenience.
+function Actor:findItem(item)
+	if self.inventory[item] then  --  it's an inventory slot
+		return item
+	end
+	for k,v in pairs(self.inventory) do
+		if v == item then
+			return slot
+		end
+	end
+	return nil
+end
+
+--	Actor:addItem() - tries to add an item to the Actor's inventory, returns the
+--	inventory slot (character) it was added in, or nil if there is no room.
+function Actor:addItem(item)
+	local slot = self:unusedInventSlot()
+	if not slot then
+		return nil
+	end
+	self.inventory[slot] = item
+	item:setMap(nil)
+	return slot
+end
+
+--	Actor:removeItem() - removes an item from the Actor's inventory (the caller
+--	must ensure the item gets a new owner itself); does not return anything.
+function Actor:removeItem(item)
+	local slot = self:findItem(item)
+	if slot then
+		self.inventory[item] = nil
+		return
+	end
+	error(item:toString() .. " not in inventory")
 end
 
 --	Actor:die() - kills the given actor, making it unable to act
