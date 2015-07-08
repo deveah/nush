@@ -299,28 +299,28 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 
 		if	self:isInBounds(x-1, y) and
 				self:isInBounds(x+2, y) and
-				self.tile[x-1][y] == Tile.floor then
+				self.tile[x-1][y] == Tile.roomFloor then
 			self.tile[x+1][y] = Tile.floor
 			self.tile[x][y] = Tile.hiddenDoor
 		end
 
 		if	self:isInBounds(x-2, y) and
 				self:isInBounds(x+1, y) and
-				self.tile[x+1][y] == Tile.floor then
+				self.tile[x+1][y] == Tile.roomFloor then
 			self.tile[x-1][y] = Tile.floor
 			self.tile[x][y] = Tile.hiddenDoor
 		end
 
 		if	self:isInBounds(x, y-1) and
 				self:isInBounds(x, y+2) and
-				self.tile[x][y-1] == Tile.floor then
+				self.tile[x][y-1] == Tile.roomFloor then
 			self.tile[x][y+1] = Tile.floor
 			self.tile[x][y] = Tile.hiddenDoor
 		end
 
 		if	self:isInBounds(x, y-2) and
 				self:isInBounds(x, y+1) and
-				self.tile[x][y+1] == Tile.floor then
+				self.tile[x][y+1] == Tile.roomFloor then
 			self.tile[x][y-1] = Tile.floor
 			self.tile[x][y] = Tile.hiddenDoor
 		end
