@@ -60,8 +60,9 @@ function Game:start()
 	self.log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
 		local map = Map.new()
-		--map:generateDummy()
 		map:generateRoomsAndCorridors(10, 4, 5)
+		map:spawnPoolsOfWater(5, 0.25)
+		map:spawnPatchesOfGrass(10, 0.5)
 		self:addMap(map)
 
 		--	populate each map with other actors

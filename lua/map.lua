@@ -162,7 +162,10 @@ function Map:digLink(x1, y1, x2, y2, floorTile)
 			return
 		end
 
-		self.tile[x][y] = floorTile
+		--	room floor tiles are not replaced
+		if self.tile[x][y] ~= Tile.roomFloor then
+			self.tile[x][y] = floorTile
+		end
 		x = x + dx
 	end
 
@@ -171,7 +174,10 @@ function Map:digLink(x1, y1, x2, y2, floorTile)
 			return
 		end
 
-		self.tile[x][y] = floorTile
+		--	room floor tiles are not replaced
+		if self.tile[x][y] ~= Tile.roomFloor then
+			self.tile[x][y] = floorTile
+		end
 		y = y + dy
 	end
 
@@ -260,7 +266,7 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 		until self:isInBounds(rx+rw, ry+rh) and
 					self:isAreaEmpty(rx, ry, rw, rh)
 
-		self:digRoom(rx, ry, rw, rh, Tile.floor, Tile.wall)
+		self:digRoom(rx, ry, rw, rh, Tile.roomFloor, Tile.wall)
 		table.insert(rooms, {x = rx, y = ry, w = rw, h = rh})
 
 		--	link each room with the closest to it
@@ -373,6 +379,7 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 			end
 		end
 	end
+
 end
 
 --	Map:findRandomEmptySpace() - searches for a random empty space;
@@ -387,6 +394,56 @@ function Map:findRandomEmptySpace()
 				not self:isOccupied(x, y)
 	
 	return x, y
+end
+
+--	Map:spawnPoolsOfWater() - spawns a given number of pools of water around
+--	the given map, with a given chance of the water to spread to the
+--	neighbouring tiles; does not return anything
+function Map:spawnPoolsOfWater(nPools, chanceToSpread)
+	for i = 1, nPools do
+		local x, y
+		repeat
+			x = math.random(1, 80)
+			y = math.random(1, 80)
+		until self.tile[x][y] == Tile.roomFloor
+
+		self.tile[x][y] = Tile.shallowWater
+	end
+
+	for i = 1, 80 do
+		for j = 1, 20 do
+			if	self:countNeighbours(i, j, Tile.shallowWater) > 0
+					and self.tile[i][j] == Tile.roomFloor
+					and math.random() < chanceToSpread then
+				self.tile[i][j] = Tile.shallowWater
+			end
+		end
+	end
+end
+
+--	Map:spawnPatchesOfGrass() - spawns a given number of patches of grass
+--	around the given map, with a given chance of the grass to spread to the
+--	neighbouring tiles; does not return anything
+function Map:spawnPatchesOfGrass(nPatches, chanceToSpread)
+	for i = 1, nPatches do
+		local x, y
+		repeat
+			x = math.random(1, 80)
+			y = math.random(1, 80)
+		until self.tile[x][y] == Tile.roomFloor
+
+		self.tile[x][y] = Tile.grass
+	end
+
+	for i = 1, 80 do
+		for j = 1, 20 do
+			if	self:countNeighbours(i, j, Tile.grass) > 0
+					and self.tile[i][j] == Tile.roomFloor
+					and math.random() < chanceToSpread then
+				self.tile[i][j] = Tile.grass
+			end
+		end
+	end
 end
 
 return Map

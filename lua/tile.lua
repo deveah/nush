@@ -33,6 +33,14 @@ Tile.floor = {
 	["opaque"] = false
 }
 
+Tile.roomFloor = {
+	["name"] = "Floor",
+	["face"] = ".",
+	["color"] = curses.white,
+	["solid"] = false,
+	["opaque"] = false
+}
+
 Tile.wall = {
 	["name"] = "Wall",
 	["face"] = "#",
@@ -47,7 +55,7 @@ Tile.grass = {
 	["color"] = curses.green,
 	["solid"] = false,
 	["opaque"] = false,
-	["walk-message"] = "Your feet are tingled by the grass."
+	["walk-message"] = "{{cyan}}Your feet are tingled by the grass."
 }
 
 Tile.shallowWater = {
@@ -56,7 +64,7 @@ Tile.shallowWater = {
 	["color"] = curses.blue + curses.bold,
 	["solid"] = false,
 	["opaque"] = false,
-	["walk-message"] = "Your feet get cold from the water."
+	["walk-message"] = "{{cyan}}Your feet get cold from the water."
 }
 
 Tile.ceilingDrip = {
@@ -65,7 +73,7 @@ Tile.ceilingDrip = {
 	["color"] = curses.white + curses.bold,
 	["solid"] = false,
 	["opaque"] = false,
-	["walk-message"] = "Something is dripping from the ceiling."
+	["walk-message"] = "{{cyan}}Something is dripping from the ceiling."
 }
 
 Tile.stairsDown = {
