@@ -29,6 +29,7 @@
 #define C_WHITE				8
 
 
+lua_State *L = NULL;
 int curses_running = 0;
 
 static int curses_init( lua_State *L )
@@ -249,14 +250,30 @@ luaL_Reg curses[] = {
 	{	NULL,			NULL }
 };
 
+static void lstop (lua_State *L, lua_Debug *ar) {
+  (void)ar;  /* unused arg. */
+  lua_sethook(L, NULL, 0, 0);
+  luaL_error(L, "interrupted!");
+}
+void interrupt_handler( int i )
+{
+	/*	terminate curses */
+	if( curses_running )
+		endwin();
+	
+	lua_sethook(L, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+
+	exit(0);
+}
+
 int main( int argc, char **argv )
 {
 	#ifdef USE_LUAJIT
-		lua_State *L = lua_open();
+		L = lua_open();
 	#endif
 
 	#ifdef USE_LUA52
-		lua_State *L = luaL_newstate();
+		L = luaL_newstate();
 	#endif
 
 	luaL_openlibs( L );
@@ -271,6 +288,8 @@ int main( int argc, char **argv )
 	#endif
 
 	init_constants( L );
+
+	signal( SIGINT, interrupt_handler );
 
 	int r;
 

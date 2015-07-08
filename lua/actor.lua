@@ -188,8 +188,19 @@ function Actor:move(x, y)
 		return false
 	end
 
+	--	bumping into a closed door opens it
 	if self.map.tile[x][y] == Tile.closedDoor then
 		return self:openDoor(x, y)
+	end
+
+	--	bumping into a hidden door reveals it
+	if self.map.tile[x][y] == Tile.hiddenDoor then
+		if self == Game.player then
+			UI:message("{{yellow}}You find a hidden door!")
+		end
+
+		self.map.tile[x][y] = Tile.closedDoor
+		return true
 	end
 
 	--	the actor cannot move onto a solid tile

@@ -100,5 +100,13 @@ Tile.closedDoor = {
 	["opaque"] = true
 }
 
+Tile.hiddenDoor = {
+	["name"] = "Wall",
+	["face"] = "#",
+	["color"] = curses.yellow,
+	["solid"] = true,
+	["opaque"] = true
+}
+
 return Tile
 
