@@ -158,12 +158,6 @@ function UI:getMessage(index)
 	end
 end
 
---  writeCentered() - Draw a string at the center of a line;
---	does not return anything
-function UI:writeCentered(y, str)
-	curses.write((Global.screenWidth - #str - 1) / 2, y, " " .. str .. " ")
-end
-
 --  UI:messageLogScreen() - display message log with interactive scrolling;
 --  does not return anything
 function UI:messageLogScreen()
@@ -173,6 +167,11 @@ function UI:messageLogScreen()
 	local maxScroll = math.max(1, #(self.messageList) - (windowHeight - 1))
 	--  index of scroll-back buffer at top of window
 	local scroll = maxScroll
+
+	--  writeCentered() - Draw a string at the center of a line
+	local function writeCentered(y, str)
+		curses.write((Global.screenWidth - #str - 1) / 2, y, " " .. str .. " ")
+	end
 
 	local function drawMessageLog()
 		for i = 0, windowHeight - 1 do
@@ -186,7 +185,7 @@ function UI:messageLogScreen()
 		--  draw the window decoration
 		local banner = string.rep("-", Global.screenWidth)
 		curses.write(0, 0, banner)
-		UI:writeCentered(0, "Previous messages")
+		writeCentered(0, "Previous messages")
 		curses.write(0, Global.screenHeight - 1, banner)
 		self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}jk {{white}}navigate {{cyan}}other {{white}}exit ")
 		if scroll > 1 then
@@ -295,11 +294,6 @@ function UI:drawTitleScreen()
 	else
 		return name
 	end
-end
-
-function UI:drawInventoryScreen(actor)
-	curses.clear()
-
 end
 
 return UI
