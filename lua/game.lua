@@ -33,6 +33,7 @@ local Log = require "lua/log"
 local UI = require "lua/ui"
 local Tile = require "lua/tile"
 local Item = require "lua/item"
+local Itemdefs = require "lua/itemdefs"
 
 
 --	Game:init() - initialize members of a Game object with default data
@@ -80,12 +81,10 @@ function Game:start()
 		end
 
 		--	populate each map with a few items
+		Util.listMethods(Itemdefs.SugarBombs)  --  DEBUG
 		for j = 1, 10 do
-			local item = Item.new()
+			local item = Itemdefs.SugarBombs:new()
 			self:addItem(item)
-			item:setName("Sugar Bombs")
-			item:setFace("&")
-			item:setColor(curses.cyan + curses.bold)
 			item:setMap(map)
 			item:setPosition(map:findRandomEmptySpace())
 		end

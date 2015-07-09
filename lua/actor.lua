@@ -34,10 +34,10 @@ function Actor.new()
 	a.face = ""
 	a.color = ""
 	a.map = nil
-	a.inventory = {}  --	mapping from inventory letter to Item
 	a.x = 0	--	although 0 is not a valid coordinate for the Actor to be on,
 	a.y = 0	--	the value signifies that an actual position has not been set
 	a.alive = true	--	by default, a newly created Actor is alive
+	a.inventory = {}  --	mapping from inventory letter to Item
 
 	a.sightMap = {}
 	for i = 1, Global.mapWidth do

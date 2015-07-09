@@ -10,15 +10,12 @@ local Game = require "lua/game"
 local Item = {}
 Item.__index = Item
 
---	Item.new() - creates a new Item object, initializing its members with
+--	Item:new() - creates a new Item object, initializing its members with
 --	default data; returns the created Item object
-function Item.new()
+function Item:new()
 	local i = {}
-	setmetatable(i, Item)
+	setmetatable(i, self)
 
-	i.name = ""
-	i.face = ""
-	i.color = ""
 	i.map = nil     --  map is nil if the item has been picked up or not on a map
 	i.x = 0         --  x/y meaningless if not a the map
 	i.y = 0

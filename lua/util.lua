@@ -26,4 +26,30 @@ function Util.seqRemove(seq, item)
 	return true
 end
 
+function Util.listMethods(obj)
+	Log:write("Listing methods...")
+	while obj do
+		for k,v in pairs(obj) do
+			--if type(v) == "function" then
+				Log:write("  " .. tostring(k) .. " = " .. tostring(v))
+			--end
+		end
+		local meta = getmetatable(obj)
+		obj = nil
+		if meta then
+			Log:write("  has metatable:")
+			for k,v in pairs(meta) do
+				--if type(v) == "function" then
+					Log:write("  " .. tostring(k) .. " = " .. tostring(v))
+				--end
+			end
+
+			obj = meta.__index
+			if obj then
+				log:write("  ...with __index:")
+			end
+		end
+	end
+end
+
 return Util
