@@ -32,6 +32,15 @@
 lua_State *L = NULL;
 int curses_running = 0;
 
+static void curses_set_running( lua_State *L, int state )
+{
+	curses_running = state;
+
+	lua_getglobal( L, "curses" );
+	lua_pushinteger( L, state );
+	lua_setfield( L, -2, "running" );
+}
+
 static int curses_init( lua_State *L )
 {
 	initscr();
@@ -65,7 +74,7 @@ static int curses_init( lua_State *L )
 	init_pair( C_WHITE, COLOR_WHITE, 0 );
 #endif
 
-	curses_running = 1;
+	curses_set_running( L, 1 );
 
 	int x, y;
 	getmaxyx( stdscr, y, x );
@@ -78,10 +87,8 @@ static int curses_init( lua_State *L )
 
 static int curses_terminate( lua_State *L )
 {
-	(void) L;
-
 	endwin();
-	curses_running = 0;
+	curses_set_running( L, 0 );
 
 	return 0;
 }
@@ -257,6 +264,7 @@ static void lstop (lua_State *L, lua_Debug *ar) {
 }
 void interrupt_handler( int i )
 {
+	(void)i;
 	/*	terminate curses */
 	if( curses_running )
 		endwin();

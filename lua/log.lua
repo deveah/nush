@@ -26,7 +26,7 @@ end
 --	Log:write() - writes to the attached log file; does not return anything
 function Log:write(data)
 	--	logging only works when debugging is activated
-	if not Global.debug then
+	if not self.file then
 		return nil
 	end
 
@@ -37,12 +37,12 @@ end
 --	Log:terminate() - terminates the resources allocated by the creation of
 --	the Log object; does not return anything
 function Log:terminate()
-	--	logging only works when debugging is activated
-	if not Global.debug then
+	if not self.file then
 		return nil
 	end
 
 	self.file:close()
+	self.file = nil
 end
 
 --	initialize logging

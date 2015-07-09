@@ -379,7 +379,7 @@ function Actor:act()
 		local k = curses.getch()
 		Log:write("Read character: " .. k)
 
-		return self:handleKey(k)
+		return (self:handleKey(k))
 	else
 		--	the actor is not player-controlled, so let the AI functions take over
 		--	(not implemented, so return that the turn was successfully spent)
