@@ -130,12 +130,12 @@ end
 
 --	Actor:findItem() - Given an item, return the inventory slot it is in, or
 --	nil if none. Also accepts an inventory slot for convenience.
-function Actor:findItem(item)
-	if self.inventory[item] then  --  it's an inventory slot
+function Actor:findItem(item_or_slot)
+	if self.inventory[item_or_slot] then  --  it's an inventory slot
 		return item
 	end
-	for k,v in pairs(self.inventory) do
-		if v == item then
+	for slot,item in pairs(self.inventory) do
+		if item == item_or_slot then
 			return slot
 		end
 	end
@@ -156,13 +156,13 @@ end
 
 --	Actor:removeItem() - removes an item from the Actor's inventory (the caller
 --	must ensure the item gets a new owner itself); does not return anything.
-function Actor:removeItem(item)
-	local slot = self:findItem(item)
+function Actor:removeItem(item_or_slot)
+	local slot = self:findItem(item_or_slot)
 	if slot then
 		self.inventory[item] = nil
 		return
 	end
-	error(item:toString() .. " not in inventory")
+	error(item_or_slot:toString() .. " not in inventory")
 end
 
 --	Actor:die() - kills the given actor, making it unable to act
@@ -338,7 +338,7 @@ function Actor:tryPickupItem(item)
 	if slot then
 		Game.log:write(self:toString() .. " picked up " .. item:toString())
 		if self == Game.player then
-			UI:message("Picked up {{yellow}}" .. slot .. "{{white}} - " .. item:toString())
+			UI:message("Picked up {{yellow}}" .. slot .. "{{white}} - " .. item:describe())
 		end
 		return true
 	end
@@ -356,7 +356,7 @@ function Actor:dropItem(item)
 	item:setMap(self.map)
 	item:setPosition(self.x, self.y)
 	if self == Game.player and self.alive then
-		UI:message("You drop the " .. item)
+		UI:message("You drop the " .. item:describe())
 	end
 end
 

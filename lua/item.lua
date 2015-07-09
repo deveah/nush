@@ -34,7 +34,13 @@ function Item:toString()
 	else
 		location = "not on a map"
 	end
-	return "<item " .. tostring(self) .. " (" .. self.name .. ") " .. location .. ">"
+	return "<item " .. tostring(self) .. " (" .. self:describe(true) .. ") " .. location .. ">"
+end
+
+--	Item:describe() - returns the player-visible name/description of the item.
+--	If optional arg 'fullyVisible' is true, then treat as full identified
+function Item:describe(fullyVisible)
+	return self.name
 end
 
 --	Item:setName() - sets the name of the given Item object; does not return
