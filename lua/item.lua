@@ -6,6 +6,7 @@
 
 local Global = require "lua/global"
 local Game = require "lua/game"
+local Log = require "lua/log"
 
 local Item = {}
 Item.__index = Item

@@ -28,24 +28,27 @@ Itemdefs.BaseItem = defineItem(Item, {
 	color = curses.white,
 	stackable = false,
 })
+Itemdefs.BaseItem.__index = Itemdefs.BaseItem
 
 
-Itemdefs.Weapon = defineItem(BaseItem, {
+Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
 	category = "Weapons",
 	equipAs = "weapon",
 })
 
 -------------------------------- Consumables ----------------------------------
 
-Itemdefs.Consumable = defineItem(BaseItem, {
+Itemdefs.Consumable = defineItem(Itemdefs.BaseItem, {
 	category = "Consumables",
 	face = "&",
 	consumable = true,
 })
+Itemdefs.Consumable.__index = Itemdefs.Consumable
 
-Itemdefs.SugarBombs = defineItem(Consumable, {
+Itemdefs.SugarBombs = defineItem(Itemdefs.Consumable, {
 	name = "Sugar Bombs",
 	color = curses.cyan + curses.bold,
 })
+Itemdefs.SugarBombs.__index = Itemdefs.SugarBombs
 
 return Itemdefs

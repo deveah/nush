@@ -46,7 +46,7 @@ function Util.listMethods(obj)
 
 			obj = meta.__index
 			if obj then
-				log:write("  ...with __index:")
+				Log:write("  ...with __index:")
 			end
 		end
 	end
