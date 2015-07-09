@@ -9,13 +9,12 @@ local Game = require "lua/game"
 local Log = require "lua/log"
 
 local Item = {}
-Item.__index = Item
 
 --	Item:new() - creates a new Item object, initializing its members with
 --	default data; returns the created Item object
 function Item:new()
 	local i = {}
-	setmetatable(i, self)
+	setmetatable(i, {__index = self})
 
 	i.map = nil     --  map is nil if the item has been picked up or not on a map
 	i.x = 0         --  x/y meaningless if not a the map

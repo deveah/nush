@@ -11,11 +11,10 @@ local Item = require "lua/item"
 --	Collection of all item and item type definitions
 local Itemdefs = {}
 
---	defineItem() - Given the base item type to inherit from, and table with
+--	defineItem() - Given the base item type to inherit from, and a table with
 --	overridden data members, returns an item definition
 local function defineItem(inheritFrom, definition)
 	setmetatable(definition, {__index = inheritFrom})
-	Log:write("meta " .. tostring(getmetatable(definition)))
 	return definition
 end
 
@@ -28,7 +27,6 @@ Itemdefs.BaseItem = defineItem(Item, {
 	color = curses.white,
 	stackable = false,
 })
-Itemdefs.BaseItem.__index = Itemdefs.BaseItem
 
 
 Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
@@ -43,12 +41,10 @@ Itemdefs.Consumable = defineItem(Itemdefs.BaseItem, {
 	face = "&",
 	consumable = true,
 })
-Itemdefs.Consumable.__index = Itemdefs.Consumable
 
 Itemdefs.SugarBombs = defineItem(Itemdefs.Consumable, {
 	name = "Sugar Bombs",
 	color = curses.cyan + curses.bold,
 })
-Itemdefs.SugarBombs.__index = Itemdefs.SugarBombs
 
 return Itemdefs

@@ -81,7 +81,6 @@ function Game:start()
 		end
 
 		--	populate each map with a few items
-		Util.listMethods(Itemdefs.SugarBombs)  --  DEBUG
 		for j = 1, 10 do
 			local item = Itemdefs.SugarBombs:new()
 			self:addItem(item)

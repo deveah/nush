@@ -26,27 +26,24 @@ function Util.seqRemove(seq, item)
 	return true
 end
 
+--	Util.listMethods() - Dump to the log the list of methods on an object
 function Util.listMethods(obj)
 	Log:write("Listing methods...")
 	while obj do
 		for k,v in pairs(obj) do
-			--if type(v) == "function" then
-				Log:write("  " .. tostring(k) .. " = " .. tostring(v))
-			--end
+			if rawget(obj, k) then  --	check not inherited
+				if type(v) == "function" then
+					Log:write("  " .. tostring(k) .. " = " .. tostring(v))
+				end
+			end
 		end
 		local meta = getmetatable(obj)
 		obj = nil
 		if meta then
-			Log:write("  has metatable:")
-			for k,v in pairs(meta) do
-				--if type(v) == "function" then
-					Log:write("  " .. tostring(k) .. " = " .. tostring(v))
-				--end
-			end
-
+			Log:write("  has metatable")
 			obj = meta.__index
 			if obj then
-				Log:write("  ...with __index:")
+				Log:write("  ...with __index; recursing:")
 			end
 		end
 	end
