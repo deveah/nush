@@ -21,7 +21,7 @@ local function main()
 end
 
 local function errorHandler(errmsg)
-	return debug.traceback(errmsg)
+	return debug.traceback(errmsg, 2)
 end
 
 local success, errmsg = xpcall(main, errorHandler)

@@ -31,6 +31,7 @@
 
 lua_State *L = NULL;
 int curses_running = 0;
+int num_interrupts = 0;
 
 static void curses_set_running( lua_State *L, int state )
 {
@@ -249,7 +250,7 @@ luaL_Reg curses[] = {
 	{	"getch",		curses_getch },
 	{	"attr",			curses_attr },
 	{	"clear",		curses_clear },
-	{ "clearLine",	curses_clearline },
+	{	"clearLine",	curses_clearline },
 	{	"refresh",		curses_refresh },
 	{	"move",			curses_move },
 	{	"cursor",		curses_cursor },
@@ -257,21 +258,32 @@ luaL_Reg curses[] = {
 	{	NULL,			NULL }
 };
 
-static void lstop (lua_State *L, lua_Debug *ar) {
-  (void)ar;  /* unused arg. */
-  lua_sethook(L, NULL, 0, 0);
-  luaL_error(L, "interrupted!");
+/*
+static void lstop( lua_State *L, lua_Debug *ar ) {
+	(void)ar;  // unused arg.
+	lua_sethook( L, NULL, 0, 0 );
+	luaL_error( L, "interrupted!" );
 }
+*/
+
 void interrupt_handler( int i )
 {
 	(void)i;
-	/*	terminate curses */
-	if( curses_running )
-		endwin();
-	
-	lua_sethook(L, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 
-	exit(0);
+	if (++num_interrupts > 1) {  // If luaL_error doesn't work
+		if( curses_running )
+			endwin();
+		printf("Interrupted. (Second Ctrl-C)\n");
+		exit(1);
+	} else {
+		// This seems to work whether we're in C or lua. Lua longjmps to the
+		// error handler, which should interrupt any C routine.
+		// (Ideally, would try lua_sethook first, and print C backtrace on 2nd Ctrl-C)
+		luaL_error(L, "interrupted!");
+
+		// Once control returns to lua, set debug hook which immediately throws an error
+		//lua_sethook(L, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+	}
 }
 
 int main( int argc, char **argv )
@@ -297,7 +309,12 @@ int main( int argc, char **argv )
 
 	init_constants( L );
 
-	signal( SIGINT, interrupt_handler );
+	// Set ctrl-C handler, portably
+	struct sigaction sa;
+	sa.sa_handler = interrupt_handler;
+	sa.sa_flags = 0;
+	sigemptyset( &sa.sa_mask );
+	sigaction( SIGINT, &sa, NULL );
 
 	int r;
 
@@ -313,6 +330,7 @@ int main( int argc, char **argv )
 	if( curses_running )
 		endwin();
 
+	// This should only happen when the error handler throws an error
 	if( r )
 	{
 		printf( ERROR_STRING, lua_tostring( L, -1 ) );
