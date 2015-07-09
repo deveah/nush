@@ -4,6 +4,8 @@
 --	Generic utility functions not belonging anywhere else
 --
 
+local Log = require "lua/log"
+
 local Util = {}
 
 --	Util.seqDelete() - removes an object from a numerical sequence, to go with

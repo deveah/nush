@@ -18,7 +18,6 @@
 --	* turnCount (integer) - the number of turns taken since the beginning of
 --			the game; a turn is a period of time in which _all_ actors take their
 --			turns
---	*	log (Log object) - used for logging debug data
 --
 
 --	The singleton Game object
@@ -48,14 +47,10 @@ end
 --	Game:start() - starts the given Game object, creating the world of
 --	the game and initialising everything; does not return anything
 function Game:start()
-	--	initialize logging
-	self.log = Log.new(Global.logFilename)
-	self.log:write("Started logging.")
-
 	--	set the random seed
 	self.randomSeed = os.time()
 	math.randomseed(self.randomSeed)
-	self.log:write("Random seed is " .. self.randomSeed)
+	Log:write("Random seed is " .. self.randomSeed)
 
 	--	initialize the interface
 	UI:init()
@@ -64,7 +59,7 @@ function Game:start()
 	local playerName = UI:drawTitleScreen()
 
 	--	create the dungeon
-	self.log:write("Creating the dungeon...")
+	Log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
 		local map = Map.new(i)
 		map:generateRoomsAndCorridors(10, 4, 5)
@@ -73,7 +68,7 @@ function Game:start()
 		self:addMap(map)
 
 		--	populate each map with other actors
-		self.log:write("Populating level " .. i .. " of the dungeon...")
+		Log:write("Populating level " .. i .. " of the dungeon...")
 		for j = 1, 10 do
 			local actor = Actor.new()
 			self:addActor(actor)
@@ -97,7 +92,7 @@ function Game:start()
 	end
 
 	--	create the player character
-	self.log:write("Creating the player character...")
+	Log:write("Creating the player character...")
 	self.player = Actor.new()
 	self:addActor(self.player)
 	self.player:setName(playerName)
@@ -112,25 +107,25 @@ function Game:start()
 	--	show a friendly welcome message
 	UI:message("Welcome to {{green}}Nush{{white}}! Please do not die often.")
 
-	self.log:write("Game initialization successfully completed.")
+	Log:write("Game initialization successfully completed.")
 end
 
 --	Game:loop() - runs the main event loop of the game, dealing with user
 --	interactions, turn scheduling, and everything else game related;
 --	does not return anything
 function Game:loop()
-	self.log:write("Entered event loop.")
+	Log:write("Entered event loop.")
 	while self.running do
 		--	increase the turn counter
 		self.turnCount = self.turnCount + 1
 
 		--	mark the beginning of the turn
-		self.log:write("Turn " .. self.turnCount .. " started.")
+		Log:write("Turn " .. self.turnCount .. " started.")
 
 		--	loop through all the actors and make them take their turns
 		for i = 1, #(self.actorList) do
 			local currentActor = self.actorList[i]
-			self.log:write("Current acting actor: " .. currentActor:toString() .. ")")
+			Log:write("Current acting actor: " .. currentActor:toString() .. ")")
 
 			--	the act() method of Actor objects returns true if the actor has spent
 			--	its turn successfully; to prevent wasting turns, the event loop
@@ -145,7 +140,7 @@ function Game:loop()
 		end
 
 		--	mark the end of the turn
-		self.log:write("Turn " .. self.turnCount .. " ended.")
+		Log:write("Turn " .. self.turnCount .. " ended.")
 	end
 end
 
@@ -153,10 +148,10 @@ end
 --	that were initialized during the game and require deinitialization;
 --	does not return anything
 function Game:terminate()
-	self.log:write("Terminating game instance...")
+	Log:write("Terminating game instance...")
 	curses.terminate()
 	UI:terminate()
-	self.log:terminate()
+	Log:terminate()
 	io.write("Bye! Please submit any bugs you may have encountered!\n")
 end
 
@@ -165,7 +160,7 @@ end
 --	does not return anything
 function Game:addActor(actor)
 	table.insert(self.actorList, actor)
-	self.log:write("Added actor " .. actor:toString() .. " to actorList.")
+	Log:write("Added actor " .. actor:toString() .. " to actorList.")
 end
 
 --	Game:removeActor() - removes an item from the global actorList in case it
@@ -175,14 +170,14 @@ function Game:removeActor(actor)
 	if not Util.seqRemove(self.actorList, actor) then
 		error("bad call Game:removeActor(" .. actor .. ")")
 	end
-	self.log:write("Remove actor " .. actor:toString() .. " from actorList.")
+	Log:write("Remove actor " .. actor:toString() .. " from actorList.")
 end
 
 --	Game:addItem() - adds an Item object into the global list of items;
 --	does not return anything
 function Game:addItem(item)
 	table.insert(self.itemList, item)
-	self.log:write("Added item " .. item:toString() .. " to itemList.")
+	Log:write("Added item " .. item:toString() .. " to itemList.")
 end
 
 --	Game:removeItem() - removes an item from the global itemList in case it is
@@ -192,7 +187,7 @@ function Game:removeItem(item)
 	if not Util.seqRemove(self.itemList, item) then
 		error("bad call Game:removeItem(" .. item .. ")")
 	end
-	self.log:write("Remove item " .. item:toString() .. " from itemList.")
+	Log:write("Remove item " .. item:toString() .. " from itemList.")
 end
 
 --	Game:itemsAtTile() - Returns sequence of items on some tile of a map
@@ -210,13 +205,13 @@ end
 --	does not return anything
 function Game:addMap(map)
 	table.insert(self.mapList, map)
-	self.log:write("Added map " .. map:toString() .. " to mapList.")
+	Log:write("Added map " .. map:toString() .. " to mapList.")
 end
 
 --	Game:halt() - makes the game terminate with a given reason;
 --	does not return anything
 function Game:halt(reason)
-	self.log:write("Halt: " .. reason)
+	Log:write("Halt: " .. reason)
 	self.running = false
 end
 

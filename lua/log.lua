@@ -45,5 +45,10 @@ function Log:terminate()
 	self.file:close()
 end
 
+--	initialize logging
+Log = Log.new(Global.logFilename)
+Log:write("Started logging.")
+
+--	Can call .new() on this Log instance to create further Logs
 return Log
 

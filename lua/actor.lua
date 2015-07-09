@@ -15,6 +15,7 @@
 --
 
 local Global = require "lua/global"
+local Log = require "lua/log"
 local Game = require "lua/game"
 local UI = require "lua/ui"
 local Tile = require "lua/tile"
@@ -57,7 +58,7 @@ end
 --	Actor:setName() - sets the name of the given Actor object; does not
 --	return anything
 function Actor:setName(name)
-	Game.log:write("Actor " .. self:toString() ..
+	Log:write("Actor " .. self:toString() ..
 		" was renamed to " .. name .. ".")
 	
 	self.name = name
@@ -66,7 +67,7 @@ end
 --	Actor:setFace() - sets the face of the given Actor object; does not
 --	return anything
 function Actor:setFace(face)
-	Game.log:write("Actor " .. self:toString() ..
+	Log:write("Actor " .. self:toString() ..
 		" has changed its face to '" .. face .. "'.")
 
 	self.face = face
@@ -75,7 +76,7 @@ end
 --	Actor:setColor() - sets the color of the given Actor object; does not
 --	return anything
 function Actor:setColor(color)
-	Game.log:write("Actor " .. self:toString() ..
+	Log:write("Actor " .. self:toString() ..
 		" has changed its color to '" .. color .. "'.")
 	
 	self.color = color
@@ -84,7 +85,7 @@ end
 --	Actor:setMap() - sets the map of the given Actor object; does not
 --	return anything
 function Actor:setMap(map)
-	Game.log:write("Actor " .. self:toString() ..
+	Log:write("Actor " .. self:toString() ..
 		" has been placed on " .. map:toString() .. ".")
 
 	self.map = map
@@ -93,7 +94,7 @@ end
 --	Actor:setPosition() - sets the (x, y) position of the given Actor object;
 --	does not return anything
 function Actor:setPosition(x, y)
-	Game.log:write("Actor " .. self:toString() ..
+	Log:write("Actor " .. self:toString() ..
 		" has been placed at (" .. x .. ", " .. y .. ").")
 
 	self.x = x
@@ -167,7 +168,7 @@ end
 
 --	Actor:die() - kills the given actor, making it unable to act
 function Actor:die()
-	Game.log:write("Actor " .. self:toString() ..
+	Log:write("Actor " .. self:toString() ..
 		" has died.")
 	self.alive = false
 	--	By default, everything they were carrying is dropped.
@@ -228,7 +229,7 @@ function Actor:updateSight()
 		traceRay(xOffset, yOffset, 5)
 	end
 
-	Game.log:write("Sight map calculated for " .. self:toString())
+	Log:write("Sight map calculated for " .. self:toString())
 end
 
 
@@ -241,14 +242,14 @@ end
 function Actor:move(x, y)
 	--	the actor must have a map to move on
 	if not self.map then
-		Game.log:write("Actor " .. self:toString() ..
+		Log:write("Actor " .. self:toString() ..
 			" attempted to move without an attached map!")
 		return false
 	end
 
 	--	the actor's movements must keep it inside the boundaries of the map
 	if not self.map:isInBounds(x, y) then
-		Game.log:write("Actor " .. self:toString() ..
+		Log:write("Actor " .. self:toString() ..
 			" attempted to move to an out-of-bounds location!")
 		return false
 	end
@@ -270,7 +271,7 @@ function Actor:move(x, y)
 
 	--	the actor cannot move onto a solid tile
 	if self.map:isSolid(x, y) then
-		Game.log:write("Actor " .. self:toString() ..
+		Log:write("Actor " .. self:toString() ..
 			" attempted to move onto a solid tile!")
 		return false
 	end
@@ -336,13 +337,13 @@ end
 function Actor:tryPickupItem(item)
 	local slot = self:addItem(item)
 	if slot then
-		Game.log:write(self:toString() .. " picked up " .. item:toString())
+		Log:write(self:toString() .. " picked up " .. item:toString())
 		if self == Game.player then
 			UI:message("Picked up {{yellow}}" .. slot .. "{{white}} - " .. item:describe())
 		end
 		return true
 	end
-	Game.log:write(self:toString() .. " failed to pickup " .. item:toString())
+	Log:write(self:toString() .. " failed to pickup " .. item:toString())
 	if self == Game.player then
 		UI:message("Your inventory is already full!")
 	end
@@ -376,7 +377,7 @@ function Actor:act()
 
 		--	and then request for input
 		local k = curses.getch()
-		Game.log:write("Read character: " .. k)
+		Log:write("Read character: " .. k)
 
 		return self:handleKey(k)
 	else
@@ -390,9 +391,9 @@ end
 --	missing 'local's
 local function dumpGlobals()
 	UI:message("{{red}}(DEBUG) Dumped globals to logfile.")
-	Game.log:write("Contents of _G:")
+	Log:write("Contents of _G:")
 	for k,v in pairs(_G) do
-		Game.log:write("  " .. k)
+		Log:write("  " .. k)
 	end
 end
 
@@ -441,7 +442,7 @@ function Actor:handleKey(key)
 	--	pick up
 	if key == "," or key == "g" then
 		local items = Game:itemsAtTile(self.map, self.x, self.y)
-		Game.log:write("Trying to pickup: items:" .. tostring(items))
+		Log:write("Trying to pickup: items:" .. tostring(items))
 		if #items == 0 then
 			UI:message("There's nothing here to pick up!")
 			return false

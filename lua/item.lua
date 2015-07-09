@@ -46,7 +46,7 @@ end
 --	Item:setName() - sets the name of the given Item object; does not return
 --	anything
 function Item:setName(name)
-	Game.log:write("Item " .. self:toString() .. " was renamed to " ..
+	Log:write("Item " .. self:toString() .. " was renamed to " ..
 		name .. ".")
 	
 	self.name = name
@@ -55,7 +55,7 @@ end
 --	Item:setFace() - sets the face of the given Item object; does not return
 --	anything
 function Item:setFace(face)
-	Game.log:write("Item " .. self:toString() .. " has changed its face to " ..
+	Log:write("Item " .. self:toString() .. " has changed its face to " ..
 		face .. ".")
 	
 	self.face = face
@@ -64,7 +64,7 @@ end
 --	Item:setColor() - sets the color of the given Item object; does not return
 --	anything
 function Item:setColor(color)
-	Game.log:write("Item " .. self:toString() .. " has changed its color to " ..
+	Log:write("Item " .. self:toString() .. " has changed its color to " ..
 		color .. ".")
 	
 	self.color = color
@@ -74,10 +74,10 @@ end
 --	does not return anything
 function Item:setMap(map)
 	if map then
-		Game.log:write("Item " .. self:toString() .. " has been placed on " ..
+		Log:write("Item " .. self:toString() .. " has been placed on " ..
 			map:toString() .. ".")
 	else
-		Game.log:write("Item " .. self:toString() .. " no longer on any map")
+		Log:write("Item " .. self:toString() .. " no longer on any map")
 	end
 	
 	self.map = map
@@ -86,7 +86,7 @@ end
 --	Item:setPosition() - sets the (x, y) position of the given Item object;
 --	does not return anything
 function Item:setPosition(x, y)
-	Game.log:write("Item " .. self:toString() ..
+	Log:write("Item " .. self:toString() ..
 		" has been placed at (" .. x .. ", " .. y .. ").")
 	
 	self.x = x

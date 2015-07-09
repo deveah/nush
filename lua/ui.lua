@@ -14,6 +14,7 @@ local UI = {}
 package.loaded['lua/ui'] = UI
 
 local Global = require 'lua/global'
+local Log = require "lua/log"
 local Game = require "lua/game"
 
 --	UI.init() - initialises a new UI object, and also initializes the curses
@@ -21,14 +22,14 @@ local Game = require "lua/game"
 function UI:init()
 	self.width, self.height = curses.init()
 	self.messageList = {}
-	Game.log:write("Initialized curses interface.")
-	Game.log:write("Screen w/h: " .. Global.screenWidth .. "x" .. Global.screenHeight)
+	Log:write("Initialized curses interface.")
+	Log:write("Screen w/h: " .. Global.screenWidth .. "x" .. Global.screenHeight)
 end
 
 --	UI:terminate() - terminates the interface object; does not return anything
 function UI:terminate()
 	curses.terminate()
-	Game.log:write("Terminated curses interface.")
+	Log:write("Terminated curses interface.")
 end
 
 --	UI.drawScreen() - draws the main screen, which includes the map, HUD, and
@@ -131,7 +132,7 @@ end
 --	may see it in-game; handles repeating messages by counting the times
 --	a message was logged; does not return anything
 function UI:message(text)
-	Game.log:write("Message logged: " .. text)
+	Log:write("Message logged: " .. text)
 	--	if there are no messages, there's no purpose in testing for repeats
 	if #self.messageList == 0 then
 		table.insert(self.messageList, {text = text, times = 1})
