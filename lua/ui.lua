@@ -296,5 +296,40 @@ function UI:drawTitleScreen()
 	end
 end
 
+--	UI:drawInventoryScreen() - draws a screen showing the contents of a given actor's
+--	inventory; does not return anything
+function UI:drawInventoryScreen(actor)
+	local currentLine = 1
+
+	curses.clear()
+
+	local banner = string.rep("-", Global.screenWidth)
+	curses.write(0, 0, banner)
+	self:writeCentered(0, "Inventory")
+	curses.write(0, Global.screenHeight - 1, banner)
+	self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}any key {{white}}exit ")
+
+
+	--	a-z
+	for i = 0, 25 do
+		local char = string.char(97 + i)
+		if actor.inventory[char] then
+			self:colorWrite(1, currentLine, "{{yellow}}" .. char .. "{{white}} - " .. actor.inventory[char].name)
+			currentLine = currentLine + 1
+		end
+	end
+
+	--	A-Z
+	for i = 0, 25 do
+		local char = string.char(65 + i)
+		if actor.inventory[char] then
+			self:colorWrite(1, currentLine, "{{yellow}}" .. char .. "{{white}} - " .. actor.inventory[char].name)
+			currentLine = currentLine + 1
+		end
+	end
+
+	curses.getch()
+end
+
 return UI
 

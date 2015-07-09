@@ -451,6 +451,12 @@ function Actor:handleKey(key)
 		end
 	end
 
+	--	show inventory
+	if key == "i" then
+		UI:drawInventoryScreen(Game.player)
+		return false
+	end
+
 	--	debug keys
 	if key == "#" then
 		dumpGlobals()
