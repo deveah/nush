@@ -19,6 +19,7 @@ local Log = require "lua/log"
 local Game = require "lua/game"
 local UI = require "lua/ui"
 local Tile = require "lua/tile"
+local Util = require "lua/util"
 
 local Actor = {}
 Actor.__index = Actor
@@ -387,16 +388,6 @@ function Actor:act()
 	end
 end
 
---	dumpGlobals() - print to log all the global variables, useful for finding
---	missing 'local's
-local function dumpGlobals()
-	UI:message("{{red}}(DEBUG) Dumped globals to logfile.")
-	Log:write("Contents of _G:")
-	for k,v in pairs(_G) do
-		Log:write("  " .. k)
-	end
-end
-
 --	Actor:handleKey() - makes the given actor spend its turn with a command
 --	specified by the given key; returns true or false, depending on whether
 --	the action was successful or not
@@ -460,7 +451,8 @@ function Actor:handleKey(key)
 
 	--	debug keys
 	if key == "#" then
-		dumpGlobals()
+		UI:message("{{red}}(DEBUG) Dumped globals to logfile.")
+		Util.dumpGlobals()
 		return false
 	end
 

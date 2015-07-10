@@ -49,4 +49,13 @@ function Util.listMethods(obj)
 	end
 end
 
+--	Util.dumpGlobals() - print to log all the global variables, useful for
+--	finding missing 'local's
+function Util.dumpGlobals()
+	Log:write("Contents of _G:")
+	for k,v in pairs(_G) do
+		Log:write("  " .. k)
+	end
+end
+
 return Util
