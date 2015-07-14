@@ -128,6 +128,48 @@ function UI:prompt(reason)
 	end
 end
 
+--	UI:directionFromKey() - given a key or keycode from curses.getch(), returns
+--	nil if not recognised as a direction, or a sequence {x, y}, -1 <= x,y <= 1,
+--	including possibly {0, 0}.
+function UI:directionFromKey(key)
+	if key == "h" or key == "left" then
+		return {-1, 0}
+	elseif key == "j" or key == "down" then
+		return {0, 1}
+	elseif key == "k" or key == "up" then
+		return {0, -1}
+	elseif key == "l" or key == "right" then
+		return {1, 0}
+	elseif key == "y" or key == "upleft" or key == "home" then
+		return {-1, -1}
+	elseif key == "u" or key == "upright" or key == "pageup" then
+		return {1, -1}
+	elseif key == "b" or key == "downleft" or key == "end" then
+		return {-1, 1}
+	elseif key == "n" or key == "downright" or key == "pagedown" then
+		return {1, 1}
+	elseif key == "." or key == "numpad5" then
+		return {0, 0}
+	else
+		return nil
+	end
+end
+
+--	UI:promptDirection() - prompts the player to enter a direction; returns
+--	nil if invalid, or a sequence {x, y}, -1 <= x,y <= 1,	including possibly
+--	{0, 0}.
+function UI:promptDirection()
+	self:message("Which direction?")
+	self:drawScreen()
+
+	local key = curses.getch()
+	local dir = self:directionFromKey(key)
+	if not dir then
+		self:message("'" .. key .. "' isn't a valid direction.")
+	end
+	return dir
+end
+
 --	UI:message() - pushes a message onto the message list, so the player
 --	may see it in-game; handles repeating messages by counting the times
 --	a message was logged; does not return anything

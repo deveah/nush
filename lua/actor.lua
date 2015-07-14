@@ -241,6 +241,15 @@ end
 --	on; returns either true or false, depending on whether the move was
 --	successful
 function Actor:move(x, y)
+	--	No movement (e.g. pressed ./numpad5) counts as waiting
+	if x == self.x and y == self.y then
+		Log:write("Actor " .. self:toString() .. " waiting.")
+		if self == Game.player then
+			UI:message("You wait.")
+		end
+		return true
+	end
+
 	--	the actor must have a map to move on
 	if not self.map then
 		Log:write("Actor " .. self:toString() ..
@@ -409,36 +418,11 @@ function Actor:handleKey(key)
 	end
 
 	--	movement
-	if key == "h" or key == "left" then	--	move left
-		return self:move(self.x - 1, self.y)
+	local dir = UI:directionFromKey(key)
+	if dir then
+		return (self:move(self.x + dir[1], self.y + dir[2]))
 	end
 
-	if key == "j" or key == "down" then	--	move down
-		return self:move(self.x, self.y + 1)
-	end
-
-	if key == "k" or key == "up"  then	--	move up
-		return self:move(self.x, self.y - 1)
-	end
-
-	if key == "l" or key == "right" then	--	move right
-		return self:move(self.x + 1, self.y)
-	end
-
-	if key == "y" or key == "upleft" or key == "home" then  --	move up-left
-		return self:move(self.x - 1, self.y - 1)
-	end
-
-	if key == "u" or key == "upright" or key == "pageup" then  --	move up-right
-		return self:move(self.x + 1, self.y - 1)
-	end
-
-	if key == "b" or key == "downleft" or key == "end" then  --	move down-left
-		return self:move(self.x - 1, self.y + 1)
-	end
-
-	if key == "n" or key == "downright" or key == "pagedown" then  --	move down-right
-		return self:move(self.x + 1, self.y + 1)
 	end
 
 	--	use of stairs
