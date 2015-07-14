@@ -425,6 +425,22 @@ function Actor:handleKey(key)
 		return self:move(self.x + 1, self.y)
 	end
 
+	if key == "y" or key == "upleft" or key == "home" then  --	move up-left
+		return self:move(self.x - 1, self.y - 1)
+	end
+
+	if key == "u" or key == "upright" or key == "pageup" then  --	move up-right
+		return self:move(self.x + 1, self.y - 1)
+	end
+
+	if key == "b" or key == "downleft" or key == "end" then  --	move down-left
+		return self:move(self.x - 1, self.y + 1)
+	end
+
+	if key == "n" or key == "downright" or key == "pagedown" then  --	move down-right
+		return self:move(self.x + 1, self.y + 1)
+	end
+
 	--	use of stairs
 	if key == ">" then
 		return self:takeStairs()
