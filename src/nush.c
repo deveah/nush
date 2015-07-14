@@ -13,8 +13,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <unistd.h>
 #include <signal.h>
 #include <curses.h>
+
 
 #define ERROR_STRING 		"Error: %s\n"
 #define MAX_STRING_LENGTH 	80
@@ -30,7 +34,7 @@
 
 
 lua_State *L = NULL;
-int curses_running = 0;
+bool curses_running = false;
 int num_interrupts = 0;
 
 static void curses_set_running( lua_State *L, int state )
@@ -44,10 +48,39 @@ static void curses_set_running( lua_State *L, int state )
 
 static int curses_init( lua_State *L )
 {
+	char *term = getenv("TERM");
+	// Include screen because it also needs more keys defined
+	bool is_xterm = term && (strstr(term, "xterm") || strstr(term, "screen"));
+
 	initscr();
 	cbreak();
 	noecho();
 	keypad( stdscr, TRUE );
+
+	if (is_xterm) {
+		// terminfo for TERM=xterm fails to list some escape codes for numpad keys;
+		// which of the following don't work varies from terminal to terminal,
+		// but every one I tried, plus screen, need some of these.
+		define_key("\033Oj", '*');
+		define_key("\033Ok", '+');
+		define_key("\033Om", '-');
+		define_key("\033Oo", '/');
+		// Some unknown subset of the diagonal keys overlaps with home/end/page up/down,
+		// better to consistently make them all overlap
+		//define_key("\033[1~", KEY_A1);
+		//define_key("\033[4~", KEY_C1);
+		//define_key("\033[6~", KEY_C3);
+		//define_key("\033[5~", KEY_A3);
+		define_key("\033[1~", KEY_HOME);
+		define_key("\033[4~", KEY_END);
+		define_key("\033[6~", KEY_NPAGE);
+		define_key("\033[5~", KEY_PPAGE);
+		define_key("\033[E",  KEY_B2);
+		define_key("\033[2~", KEY_IC);
+		define_key("\033[3~", KEY_DC);
+		define_key("\033OM", '\n');  // for screen
+	}
+
 
 #ifndef __WIN32
 	use_default_colors();
@@ -124,6 +157,36 @@ static int curses_getch( lua_State *L )
 	case KEY_RIGHT:
 		lua_pushstring( L, "right" );
 		break;
+	case KEY_HOME:
+		lua_pushstring( L, "home" );
+		break;
+	case KEY_END:
+		lua_pushstring( L, "end" );
+		break;
+	case KEY_PPAGE:
+		lua_pushstring( L, "pageup" );
+		break;
+	case KEY_NPAGE:
+		lua_pushstring( L, "pagedown" );
+		break;
+	// numpad
+	case KEY_A1:
+		lua_pushstring( L, "upleft" );
+		break;
+	case KEY_A3:
+		lua_pushstring( L, "upright" );
+		break;
+	case KEY_C1:
+		lua_pushstring( L, "downleft" );
+		break;
+	case KEY_C3:
+		lua_pushstring( L, "downright" );
+		break;
+	case KEY_B2:
+		lua_pushstring( L, "numpad5" );
+		break;
+
+	case KEY_ENTER:
 	case '\n':
 		lua_pushstring( L, "enter" );
 		break;

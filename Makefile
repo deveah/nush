@@ -6,6 +6,7 @@ LUAJIT_LIBS = -lcurses -lluajit-5.1
 
 SOURCE = src/nush.c
 EXECUTABLE = nush
+KEYTEST_EXE = keytest
 
 all:
 	make lua52
@@ -16,6 +17,9 @@ lua52:
 luajit:
 	$(CC) $(SOURCE) -o $(EXECUTABLE) $(LUAJIT_LIBS) $(CFLAGS) -DUSE_LUAJIT
 
+keytest:
+	$(CC) src/keytest.c -o $(KEYTEST_EXE) $(CFLAGS) -lcurses
+
 clean:
-	rm $(EXECUTABLE)
+	rm $(EXECUTABLE) $(KEYTEST_EXE)
 

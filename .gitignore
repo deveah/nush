@@ -3,6 +3,7 @@
 *.swo
 
 nush
+keytest
 *.exe
 *.dll
 
