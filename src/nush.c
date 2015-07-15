@@ -263,6 +263,12 @@ static int curses_getch( lua_State *L )
 	case PADSLASH:
 		lua_pushstring( L, "/" );
 		break;
+	case PADSTOP:
+		lua_pushstring( L, "delete" );
+		break;
+	case PAD0:
+		lua_pushstring( L, "insert" );
+		break;
 	case PADENTER:
 		lua_pushstring( L, "enter" );
 		break;
