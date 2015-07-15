@@ -129,45 +129,44 @@ function UI:prompt(reason)
 end
 
 --	UI:directionFromKey() - given a key or keycode from curses.getch(), returns
---	nil if not recognised as a direction, or a sequence {x, y}, -1 <= x,y <= 1,
---	including possibly {0, 0}.
+--	dir, x, y, where dir is a code like "l" or "dl" or ".", and -1 <= x,y <= 1,
+--	including possibly ".", 0, 0 for "self", or returns nil for invalid.
 function UI:directionFromKey(key)
 	if key == "h" or key == "left" then
-		return {-1, 0}
+		return "l", -1, 0
 	elseif key == "j" or key == "down" then
-		return {0, 1}
+		return "d", 0, 1
 	elseif key == "k" or key == "up" then
-		return {0, -1}
+		return "u", 0, -1
 	elseif key == "l" or key == "right" then
-		return {1, 0}
+		return "r", 1, 0
 	elseif key == "y" or key == "upleft" or key == "home" then
-		return {-1, -1}
+		return "ul", -1, -1
 	elseif key == "u" or key == "upright" or key == "pageup" then
-		return {1, -1}
+		return "ur", 1, -1
 	elseif key == "b" or key == "downleft" or key == "end" then
-		return {-1, 1}
+		return "dl", -1, 1
 	elseif key == "n" or key == "downright" or key == "pagedown" then
-		return {1, 1}
-	elseif key == "." or key == "numpad5" then
-		return {0, 0}
+		return "dr", 1, 1
+	elseif key == "." or key == "delete" or key == "numpad5" then
+		return ".", 0, 0
 	else
 		return nil
 	end
 end
 
 --	UI:promptDirection() - prompts the player to enter a direction; returns
---	nil if invalid, or a sequence {x, y}, -1 <= x,y <= 1,	including possibly
---	{0, 0}.
-function UI:promptDirection()
-	self:message("Which direction?")
+--	nil if invalid, or dir,x,y; see UI:directionFromKey()
+function UI:promptDirection(reason)
+	self:message(reason or "Which direction?")
 	self:drawScreen()
 
 	local key = curses.getch()
-	local dir = self:directionFromKey(key)
+	local dir, dirx, diry = self:directionFromKey(key)
 	if not dir then
 		self:message("'" .. key .. "' isn't a valid direction.")
 	end
-	return dir
+	return dir, dirx, diry
 end
 
 --	UI:message() - pushes a message onto the message list, so the player

@@ -8,6 +8,33 @@ local Log = require "lua/log"
 
 local Util = {}
 
+
+--	Util.xyFromDirection() - given a direction code like "l", "ul" (up-left),
+--	or "." (self), returns x,y with -1 <= x,y <= 1
+function Util.xyFromDirection(dir)
+	if dir == "l" then
+		return -1, 0
+	elseif dir == "d" then
+		return 0, 1
+	elseif dir == "u" then
+		return 0, -1
+	elseif dir == "r" then
+		return 1, 0
+	elseif dir == "ul" then
+		return -1, -1
+	elseif dir == "ur" then
+		return 1, -1
+	elseif dir == "dl" then
+		return -1, 1
+	elseif dir == "dr" then
+		return 1, 1
+	elseif dir == "." then
+		return 0, 0
+	else
+		error("Bad direction " .. tostring(dir))
+	end
+end
+
 --	Util.seqDelete() - removes an object from a numerical sequence, to go with
 --	table.insert and table.remove.
 --	Returns true on success, false if it didn't exist.

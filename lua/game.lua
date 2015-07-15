@@ -59,6 +59,9 @@ function Game:start()
 	--	draw the title screen
 	local playerName = UI:drawTitleScreen()
 
+	--	show a friendly welcome message
+	UI:message("Welcome to {{green}}Nush{{white}}! Please do not die often.")
+
 	--	create the dungeon
 	Log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
@@ -107,9 +110,6 @@ function Game:start()
 	--	allow the event loop to run
 	self.running = true
 
-	--	show a friendly welcome message
-	UI:message("Welcome to {{green}}Nush{{white}}! Please do not die often.")
-
 	Log:write("Game initialization successfully completed.")
 end
 
@@ -152,7 +152,6 @@ end
 --	does not return anything
 function Game:terminate()
 	Log:write("Terminating game instance...")
-	curses.terminate()
 	UI:terminate()
 	Log:terminate()
 	io.write("Bye! Please submit any bugs you may have encountered!\n")

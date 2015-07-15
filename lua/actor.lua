@@ -423,9 +423,9 @@ function Actor:handleKey(key)
 	end
 
 	--	movement
-	local dir = UI:directionFromKey(key)
+	local dir, dirx, diry = UI:directionFromKey(key)
 	if dir then
-		return (self:move(self.x + dir[1], self.y + dir[2]))
+		return (self:move(self.x + dirx, self.y + diry))
 	end
 
 	--	use of stairs
@@ -435,11 +435,9 @@ function Actor:handleKey(key)
 
 	--	close door
 	if key == "c" then
-		UI:message("Close where?")
-		UI:drawScreen()	-- the screen needs to be refreshed for the message to appear
-		local dir = UI:directionFromKey(curses.getch())
+		local dir, dirx, diry = UI:promptDirection("Close where?")
 		if dir then
-			return self:closeDoor(self.x + dir[1], self.y + dir[2])
+			return self:closeDoor(self.x + dirx, self.y + diry)
 		elseif self == Game.player then
 			UI:message("Okay, then.")	-- signal that no action has been taken
 			return false
