@@ -11,9 +11,12 @@
 --			onto it
 --	* opaque (boolean) - whether or not the tile prevents actors from seeing
 --			through it
---	* walk-message (string, optional) - the message the player character gets
---			from walking onto the tile
+--	*	on-walk (function, optional) - an event which is triggered when an actor
+--			steps on the tile; the function takes a single argument, the actor object
 --
+
+local Game = require "lua/game"
+local UI = require "lua/ui"
 
 local Tile = {}
 
@@ -55,7 +58,11 @@ Tile.grass = {
 	["color"] = curses.green,
 	["solid"] = false,
 	["opaque"] = false,
-	["walk-message"] = "{{cyan}}Your feet are tingled by the grass."
+	["on-walk"] = function(actor)
+		if actor == Game.player then
+			UI:message("{{cyan}}Your feet are tingled by the grass.")
+		end
+	end
 }
 
 Tile.shallowWater = {
@@ -64,7 +71,11 @@ Tile.shallowWater = {
 	["color"] = curses.blue + curses.bold,
 	["solid"] = false,
 	["opaque"] = false,
-	["walk-message"] = "{{cyan}}Your feet get cold from the water."
+	["on-walk"] = function(actor)
+		if actor == Game.player then
+			UI:message("{{cyan}}Your feet get cold from the water.")
+		end
+	end
 }
 
 Tile.ceilingDrip = {
@@ -73,7 +84,11 @@ Tile.ceilingDrip = {
 	["color"] = curses.white + curses.bold,
 	["solid"] = false,
 	["opaque"] = false,
-	["walk-message"] = "{{cyan}}Something is dripping from the ceiling."
+	["on-walk"] = function(actor)
+		if actor == Game.player then
+			UI:message("{{cyan}}Something is dripping from the ceiling.")
+		end
+	end
 }
 
 Tile.stairsDown = {

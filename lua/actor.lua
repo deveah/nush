@@ -101,9 +101,10 @@ function Actor:setPosition(x, y)
 	self.x = x
 	self.y = y
 
-	--	some tiles may trigger special messages for the player when being walked on
-	if self.map.tile[self.x][self.y]["walk-message"] and self == Game.player then
-		UI:message(self.map.tile[self.x][self.y]["walk-message"])
+	--	some tiles may trigger special events when being walked on
+	local f = self.map.tile[self.x][self.y]["on-walk"]
+	if f and type(f) == "function" then
+		f(self)
 	end
 
 	--	each repositioning triggers the recalculation of the sight map
