@@ -66,9 +66,15 @@ function Game:start()
 	Log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
 		local map = Map.new(i, "Dungeon:" .. i)
-		map:generateRoomsAndCorridors(10, 4, 5)
-		map:spawnPoolsOfWater(5, 0.25)
-		map:spawnPatchesOfGrass(10, 0.5)
+		if math.random() < 0.3 then
+			map:generateCave(40, 4, 8)
+			map:spawnPoolsOfWater(3, 0.8)
+			map:spawnPatchesOfGrass(1, 0.9)
+		else
+			map:generateRoomsAndCorridors(15, 4, 5)
+			map:spawnPoolsOfWater(5, 0.25)
+			map:spawnPatchesOfGrass(10, 0.5)
+		end
 		self:addMap(map)
 
 		--	link with the previously created map (if it exists)

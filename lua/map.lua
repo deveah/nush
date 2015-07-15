@@ -384,6 +384,102 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 
 end
 
+--	TODO: doc.
+function Map:generateCave(nRooms, nLoops, cavernization)
+	local rooms = {}
+
+	--	TODO: doc.
+	local function getTileCost(x, y)
+		local cost = 2 * self:countNeighbours(x, y, Tile.roomFloor)
+		if self.tile[x][y] == Tile.roomFloor then cost = cost + 16 end
+		return cost
+	end
+
+	--	roomDistance() - calculates the distance between two rooms
+	local function roomDistance(indexA, indexB)
+		return math.sqrt(	(indexA.x - indexB.x) * (indexA.x - indexB.x) +
+											(indexA.y - indexB.y) * (indexA.y - indexB.y))
+	end
+
+	--	closestRoom() - returns the index of the closest room to a given one
+	local function closestRoom(toWhich)
+		local min, minIndex = 999, 1
+		for i = 1, #rooms do
+			local dist = roomDistance(rooms[toWhich], rooms[i])
+			if dist < min and i ~= toWhich then
+				min = dist
+				minIndex = i
+			end
+		end
+		return minIndex
+	end
+	
+	--	create the rooms
+	for i = 1, nRooms do
+		local rx, ry, rw, rh
+		repeat
+			rx = math.random(1, 70)
+			ry = math.random(1, 15)
+			rw = math.random(2, 6)
+			rh = math.random(2, 5)
+		until self:isInBounds(rx+rw, ry+rh) and
+					self:isAreaEmpty(rx, ry, rw, rh)
+
+		self:digRoom(rx, ry, rw, rh, Tile.floor, Tile.wall)
+		table.insert(rooms, {x = rx, y = ry, w = rw, h = rh})
+
+		--	link each room with the closest to it
+		if i > 1 then
+			local r = rooms[closestRoom(#rooms)]
+			local sx = math.floor((r.x * 2 + r.w) / 2)
+			local sy = math.floor((r.y * 2 + r.h) / 2)
+			local dx = math.floor((rx * 2 + rw) / 2)
+			local dy = math.floor((ry * 2 + rh) / 2)
+			self:digLink(sx, sy, dx, dy, Tile.roomFloor)
+		end
+	end
+
+	--	postprocess: dig redundant links to make loops
+	for i = 1, nLoops do
+		local sourceRoom, destinationRoom
+		repeat
+			sourceRoom = math.random(1, #rooms)
+			destinationRoom = math.random(1, #rooms)
+		until	sourceRoom ~= destinationRoom and
+					roomDistance(rooms[sourceRoom], rooms[destinationRoom]) < 20
+
+		local sr, dr = rooms[sourceRoom], rooms[destinationRoom]
+		local sx = math.floor((sr.x * 2 + sr.w) / 2)
+		local sy = math.floor((sr.y * 2 + sr.h) / 2)
+		local dx = math.floor((dr.x * 2 + dr.w) / 2)
+		local dy = math.floor((dr.y * 2 + dr.h) / 2)
+
+		self:digLink(sx, sy, dx, dy, Tile.roomFloor)
+	end
+
+	--	postprocess: 'cavernize' - walls neighbouring the cave may collapse,
+	--	creating a more natural curve
+	for k = 1, 10 do
+		for i = 1, 80 do
+			for j = 1, 20 do
+				if getTileCost(i, j) > cavernization then
+					self.tile[i][j] = Tile.roomFloor
+				end
+			end
+		end
+	end
+
+	--	postprocess: surround corridors with wall tiles
+	for i = 1, 80 do
+		for j = 1, 20 do
+			if	self.tile[i][j] == Tile.void and
+					self:countNeighbours(i, j, Tile.roomFloor) >= 1 then
+				self.tile[i][j] = Tile.wall
+			end
+		end
+	end
+
+end
 --	Map:linkWith() - links together two maps through the use of stairs;
 --	the algorithm searches for stair spawning positions which are availible
 --	on both maps, so that taking stairs is a strictly vertical movement;
