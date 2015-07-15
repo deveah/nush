@@ -428,6 +428,19 @@ function Actor:handleKey(key)
 		return self:takeStairs()
 	end
 
+	--	close door
+	if key == "c" then
+		UI:message("Close where?")
+		UI:drawScreen()	-- the screen needs to be refreshed for the message to appear
+		local dir = UI:directionFromKey(curses.getch())
+		if dir then
+			return self:closeDoor(self.x + dir[1], self.y + dir[2])
+		elseif self == Game.player then
+			UI:message("Okay, then.")	-- signal that no action has been taken
+			return false
+		end
+	end
+
 	--	pick up
 	if key == "," or key == "g" then
 		local items = Game:itemsAtTile(self.map, self.x, self.y)
@@ -478,6 +491,9 @@ function Actor:openDoor(x, y)
 
 	--	only closed doors can be opened
 	if self.map.tile[x][y] ~= Tile.closedDoor then
+		if self == Game.player then
+			UI:message("There's no closed door there!")
+		end
 		return false
 	end
 
@@ -486,6 +502,35 @@ function Actor:openDoor(x, y)
 	end
 
 	self.map.tile[x][y] = Tile.openDoor
+
+	--	force the update of the field of view
+	self:updateSight()
+
+	--	the action has been completed successfully
+	return true
+end
+
+--	Actor:closeDoor() - makes the given actor close a door at a given location;
+--	returns true if the action has been successfully completed, and false
+--	otherwise
+function Actor:closeDoor(x, y)
+	if not self.map:isInBounds(x, y) then
+		return false
+	end
+
+	--	only open doors can be closed
+	if self.map.tile[x][y] ~= Tile.openDoor then
+		if self == Game.player then
+			UI:message("There's no open door there!")
+		end
+		return false
+	end
+
+	if self == Game.player then
+		UI:message("You close the door.")
+	end
+
+	self.map.tile[x][y] = Tile.closedDoor
 
 	--	force the update of the field of view
 	self:updateSight()
