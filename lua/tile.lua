@@ -13,6 +13,7 @@
 --			through it
 --	*	on-walk (function, optional) - an event which is triggered when an actor
 --			steps on the tile; the function takes a single argument, the actor object
+--	* role (string, optional) - used to categorise different classes of tiles
 --
 
 local Game = require "lua/game"

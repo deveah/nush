@@ -401,6 +401,7 @@ function Map:linkWith(what)
 		["color"] = "white",
 		["solid"] = false,
 		["opaque"] = false,
+		["role"] = "stairs",
 		["destination-map"] = what
 	}
 
@@ -410,6 +411,7 @@ function Map:linkWith(what)
 		["color"] = "white",
 		["solid"] = false,
 		["opaque"] = false,
+		["role"] = stairs,
 		["destination-map"] = self
 	}
 
@@ -417,6 +419,7 @@ end
 
 --	Map:findRandomEmptySpace() - searches for a random empty space;
 --	an empty space has a non-solid tile, and is occupied by no actor;
+--	stairs are not empty spaces;
 --	returns a pair of coordinates (x, y) which comply with the restrictions
 function Map:findRandomEmptySpace()
 	local x, y
@@ -424,7 +427,8 @@ function Map:findRandomEmptySpace()
 		x = math.random(1, 80)
 		y = math.random(1, 20)
 	until not self:isSolid(x, y) and
-				not self:isOccupied(x, y)
+				not self:isOccupied(x, y) and
+				self.tile[x][y].role ~= "stairs"
 	
 	return x, y
 end
