@@ -13,11 +13,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
 #include <curses.h>
+#ifndef PDCURSES
+	/* bool defined by PDcurses */
+	#include <stdbool.h>
+#endif
 
 
 #define ERROR_STRING 		"Error: %s\n"
@@ -34,7 +37,7 @@
 
 
 lua_State *L = NULL;
-bool curses_running = false;
+bool curses_running = 0;
 int num_interrupts = 0;
 
 static void curses_set_running( lua_State *L, int state )
@@ -48,16 +51,15 @@ static void curses_set_running( lua_State *L, int state )
 
 static int curses_init( lua_State *L )
 {
-	char *term = getenv("TERM");
-	/* Include screen because it also needs more keys defined */
-	bool is_xterm = term && (strstr(term, "xterm") || strstr(term, "screen"));
-
 	initscr();
 	cbreak();
 	noecho();
 	keypad( stdscr, TRUE );
 
-#ifndef __WIN32
+#ifndef PDCURSES
+	char *term = getenv("TERM");
+	/* Include screen because it also needs more keys defined */
+	bool is_xterm = term && (strstr(term, "xterm") || strstr(term, "screen"));
 	if (is_xterm) {
 		/* terminfo for TERM=xterm fails to list some escape codes for numpad keys;
 		// which of the following don't work varies from terminal to terminal,
@@ -121,10 +123,21 @@ static int curses_init( lua_State *L )
 	return 2;
 }
 
+static void exit_curses()
+{
+	if ( curses_running ) {
+		/* clear and refresh needed for pdcurses */
+		clear();
+		refresh();
+		endwin();
+		curses_set_running( L, 0 );
+	}
+}
+
 static int curses_terminate( lua_State *L )
 {
-	endwin();
-	curses_set_running( L, 0 );
+	(void)L;
+	exit_curses();
 
 	return 0;
 }
@@ -147,6 +160,7 @@ static int curses_getch( lua_State *L )
 
 	switch( c )
 	{
+	/* The following may or may not be on numpad */
 	case KEY_UP:
 		lua_pushstring( L, "up" );
 		break;
@@ -171,6 +185,13 @@ static int curses_getch( lua_State *L )
 	case KEY_NPAGE:
 		lua_pushstring( L, "pagedown" );
 		break;
+	case KEY_IC:
+		lua_pushstring( L, "insert" );
+		break;
+	case KEY_DC:
+		lua_pushstring( L, "delete" );
+		break;
+
 	/* numpad */
 	case KEY_A1:
 		lua_pushstring( L, "upleft" );
@@ -192,6 +213,37 @@ static int curses_getch( lua_State *L )
 	case '\n':
 		lua_pushstring( L, "enter" );
 		break;
+
+#ifdef PDCURSES
+	/* more numpad keycodes */
+	case KEY_A2:
+		lua_pushstring( L, "up" );
+		break;
+	case KEY_C2:
+		lua_pushstring( L, "down" );
+		break;
+	case KEY_B1:
+		lua_pushstring( L, "left" );
+		break;
+	case KEY_B3:
+		lua_pushstring( L, "right" );
+		break;
+	case PADPLUS:
+		lua_pushstring( L, "+" );
+		break;
+	case PADMINUS:
+		lua_pushstring( L, "-" );
+		break;
+	case PADSTAR:
+		lua_pushstring( L, "*" );
+		break;
+	case PADSLASH:
+		lua_pushstring( L, "/" );
+		break;
+	case PADENTER:
+		lua_pushstring( L, "enter" );
+		break;
+#endif
 	default:
 		s[0] = c;
 		s[1] = 0;
@@ -257,6 +309,7 @@ static int curses_cursor( lua_State *L )
 	return 0;
 }
 
+/* Note: this doesn't accept numpad enter under pdcurses */
 static int curses_getstr( lua_State *L )
 {
 	char str[MAX_STRING_LENGTH];
@@ -338,7 +391,7 @@ void interrupt_handler( int i )
 
 	if (++num_interrupts > 1) {  /* If luaL_error doesn't work */
 		if( curses_running )
-			endwin();
+			exit_curses();
 		printf("Interrupted. (Second Ctrl-C)\n");
 		exit(1);
 	} else {
@@ -406,7 +459,7 @@ int main( int argc, char **argv )
 	}
 
 	if( curses_running )
-		endwin();
+		exit_curses();
 
 	/* This should only happen when the error handler throws an error */
 	if( r )
