@@ -12,6 +12,7 @@
 --
 
 local Global = require "lua/global"
+local Log = require "lua/log"
 local Game = require "lua/game"
 local Tile = require "lua/tile"
 
@@ -252,7 +253,9 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 	--	create the rooms
 	for i = 1, nRooms do
 		local rx, ry, rw, rh
+		local attempts = 0
 		repeat
+			attempts = attempts + 1
 			rx = math.random(1, 70)
 			ry = math.random(1, 15)
 			rw = math.random(5, 8)
@@ -266,7 +269,10 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 			if rw % 2 == 0 then rw = rw + 1 end
 			if rh % 2 == 0 then rh = rh + 1 end
 		until self:isInBounds(rx+rw, ry+rh) and
-					self:isAreaEmpty(rx, ry, rw, rh)
+					self:isAreaEmpty(rx, ry, rw, rh) or
+					attempts == 100
+
+		if attempts == 100 then break end
 
 		self:digRoom(rx, ry, rw, rh, Tile.roomFloor, Tile.wall)
 		table.insert(rooms, {x = rx, y = ry, w = rw, h = rh})
