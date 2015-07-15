@@ -423,8 +423,6 @@ function Actor:handleKey(key)
 		return (self:move(self.x + dir[1], self.y + dir[2]))
 	end
 
-	end
-
 	--	use of stairs
 	if key == ">" then
 		return self:takeStairs()
