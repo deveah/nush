@@ -16,3 +16,16 @@
 *	dungeon branches, eg. Waste Processing, Hydroponics with different themes
 	and varying loot
 
+*	experience points are gained through the exploration of the dungeon - either
+	when entering an unexplored level, either when killing a type of enemy for
+	the first time; also, hidden artifacts scattered around the dungeon which
+	instantly give experience points
+*	enemies are categorised; killing an enemy of a certain category slightly
+	increases the effectiveness of the player's attacks against enemies from
+	the same category
+
+*	skills:
+	*	offensive: unarmed, melee, handguns, shotguns, rifles, explosive, exotic
+	*	defensive: sneak, dodge
+	*	technical: lockpick, repair, tinker
+
