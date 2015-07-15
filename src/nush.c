@@ -11,6 +11,13 @@
 	#include <lauxlib.h>
 #endif
 
+#ifdef __WIN32
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+#else
+	#include <sys/time.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,6 +46,22 @@
 lua_State *L = NULL;
 bool curses_running = 0;
 int num_interrupts = 0;
+
+/* milliseconds since some arbitrary reference point */
+#ifdef __WIN32
+long long milliseconds() {
+	FILETIME systime;
+	GetSystemTimeAsFileTime( &systime );
+	return (((long long)systime.dwHighDateTime << 32)
+		+ systime.dwLowDateTime) / 10000LL;
+}
+#else
+long long milliseconds() {
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+#endif
 
 static void curses_set_running( lua_State *L, int state )
 {
@@ -376,6 +399,38 @@ luaL_Reg curses[] = {
 	{	NULL,			NULL }
 };
 
+/* clib.sleep(seconds) - sleep for some number of seconds, with precision
+   of at least 10 milliseconds */
+static int clib_sleep( lua_State *L )
+{
+	double seconds = luaL_checknumber( L, 1 );
+	if (seconds < 0)
+		return 0;
+#ifdef __WIN32
+	/* Precision is only 10ms (or maybe 15ms?) */
+	Sleep(seconds * 1e3);
+#else
+	usleep(seconds * 1e6);
+#endif
+	return 0;
+}
+
+/* clib.time() - Returns a time stamp in seconds, will millisecond precision,
+   unlike lua's os.time() which has seconds precision. */
+static int clib_time( lua_State *L )
+{
+	lua_pushnumber( L, 1e-3 * milliseconds() );
+
+	return 1;
+}
+
+
+luaL_Reg clib[] = {
+	{	"sleep",		clib_sleep },
+	{	"time",			clib_time },
+	{	NULL,			NULL }
+};
+
 /*
 static void lstop( lua_State *L, lua_Debug *ar ) {
 	(void)ar;  // unused arg.
@@ -427,11 +482,14 @@ int main( int argc, char **argv )
 
 	#if defined(USE_LUAJIT) || defined(USE_LUA51)
 		luaL_register( L, "curses", curses );
+		luaL_register( L, "clib", clib );
 	#endif
 
 	#ifdef USE_LUA52
 		luaL_newlib( L, curses );
 		lua_setglobal( L, "curses" );
+		luaL_newlib( L, clib );
+		lua_setglobal( L, "clib" );
 	#endif
 
 	init_constants( L );
