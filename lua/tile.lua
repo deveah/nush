@@ -91,22 +91,6 @@ Tile.ceilingDrip = {
 	end
 }
 
-Tile.stairsDown = {
-	["name"] = "Stairs down",
-	["face"] = ">",
-	["color"] = "white",
-	["solid"] = false,
-	["opaque"] = false
-}
-
-Tile.stairsUp = {
-	["name"] = "Stairs up",
-	["face"] = "<",
-	["color"] = "white",
-	["solid"] = false,
-	["opaque"] = false
-}
-
 Tile.openDoor = {
 	["name"] = "Open door",
 	["face"] = "/",

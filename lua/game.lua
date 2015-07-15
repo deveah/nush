@@ -62,11 +62,16 @@ function Game:start()
 	--	create the dungeon
 	Log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
-		local map = Map.new(i)
+		local map = Map.new(i, "Dungeon:" .. i)
 		map:generateRoomsAndCorridors(10, 4, 5)
 		map:spawnPoolsOfWater(5, 0.25)
 		map:spawnPatchesOfGrass(10, 0.5)
 		self:addMap(map)
+
+		--	link with the previously created map (if it exists)
+		if i > 1 then
+			map:linkWith(self.mapList[i-1])
+		end
 
 		--	populate each map with other actors
 		Log:write("Populating level " .. i .. " of the dungeon...")

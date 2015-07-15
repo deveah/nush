@@ -20,10 +20,11 @@ Map.__index = Map
 
 --	Map.new() - creates a new Map object and initializes its members with
 --	default data; returns the created Map object
-function Map.new(mapnum)
+function Map.new(mapnum, name)
 	local m = {}
 	setmetatable(m, Map)
 
+	m.name = name
 	m.num = mapnum
 	m.tile = {}
 	m.memory = {}
@@ -380,6 +381,37 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 			end
 		end
 	end
+
+end
+
+--	Map:linkWith() - links together two maps through the use of stairs;
+--	the algorithm searches for stair spawning positions which are availible
+--	on both maps, so that taking stairs is a strictly vertical movement;
+--	does not return anything
+function Map:linkWith(what)
+	local x, y
+	repeat
+		x, y = self:findRandomEmptySpace()
+	until	not what:isSolid(x, y) and
+				not what:isOccupied(x, y)
+	
+	self.tile[x][y] = {
+		["name"] = "Stairs up",
+		["face"] = "<",
+		["color"] = "white",
+		["solid"] = false,
+		["opaque"] = false,
+		["destination-map"] = what
+	}
+
+	what.tile[x][y] = {
+		["name"] = "Stairs down",
+		["face"] = ">",
+		["color"] = "white",
+		["solid"] = false,
+		["opaque"] = false,
+		["destination-map"] = self
+	}
 
 end
 

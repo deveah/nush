@@ -102,7 +102,7 @@ function UI:drawScreen()
 
 	--	draw the status line
 	curses.clearLine(23)
-	curses.write(0, 23, "Placeholder status line.")
+	curses.write(Global.screenWidth - Game.player.map.name:len(), 23, Game.player.map.name)
 
 	--	position the cursor on the player, so it may be easily seen
 	curses.move(Game.player.x + xOffset, Game.player.y + yOffset)

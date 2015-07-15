@@ -323,6 +323,8 @@ function Actor:takeStairs()
 		if self == Game.player then
 			UI:message("You descend the stairs.")
 		end
+		self.map = self.map.tile[self.x][self.y]["destination-map"]
+		self:updateSight()	-- force update of sight map
 		return true
 	end
 
@@ -331,6 +333,8 @@ function Actor:takeStairs()
 		if self == Game.player then
 			UI:message("You ascend the stairs.")
 		end
+		self.map = self.map.tile[self.x][self.y]["destination-map"]
+		self:updateSight()	-- force update of sight map
 		return true
 	end
 
