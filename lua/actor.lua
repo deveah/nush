@@ -111,6 +111,17 @@ function Actor:setPosition(x, y)
 	self:updateSight()
 end
 
+--	Actor:draw() - draw this actor on the map if it should be visible from
+--	the player character's point of view; returns nothing.
+function Actor:draw(xOffset, yOffset)
+	if Game.player.sightMap[self.x][self.y] then
+		curses.attr(self.color)
+		curses.write(self.x + xOffset, self.y + yOffset, self.face)
+	end
+end
+
+----------------------------------- Inventory --------------------------------
+
 --	Actor:unusedInventSlot() - returns the first unused inventory slot, or nil
 --	none are free.
 function Actor:unusedInventSlot()
@@ -178,6 +189,9 @@ function Actor:die()
 		self:dropItem(item)
 	end
 end
+
+
+----------------------------------- FOV --------------------------------------
 
 --	Actor:updateSight() - calculates the given actor's sight map;
 --	does not return anything

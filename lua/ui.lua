@@ -70,16 +70,20 @@ function UI:drawScreen()
 		end
 	end
 
-	--	draw the actors on the same map as the player, who are visible from
-	--	the player character's point of view; only actors who are alive
-	--	can be seen
+	--	draw the actors on the same map as the player; skipping over dead actors
+	--	who haven't been deleted yet.
 	for i = 1, #(Game.actorList) do
-		if	Game.actorList[i].map == map
-				and Game.player.sightMap[Game.actorList[i].x][Game.actorList[i].y]
-				and Game.actorList[i].alive then
-			curses.attr(Game.actorList[i].color)
-			curses.write(Game.actorList[i].x + xOffset, Game.actorList[i].y + yOffset,
-				Game.actorList[i].face)
+		local actor = Game.actorList[i]
+		if actor.map == map and actor.alive then
+			actor:draw(xOffset, yOffset)
+		end
+	end
+
+	--	draw the particles above everything else.
+	for i = 1, #(Game.particleList) do
+		local particle = Game.particleList[i]
+		if particle.map == map then
+			particle:draw(xOffset, yOffset)
 		end
 	end
 

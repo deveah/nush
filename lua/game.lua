@@ -8,9 +8,10 @@
 --			input from the user; if the game is not running, the event loop will
 --			transition into a halting state, cleaning up all the relevant resources
 --			and informing the user accordingly
---	*	actorList (table) - a list of all living actors that have the ability to
---			take their turns
---	*	itemList (table) - a list of all items whether on the floor or owned by
+--	*	actorList (list) - a list of all living actors that have the ability
+--			to take their turns
+--	*	particleList (list) - a list of all particles
+--	*	itemList (list) - a list of all items whether on the floor or owned by
 --			an actor
 --	*	mapList (table) - a list of all maps (levels) of the dungeon
 --	*	player (Actor object) - a shortcut to the player-controlled character;
@@ -40,6 +41,7 @@ local Itemdefs = require "lua/itemdefs"
 function Game:init()
 	self.running = false
 	self.actorList = {}
+	self.particleList = {}
 	self.itemList = {}
 	self.mapList = {}
 	self.turnCount = 0
@@ -163,7 +165,6 @@ function Game:terminate()
 	io.write("Bye! Please submit any bugs you may have encountered!\n")
 end
 
-
 --	Game:addActor() - adds an Actor object into the list of living actors;
 --	does not return anything
 function Game:addActor(actor)
@@ -172,13 +173,29 @@ function Game:addActor(actor)
 end
 
 --	Game:removeActor() - removes an item from the global actorList in case it
---	is destroyed. Do NOT call this to delete an actor, call actor:destroy().
+--	is destroyed.
 --	Does not return anything
 function Game:removeActor(actor)
 	if not Util.seqRemove(self.actorList, actor) then
-		error("bad call Game:removeActor(" .. actor .. ")")
+		error("bad call Game:removeActor(" .. actor:toString() .. ")")
 	end
 	Log:write("Remove actor " .. actor:toString() .. " from actorList.")
+end
+
+--	Game:addParticle() - adds a Particle object into the list of living
+--	actors;	does not return anything
+function Game:addParticle(particle)
+	table.insert(self.particleList, particle)
+	Log:write("Added particle " .. particle:toString() .. " to particleList.")
+end
+
+--	Game:removeParticle() - removes a particle from the global particleList.
+--	Does not return anything
+function Game:removeParticle(particle)
+	if not Util.seqRemove(self.particleList, particle) then
+		error("bad call Game:removeParticle(" .. particle:toString() .. ")")
+	end
+	Log:write("Remove particle " .. particle:toString() .. " from particleList.")
 end
 
 --	Game:addItem() - adds an Item object into the global list of items;
@@ -193,7 +210,7 @@ end
 --	Does not return anything
 function Game:removeItem(item)
 	if not Util.seqRemove(self.itemList, item) then
-		error("bad call Game:removeItem(" .. item .. ")")
+		error("bad call Game:removeItem(" .. item:toString() .. ")")
 	end
 	Log:write("Remove item " .. item:toString() .. " from itemList.")
 end
