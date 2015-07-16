@@ -1,2 +1,0 @@
-Player died on Dungeon:1, shot self in foot
-Player died on Dungeon:2, shot self in foot
