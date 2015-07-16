@@ -108,23 +108,23 @@ function Map:generateDummy()
 
 	--	add some other random tiles
 	for i = 1, 10 do
-		local x = math.random(2, 79)
-		local y = math.random(2, 19)
+		local x = math.random(2, Global.mapWidth - 1)
+		local y = math.random(2, Global.mapHeight - 1)
 		self.tile[x][y] = Tile.grass
 	end
 	for i = 1, 10 do
-		local x = math.random(2, 79)
-		local y = math.random(2, 19)
+		local x = math.random(2, Global.mapWidth - 1)
+		local y = math.random(2, Global.mapHeight - 1)
 		self.tile[x][y] = Tile.shallowWater
 	end
 	for i = 1, 10 do
-		local x = math.random(2, 79)
-		local y = math.random(2, 19)
+		local x = math.random(2, Global.mapWidth - 1)
+		local y = math.random(2, Global.mapHeight - 1)
 		self.tile[x][y] = Tile.ceilingDrip
 	end
 	for i = 1, 10 do
-		local x = math.random(2, 79)
-		local y = math.random(2, 19)
+		local x = math.random(2, Global.mapWidth - 1)
+		local y = math.random(2, Global.mapHeight - 1)
 		self.tile[x][y] = Tile.wall
 	end
 end
@@ -256,8 +256,8 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 		local attempts = 0
 		repeat
 			attempts = attempts + 1
-			rx = math.random(1, 70)
-			ry = math.random(1, 15)
+			rx = math.random(1, Global.mapWidth - 5)
+			ry = math.random(1, Global.mapHeight - 5)
 			rw = math.random(5, 8)
 			rh = math.random(5, 7)
 
@@ -299,8 +299,8 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 	for i = 1, nLockers do
 		local x, y
 		repeat
-			x = math.random(1, 80)
-			y = math.random(1, 20)
+			x = math.random(1, Global.mapWidth)
+			y = math.random(1, Global.mapHeight)
 		until	self.tile[x][y] == Tile.wall and
 					((x % 2 == 0 and y % 2 == 1) or
 					(x % 2 == 1 and y % 2 == 0))
@@ -358,8 +358,8 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 	end
 
 	--	postprocess: surround corridors with wall tiles
-	for i = 1, 80 do
-		for j = 1, 20 do
+	for i = 1, Global.mapWidth do
+		for j = 1, Global.mapHeight do
 			if	self.tile[i][j] == Tile.void and
 					self:countNeighbours(i, j, Tile.floor) >= 1 then
 				self.tile[i][j] = Tile.wall
@@ -424,8 +424,8 @@ function Map:generateCave(nRooms, nLoops, cavernization)
 	for i = 1, nRooms do
 		local rx, ry, rw, rh
 		repeat
-			rx = math.random(1, 70)
-			ry = math.random(1, 15)
+			rx = math.random(1, Global.mapWidth - 5)
+			ry = math.random(1, Global.mapHeight - 5)
 			rw = math.random(2, 6)
 			rh = math.random(2, 5)
 		until self:isInBounds(rx+rw, ry+rh) and
@@ -466,8 +466,8 @@ function Map:generateCave(nRooms, nLoops, cavernization)
 	--	postprocess: 'cavernize' - walls neighbouring the cave may collapse,
 	--	creating a more natural curve
 	for k = 1, 10 do
-		for i = 1, 80 do
-			for j = 1, 20 do
+		for i = 1, Global.mapWidth do
+			for j = 1, Global.mapHeight do
 				if getTileCost(i, j) > cavernization then
 					self.tile[i][j] = Tile.roomFloor
 				end
@@ -476,8 +476,8 @@ function Map:generateCave(nRooms, nLoops, cavernization)
 	end
 
 	--	postprocess: surround corridors with wall tiles
-	for i = 1, 80 do
-		for j = 1, 20 do
+	for i = 1, Global.mapWidth do
+		for j = 1, Global.mapHeight do
 			if	self.tile[i][j] == Tile.void and
 					self:countNeighbours(i, j, Tile.roomFloor) >= 1 then
 				self.tile[i][j] = Tile.wall
@@ -526,8 +526,8 @@ end
 function Map:findRandomEmptySpace()
 	local x, y
 	repeat
-		x = math.random(1, 80)
-		y = math.random(1, 20)
+		x = math.random(1, Global.mapWidth)
+		y = math.random(1, Global.mapHeight)
 	until not self:isSolid(x, y) and
 				not self:isOccupied(x, y) and
 				self.tile[x][y].role ~= "stairs"
@@ -542,15 +542,15 @@ function Map:spawnPoolsOfWater(nPools, chanceToSpread)
 	for i = 1, nPools do
 		local x, y
 		repeat
-			x = math.random(1, 80)
-			y = math.random(1, 80)
+			x = math.random(1, Global.mapWidth)
+			y = math.random(1, Global.mapHeight)
 		until self.tile[x][y] == Tile.roomFloor
 
 		self.tile[x][y] = Tile.shallowWater
 	end
 
-	for i = 1, 80 do
-		for j = 1, 20 do
+	for i = 1, Global.mapWidth do
+		for j = 1, Global.mapHeight do
 			if	self:countNeighbours(i, j, Tile.shallowWater) > 0
 					and self.tile[i][j] == Tile.roomFloor
 					and math.random() < chanceToSpread then
@@ -567,15 +567,15 @@ function Map:spawnPatchesOfGrass(nPatches, chanceToSpread)
 	for i = 1, nPatches do
 		local x, y
 		repeat
-			x = math.random(1, 80)
-			y = math.random(1, 80)
+			x = math.random(1, Global.mapWidth)
+			y = math.random(1, Global.mapHeight)
 		until self.tile[x][y] == Tile.roomFloor
 
 		self.tile[x][y] = Tile.grass
 	end
 
-	for i = 1, 80 do
-		for j = 1, 20 do
+	for i = 1, Global.mapWidth do
+		for j = 1, Global.mapHeight do
 			if	self:countNeighbours(i, j, Tile.grass) > 0
 					and self.tile[i][j] == Tile.roomFloor
 					and math.random() < chanceToSpread then
