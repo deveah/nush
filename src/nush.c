@@ -32,7 +32,7 @@
 #endif
 
 
-#define ERROR_STRING 		"Error: %s\n"
+#define ERROR_STRING 		"Error: %s"
 #define MAX_STRING_LENGTH 	80
 #define LOGFILE			"log.txt"  /* Also defined in lua/global.lua */
 
@@ -80,6 +80,7 @@ static void log_printf( char *fmt, ... )
 	va_start( ap, fmt );
 	vfprintf( file, fmt, ap );
 	va_end( ap );
+	fprintf( file, "\n" );
 	fclose( file );
 }
 
@@ -525,10 +526,10 @@ int main( int argc, char **argv )
 		L = lua_open();
 	#endif
 
-	log_printf("Initialized lua.\n");
+	log_printf("Initialized lua.");
 
 	luaL_openlibs( L );
-	log_printf("Initialized lua libraries.\n");
+	log_printf("Initialized lua libraries.");
 
 	#if defined(USE_LUAJIT) || defined(USE_LUA51)
 		luaL_register( L, "curses", curses );
@@ -543,7 +544,7 @@ int main( int argc, char **argv )
 	#endif
 
 	init_constants( L );
-	log_printf("Registered curses namespace.\n");
+	log_printf("Registered curses namespace.");
 
 	/* Set ctrl-C handler, portably */
 #ifndef __WIN32
@@ -552,7 +553,7 @@ int main( int argc, char **argv )
 	sa.sa_flags = 0;
 	sigemptyset( &sa.sa_mask );
 	sigaction( SIGINT, &sa, NULL );
-	log_printf("Registered interrupt handler.\n");
+	log_printf("Registered interrupt handler.");
 #endif
 
 	int r;
