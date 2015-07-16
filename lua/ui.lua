@@ -116,7 +116,7 @@ end
 --	true if the player has responded "ok", and false for every other reason
 function UI:prompt(reason)
 	--	show the user the reason for prompting
-	self:message(reason .. " (ok/cancel)")
+	self:message(reason .. " ({{WHITE}}o{{white}}k/{{WHITE}}c{{white}}ancel)")
 
 	--	update the screen so the prompt is visible
 	self:drawScreen()

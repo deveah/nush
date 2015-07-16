@@ -504,6 +504,11 @@ void interrupt_handler( int i )
 
 int main( int argc, char **argv )
 {
+	/* Reduce Esc delay to 100ms (there is no delay on Windows) */
+#ifdef NCURSES_VERSION
+	ESCDELAY = 100;
+#endif
+
 	/* Delete log file here rather than in lua so that we can log to it
 	   before log.lua runs */
 	remove( LOGFILE );

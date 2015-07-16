@@ -539,7 +539,7 @@ end
 --	the action was successful or not
 function Actor:handleKey(key)
 	--	system keys
-	if key == "Q" then	--	quit
+	if key == "Q" or key == "escape" then	--	quit
 		if UI:prompt("Are you sure you want to exit?") then
 			Game:halt("Player requested game termination.")
 			return true	--	an exit request still spends a turn
@@ -573,7 +573,7 @@ function Actor:handleKey(key)
 	end
 
 	--	use of stairs
-	if key == ">" then
+	if key == ">" or key == "<" then
 		return (self:takeStairs())
 	end
 
