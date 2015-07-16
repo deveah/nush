@@ -83,7 +83,7 @@ end
 function Map:isOccupied(x, y)
 	for i = 1, #(Game.actorList) do
 		local actor = Game.actorList[i]
-		if actor.map == self and actor.x == x and actor.y == y then
+		if actor.map == self and actor.x == x and actor.y == y and actor.alive then
 			return actor
 		end
 	end

@@ -10,6 +10,14 @@ local Global = {}
 --	into the file designated by the `Global.logFilename` variable
 Global.debug = true
 
+--	Whether to display animations, otherwise uses alternative visualisations
+Global.animations = true
+
+--	Length of each animation frame in seconds. For consistency with Windows
+--	should be close to multiple of 10ms. Some terms may only draw at 30 fps,
+--	so less than 0.03 causes lost frames
+Global.animationFrameLength = 0.02
+
 --	the default name of the player character
 Global.defaultName = "Player"
 
@@ -29,4 +37,3 @@ Global.mapHeight =	20
 Global.dungeonDepth = 10
 
 return Global
-

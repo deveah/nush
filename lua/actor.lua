@@ -4,20 +4,23 @@
 --	Actor object definition and methods
 --
 --	An Actor object has the following members:
---	*	name (string) - a name describing the actor type
---	* face (string) - a character describing how the actor looks in-game
+--	*	name (string)     - a name describing the actor type
+--	* face (string)     - a character describing how the actor looks in-game
 --	*	color (curses constant) - the color of the actor in-game
---	*	map (Map object) - the map on which the Actor is currently
---	* x, y (integers) - the position of the Actor on the map
---	*	sightMap (two-dimensional boolean table) - a map showing the tiles
---			currently visible to the actor
---	*	alive (boolean) - true if the actor can act
+--	*	map (Map object)  - the map on which the Actor is currently
+--	* x, y (integers)   - the position of the Actor on the map
+--	*	sightMap (2D boolean table) - a map showing the tiles
+--	                      currently visible to the actor
+--	* sightRange (int)  - Number of tiles the actor can see
+--	* inventory (table) - Mapping from inventory slot (letter) to Items
+--	*	alive (boolean)   - true if the actor can act
 --
 
 local Global = require "lua/global"
 local Log = require "lua/log"
 local Game = require "lua/game"
 local UI = require "lua/ui"
+local Particle = require "lua/particle"
 local Tile = require "lua/tile"
 local Util = require "lua/util"
 
@@ -37,8 +40,9 @@ function Actor.new()
 	a.map = nil
 	a.x = 0	--	although 0 is not a valid coordinate for the Actor to be on,
 	a.y = 0	--	the value signifies that an actual position has not been set
-	a.alive = true	--	by default, a newly created Actor is alive
-	a.inventory = {}  --	mapping from inventory letter to Item
+	a.alive = true
+	a.inventory = {}
+	a.sightRange = 5
 
 	a.sightMap = {}
 	for i = 1, Global.mapWidth do
@@ -111,10 +115,15 @@ function Actor:setPosition(x, y)
 	self:updateSight()
 end
 
+--	Actor:visible() - returns whether this actor is visible to the player
+function Actor:visible()
+	return self.map == Game.player.map and Game.player.sightMap[self.x][self.y]
+end
+
 --	Actor:draw() - draw this actor on the map if it should be visible from
 --	the player character's point of view; returns nothing.
 function Actor:draw(xOffset, yOffset)
-	if Game.player.sightMap[self.x][self.y] then
+	if self:visible() then
 		curses.attr(self.color)
 		curses.write(self.x + xOffset, self.y + yOffset, self.face)
 	end
@@ -242,7 +251,7 @@ function Actor:updateSight()
 	for i = 1, 360 do
 		local xOffset = math.cos(i * math.pi / 180)
 		local yOffset = math.sin(i * math.pi / 180)
-		traceRay(xOffset, yOffset, 5)
+		traceRay(xOffset, yOffset, self.sightRange)
 	end
 
 	Log:write("Sight map calculated for " .. self:toString())
@@ -305,10 +314,7 @@ function Actor:move(x, y)
 	--	instead, the actor who occupies that certain tile is attacked
 	local actor = self.map:isOccupied(x, y)
 	if actor and actor.alive then
-		if self == Game.player then
-			UI:message("You attack the " .. actor.name .. ".")
-		end
-		return self:meleeAttack(actor)
+		return (self:meleeAttack(actor))
 	end
 
 	--	if all is well, update the actor's position
@@ -321,9 +327,87 @@ end
 --	even if the hit was a miss
 function Actor:meleeAttack(defender)
 	if self == Game.player then
+		UI:message("You attack the " .. defender.name .. ".")
 		UI:message("{{red}}The " .. defender.name .. " dies!")
 	end
 	defender:die()
+	return true
+end
+
+--	Actor:rangedAttack() - called when the actor's projectile intercepts
+--	another actor; returns true if the projectile hit (whether or not it caused
+--	damage), false if it flies past.
+function Actor:rangedAttack(defender)
+	if math.random() > 0.6 then --	temp 60% chance to hit
+		return false
+	end
+	if self == Game.player then
+		if defender:visible() then
+			UI:message("You hit the " .. defender.name .. ".")
+			UI:message("{{red}}The " .. defender.name .. " dies!")
+		else
+			UI:message("You hit something.")
+		end
+	end
+	defender:die()
+	return true
+end
+
+--	Actor:fireWeapon() - actor fires their weapon in some direction. Animates
+--	the weapon firing and calls self:rangedAttack() on all targets.
+--	Returns true (always) if a turn consumed.
+function Actor:fireWeapon(direction)
+	--	Range of the weapon
+	local range = 7
+
+	local bulletIcons = {
+		l = '-', r = '-', u = '|', d = '|',
+		ul = '\\', dr = '\\', ur = '/', dl = '/'
+	}
+
+	local bullet = Particle.new()
+	Game:addParticle(bullet)
+	bullet:setMap(self.map)
+	bullet:setFace(bulletIcons[direction])
+	bullet:setColor(curses.red)
+
+	local x, y = self.x, self.y
+	local diffx, diffy = Util.xyFromDirection(direction)
+	local nexttick
+	local hit = false --	Have hit something
+
+	for i = 1, range do
+		--	Aniamtion timing
+		nexttick = clib.time() + Global.animationFrameLength
+
+		x = x + diffx
+		y = y + diffy
+		bullet:setPosition(x, y)
+
+		--	Check for collisions
+		local actorHere = self.map:isOccupied(x, y)
+		if actorHere then
+			if self:rangedAttack(actorHere) then
+				--bullet:setFace('%')
+				hit = true
+			end
+		end
+		if self.map:isSolid(x, y) then
+			--bullet:setFace('%')
+			hit = true
+		end
+
+		--	Display
+		UI:drawScreen()
+		curses.refresh()
+		if Global.animations then
+			clib.sleep(nexttick - clib.time())
+		end
+
+		if hit then break end
+	end
+	Game:removeParticle(bullet)
+
 	return true
 end
 
@@ -391,7 +475,6 @@ function Actor:dropItem(item)
 end
 
 
----------------------------- Actor AI and control -----------------------------
 
 --	Actor:act() - makes the given Actor object spend its turn; if the actor
 --	is player-controlled, it requests input from the player and acts according
@@ -413,6 +496,26 @@ function Actor:act()
 		--	the actor is not player-controlled, so let the AI functions take over
 		--	(not implemented, so return that the turn was successfully spent)
 		return true
+	end
+end
+
+
+------------------------------- Player control --------------------------------
+
+--	Actor:playerFires() - handle the player wanting to shoot, returns whether
+--	successful.
+--	TODO: allow proper targetting rather than only firing in a direction
+function Actor:playerFires()
+	local dir = UI:promptDirection("Fire in which direction?")
+	if not dir then
+		return false
+	end
+	if dir == '.' then
+		UI:message("You shoot yourself in the foot!")
+		self:die()
+		return true
+	else
+		return (self:fireWeapon(dir))
 	end
 end
 
@@ -442,9 +545,14 @@ function Actor:handleKey(key)
 		return (self:move(self.x + dirx, self.y + diry))
 	end
 
+	--	fire
+	if key == "f" then
+		return (self:playerFires())
+	end
+
 	--	use of stairs
 	if key == ">" then
-		return self:takeStairs()
+		return (self:takeStairs())
 	end
 
 	--	close door
