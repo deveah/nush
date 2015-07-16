@@ -188,8 +188,10 @@ function Actor:removeItem(item_or_slot)
 	error(item_or_slot:toString() .. " not in inventory")
 end
 
---	Actor:die() - kills the given actor, making it unable to act
-function Actor:die()
+--	Actor:die() - kills the given actor, making it unable to act;
+--	'reason' is an optional parameter which is used to trace the cause of death;
+--	does not return anything
+function Actor:die(reason)
 	Log:write("Actor " .. self:toString() ..
 		" has died.")
 	self.alive = false
@@ -203,6 +205,11 @@ function Actor:die()
 		UI:message("{{RED}}You die... {{red}}Press any key to exit.")
 		UI:drawScreen()
 		curses.getch()
+
+		--	output to the highscores file
+		local f = io.open("scores.txt", "a")
+		f:write(Game.player.name .. " died on " .. Game.player.map.name .. ", " .. reason .. "\n")
+		f:close()
 		Game.running = false
 	end
 end
@@ -338,7 +345,7 @@ function Actor:meleeAttack(defender)
 		UI:message("You attack the " .. defender.name .. ".")
 		UI:message("{{red}}The " .. defender.name .. " dies!")
 	end
-	defender:die()
+	defender:die("hit by " .. self.name)
 	return true
 end
 
@@ -357,7 +364,7 @@ function Actor:rangedAttack(defender)
 			UI:message("You hit something.")
 		end
 	end
-	defender:die()
+	defender:die("shot by " .. self.name)
 	return true
 end
 
@@ -520,7 +527,7 @@ function Actor:playerFires()
 	end
 	if dir == '.' then
 		UI:message("You shoot yourself in the foot!")
-		self:die()
+		self:die("shot self in foot")
 		return true
 	else
 		return (self:fireWeapon(dir))
