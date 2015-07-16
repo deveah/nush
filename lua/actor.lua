@@ -197,6 +197,14 @@ function Actor:die()
 	for _, item in pairs(self.inventory) do
 		self:dropItem(item)
 	end
+
+	--	check if the dead actor is the player, and if so, terminate the game
+	if self == Game.player then
+		UI:message("{{RED}}You die... {{red}}Press any key to exit.")
+		UI:drawScreen()
+		curses.getch()
+		Game.running = false
+	end
 end
 
 

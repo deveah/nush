@@ -295,6 +295,13 @@ function UI:colorWrite(x, y, text)
 		elseif word == "yellow" then	curses.attr(curses.yellow)
 		elseif word == "magenta" then	curses.attr(curses.magenta)
 		elseif word == "cyan" then		curses.attr(curses.cyan)
+		elseif word == "WHITE" then		curses.attr(curses.white + curses.bold)
+		elseif word == "RED" then			curses.attr(curses.red + curses.bold)
+		elseif word == "GREEN" then		curses.attr(curses.green + curses.bold)
+		elseif word == "BLUE" then		curses.attr(curses.blue + curses.bold)
+		elseif word == "YELLOW" then	curses.attr(curses.yellow + curses.bold)
+		elseif word == "MAGENTA" then	curses.attr(curses.magenta + curses.bold)
+		elseif word == "CYAN" then		curses.attr(curses.cyan + curses.bold)
 		else
 			write(text:sub(startpos, nextpos))
 		end

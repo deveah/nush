@@ -141,7 +141,7 @@ function Game:loop()
 			--	the act() method of Actor objects returns true if the actor has spent
 			--	its turn successfully; to prevent wasting turns, the event loop
 			--	must make actors act until they come up with a valid move
-			while not currentActor:act() do end
+			while currentActor.alive and not currentActor:act() do end
 
 			--	if something triggered a game halt, cancel the rest of the actions
 			--	of the remaining actors
