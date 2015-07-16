@@ -266,6 +266,8 @@ end
 --	Does not return anything.
 function UI:colorWrite(x, y, text)
 	local currentX = x
+	--	Stack of previous markup codes, starting with default
+	local markupStack = {"white"}
 
 	local function write(str)
 		curses.write(currentX, y, str)
@@ -286,6 +288,14 @@ function UI:colorWrite(x, y, text)
 		--	Print anything we jumped over
 		if startpos > pos then
 			write(text:sub(pos, startpos - 1))
+		end
+
+		--	Push or pop from the markup stack
+		if word == "pop" then
+			table.remove(markupStack)
+			word = markupStack[#markupStack]
+		else
+			table.insert(markupStack, word)
 		end
 
 		if		 word == "white" then		curses.attr(curses.white)
