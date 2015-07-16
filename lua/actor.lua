@@ -548,6 +548,13 @@ function Actor:handleKey(key)
 		end
 	end
 
+	--	redraw the screen if corrupted
+	if key == "R" or  key == "\x12" or key == "\x0c" then  -- ^R or ^L
+		UI:drawScreen()
+		curses.redraw()
+		return false
+	end
+
 	--  message log
 	if key == "p" then
 		UI:messageLogScreen()

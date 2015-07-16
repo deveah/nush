@@ -203,6 +203,10 @@ static int curses_getch( lua_State *L )
 
 	switch( c )
 	{
+	case '\x1b':  /* ^[ */
+		lua_pushstring( L, "escape" );
+		break;
+
 	/* The following may or may not be on numpad */
 	case KEY_UP:
 		lua_pushstring( L, "up" );
@@ -339,6 +343,16 @@ static int curses_refresh( lua_State *L )
 	return 0;
 }
 
+/* curses.redraw() - Cause the screen to be redrawn */
+static int curses_redraw( lua_State *L )
+{
+	(void) L;
+	/* touchwin/redrawwin works in ncurses, but not pdcurses under
+	   Windows */
+	clearok(stdscr, 1);
+	return 0;
+}
+
 static int curses_move( lua_State *L )
 {
 	int x = lua_tointeger( L, -2 ),
@@ -419,6 +433,7 @@ luaL_Reg curses[] = {
 	{	"clear",		curses_clear },
 	{	"clearLine",	curses_clearline },
 	{	"refresh",		curses_refresh },
+	{	"redraw",		curses_redraw },
 	{	"move",			curses_move },
 	{	"cursor",		curses_cursor },
 	{	"getstr",		curses_getstr },
