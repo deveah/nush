@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+#include <time.h>
 #include <unistd.h>
 #include <signal.h>
 #include <curses.h>
@@ -32,6 +34,7 @@
 
 #define ERROR_STRING 		"Error: %s\n"
 #define MAX_STRING_LENGTH 	80
+#define LOGFILE			"log.txt"  /* Also defined in lua/global.lua */
 
 #define C_BLACK				1
 #define C_RED				2
@@ -62,6 +65,23 @@ long long milliseconds() {
 	return (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 #endif
+
+/* Logs to the same file as Log:write() */
+static void log_printf( char *fmt, ... )
+{
+	FILE *file = fopen( LOGFILE, "a" );
+	if ( !file )
+		return;
+	time_t thetime = time( NULL );
+	char timestr[100];
+	strftime( timestr, 100, "%c", localtime( &thetime ) );
+	fprintf( file, "%s [C]: ", timestr );
+	va_list ap;
+	va_start( ap, fmt );
+	vfprintf( file, fmt, ap );
+	va_end( ap );
+	fclose( file );
+}
 
 static void curses_set_running( lua_State *L, int state )
 {
@@ -469,6 +489,10 @@ void interrupt_handler( int i )
 
 int main( int argc, char **argv )
 {
+	/* Delete log file here rather than in lua so that we can log to it
+	   before log.lua runs */
+	remove( LOGFILE );
+
 	#ifdef USE_LUAJIT
 		L = lua_open();
 	#endif
@@ -481,10 +505,10 @@ int main( int argc, char **argv )
 		L = lua_open();
 	#endif
 
-	printf("Initialized lua.\n");
+	log_printf("Initialized lua.\n");
 
 	luaL_openlibs( L );
-	printf("Initialized lua libraries.\n");
+	log_printf("Initialized lua libraries.\n");
 
 	#if defined(USE_LUAJIT) || defined(USE_LUA51)
 		luaL_register( L, "curses", curses );
@@ -499,7 +523,7 @@ int main( int argc, char **argv )
 	#endif
 
 	init_constants( L );
-	printf("Registered curses namespace.\n");
+	log_printf("Registered curses namespace.\n");
 
 	/* Set ctrl-C handler, portably */
 #ifndef __WIN32
@@ -508,7 +532,7 @@ int main( int argc, char **argv )
 	sa.sa_flags = 0;
 	sigemptyset( &sa.sa_mask );
 	sigaction( SIGINT, &sa, NULL );
-	printf("Registered interrupt handler.\n");
+	log_printf("Registered interrupt handler.\n");
 #endif
 
 	int r;
@@ -529,6 +553,7 @@ int main( int argc, char **argv )
 	if( r )
 	{
 		printf( ERROR_STRING, lua_tostring( L, -1 ) );
+		log_printf( ERROR_STRING, lua_tostring( L, -1 ) );
 	}
 
 	return 0;

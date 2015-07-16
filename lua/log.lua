@@ -11,13 +11,19 @@ Log.__index = Log
 
 --	Log.new() - creates a new Log object, initializing its members with default
 --	data; returns the Log object
-function Log.new(filename)
+--	dontDelete is an optional arg that should only be used for Global.logFilename
+function Log.new(filename, dontDelete)
 	local l = {}
 	setmetatable(l, Log)
 
 	--	logging only works when debugging is activated
 	if Global.debug then
-		l.file = io.open(filename, "w")
+		--	Use append mode because log_printf in C appends to the same file
+		--	Lua docs seem to say that "a" erases the file, but doesn't work for me.
+		if not dontDelete then
+			os.remove(filename)
+		end
+		l.file = io.open(filename, "a+")
 	end
 
 	return l
@@ -46,7 +52,7 @@ function Log:terminate()
 end
 
 --	initialize logging
-Log = Log.new(Global.logFilename)
+Log = Log.new(Global.logFilename, true)
 Log:write("Started logging.")
 
 --	Can call .new() on this Log instance to create further Logs

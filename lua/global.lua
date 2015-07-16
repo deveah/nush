@@ -13,7 +13,7 @@ Global.debug = true
 --	the default name of the player character
 Global.defaultName = "Player"
 
---	Name of the file used for logging
+--	Name of the file used for logging (Note: also defined in nush.c)
 Global.logFilename = "log.txt"
 
 --  Size of the screen. This could be initialised from curses.init(),
