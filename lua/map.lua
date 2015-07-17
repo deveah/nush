@@ -93,6 +93,23 @@ function Map:isOccupied(x, y)
 	return false
 end
 
+--	Map:neighbours() - returns an iterator over the coordinates of tiles which
+--	are adjacent to x,y. Use like:
+--		for x,y in map:neighbours(startx, starty) do ...
+function Map:neighbours(x, y)
+	local function iterator()
+		for i = x-1, x+1 do
+			for j = y-1, y+1 do
+				if	self:isInBounds(i, j) and
+						not (i == x and j == y) then
+					coroutine.yield(i, j)
+				end
+			end
+		end
+	end
+	return coroutine.wrap(iterator)
+end
+
 --	Map:countNeighbours() - returns the number of a given type of neighbouring
 --	tiles that surround a given coordinate
 function Map:countNeighbours(x, y, tile)
