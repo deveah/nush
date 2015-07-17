@@ -44,6 +44,8 @@ function Map.new(mapnum, name)
 	return m
 end
 
+-------------------------------- Utility functions ---------------------------
+
 --	Map:toString() - returns a string describing the Map object
 function Map:toString()
 	return "<map " .. self.num .. " " .. tostring(self) .. ">"
@@ -90,6 +92,69 @@ function Map:isOccupied(x, y)
 	end
 	return false
 end
+
+--	Map:countNeighbours() - returns the number of a given type of neighbouring
+--	tiles that surround a given coordinate
+function Map:countNeighbours(x, y, tile)
+	local count = 0
+	for i = x-1, x+1 do
+		for j = y-1, y+1 do
+			if	self:isInBounds(i, j) and
+					not (i == x and j == y) and
+					self.tile[i][j] == tile then
+				count = count + 1
+			end
+		end
+	end
+
+	return count
+end
+
+--	Map:countNeighboursByRole() - returns the number of a given role of neighbouring
+--	tiles that surround a given coordinate
+function Map:countNeighboursByRole(x, y, role)
+	local count = 0
+	for i = x-1, x+1 do
+		for j = y-1, y+1 do
+			if	self:isInBounds(i, j) and
+					not (i == x and j == y) and
+					self.tile[i][j].role == role then
+				count = count + 1
+			end
+		end
+	end
+
+	return count
+end
+
+--	Map:itemsAtTile() - Returns list of items on some tile of the map
+function Map:itemsAtTile(x, y)
+	local ret = {}
+	for _, item in ipairs(Game.itemList) do
+		if item.map == self and item.x == x and item.y == y then
+			table.insert(ret, item)
+		end
+	end
+	return ret
+end
+
+--	Map:findRandomEmptySpace() - searches for a random empty space;
+--	an empty space has a non-solid tile, and is occupied by no actor;
+--	stairs are not empty spaces;
+--	returns a pair of coordinates (x, y) which comply with the restrictions
+function Map:findRandomEmptySpace()
+	local x, y
+	repeat
+		x = math.random(1, Global.mapWidth)
+		y = math.random(1, Global.mapHeight)
+	until not self:isSolid(x, y) and
+				not self:isOccupied(x, y) and
+				self.tile[x][y].role ~= "stairs"
+	
+	return x, y
+end
+
+--------------------------------- Map generation -----------------------------
 
 --	Map:generateDummy() - generates a dummy map filled with floor tiles, and
 --	surrounded with wall tiles; at random locations, the floor tiles may be
@@ -207,40 +272,6 @@ function Map:isAreaEmpty(x, y, w, h)
 	end
 
 	return true
-end
-
---	Map:countNeighbours() - returns the number of a given type of neighbouring
---	tiles that surround a given coordinate
-function Map:countNeighbours(x, y, tile)
-	local count = 0
-	for i = x-1, x+1 do
-		for j = y-1, y+1 do
-			if	self:isInBounds(i, j) and
-					not (i == x and j == y) and
-					self.tile[i][j] == tile then
-				count = count + 1
-			end
-		end
-	end
-
-	return count
-end
-
---	Map:countNeighboursByRole() - returns the number of a given role of neighbouring
---	tiles that surround a given coordinate
-function Map:countNeighboursByRole(x, y, role)
-	local count = 0
-	for i = x-1, x+1 do
-		for j = y-1, y+1 do
-			if	self:isInBounds(i, j) and
-					not (i == x and j == y) and
-					self.tile[i][j].role == role then
-				count = count + 1
-			end
-		end
-	end
-
-	return count
 end
 
 --	Map:generateRoomsAndCorridors() - generates a rooms-and-corridors map
@@ -551,22 +582,6 @@ function Map:linkWith(what)
 
 	self.tile[x][y] = Util.copyTable(Tile.downStairs)
 	self.tile[x][y]["destination-map"] = self
-end
-
---	Map:findRandomEmptySpace() - searches for a random empty space;
---	an empty space has a non-solid tile, and is occupied by no actor;
---	stairs are not empty spaces;
---	returns a pair of coordinates (x, y) which comply with the restrictions
-function Map:findRandomEmptySpace()
-	local x, y
-	repeat
-		x = math.random(1, Global.mapWidth)
-		y = math.random(1, Global.mapHeight)
-	until not self:isSolid(x, y) and
-				not self:isOccupied(x, y) and
-				self.tile[x][y].role ~= "stairs"
-	
-	return x, y
 end
 
 --	Map:spawnMachinery() - spawns a given number of broken machinery

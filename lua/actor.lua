@@ -620,7 +620,7 @@ function Actor:handleKey(key)
 
 	--	pick up
 	if key == "," or key == "g" then
-		local items = Game:itemsAtTile(self.map, self.x, self.y)
+		local items = self.map:itemsAtTile(self.x, self.y)
 		Log:write("Trying to pickup: items:" .. tostring(items))
 		if #items == 0 then
 			UI:message("There's nothing here to pick up!")
