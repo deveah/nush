@@ -537,7 +537,7 @@ function Map:linkWith(what)
 	self.tile[x][y] = {
 		["name"] = "Stairs up",
 		["face"] = "<",
-		["color"] = "white",
+		["color"] = curses.white,
 		["solid"] = false,
 		["opaque"] = false,
 		["role"] = "stairs",
@@ -547,7 +547,7 @@ function Map:linkWith(what)
 	what.tile[x][y] = {
 		["name"] = "Stairs down",
 		["face"] = ">",
-		["color"] = "white",
+		["color"] = curses.white,
 		["solid"] = false,
 		["opaque"] = false,
 		["role"] = stairs,
