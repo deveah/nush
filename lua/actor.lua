@@ -608,19 +608,32 @@ function Actor:handleKey(key)
 	end
 
 	--	debug keys
+	--	dump globals
 	if key == "#" then
 		UI:message("{{red}}(DEBUG) Dumped globals to logfile.")
 		Util.dumpGlobals()
 		return false
 	end
 
+	--	make the whole map temporarily visible to the player
 	if key == "$" then
-		--	make the whole map temporarily visible to the player
 		for i = 1, 80 do
 			for j = 1, 20 do
 				Game.player.sightMap[i][j] = true
 			end
 		end
+	end
+
+	--	teleport player to next/previous map
+	if key == "(" then
+		Game.player.map = Game.mapList[Game.player.map.num + 1]
+		Game.player.x, Game.player.y = Game.player.map:findRandomEmptySpace()
+		Game.player:updateSight()
+	end
+	if key == ")" then
+		Game.player.map = Game.mapList[Game.player.map.num - 1]
+		Game.player.x, Game.player.y = Game.player.map:findRandomEmptySpace()
+		Game.player:updateSight()
 	end
 
 	--	there was no known action corresponding to the given key, so signal that
