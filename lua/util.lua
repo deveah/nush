@@ -118,6 +118,7 @@ function Util.copyTable(tbl)
 			t[k] = v
 		end
 	end
+	setmetatable(t, getmetatable(tbl))
 	return t
 end
 

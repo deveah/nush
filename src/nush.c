@@ -687,10 +687,9 @@ int main( int argc, char **argv )
 	/* This should only happen when the error handler throws an error */
 	if( r )
 	{
-		printf( ERROR_STRING, lua_tostring( L, -1 ) );
+		printf( ERROR_STRING "\n", lua_tostring( L, -1 ) );
 		log_printf( ERROR_STRING, lua_tostring( L, -1 ) );
 	}
 
 	return 0;
 }
-

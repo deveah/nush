@@ -769,12 +769,16 @@ function Actor:unlockDoor(x, y)
 
 	--	check to see if the actor has the right keycard
 	if self:hasItem(self.map.tile[x][y].locked .. " keycard") then
-		UI:message("{{green}}You open the locked door using your {{GREEN}}" ..
-			self.map.tile[x][y].locked .. "{{pop}} keycard.")
+		if self == Game.player then
+			UI:message("{{green}}You open the locked door using your {{GREEN}}" ..
+				self.map.tile[x][y].locked .. "{{pop}} keycard.")
+		end
 		self.map.tile[x][y] = Tile.openDoor
 		return true
 	else
-		UI:message("The door requires a `" .. self.map.tile[x][y].locked .. "' keycard, which you do not have.")
+		if self == Game.player then
+			UI:message("The door requires a `" .. self.map.tile[x][y].locked .. "' keycard, which you do not have.")
+		end
 		return false
 	end
 end
