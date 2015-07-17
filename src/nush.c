@@ -310,7 +310,6 @@ static int curses_getch( lua_State *L )
 static int curses_attr( lua_State *L )
 {
 	int a = lua_tointeger( L, -1 );
-	
 	attrset( a );
 
 	return 0;
@@ -369,6 +368,51 @@ static int curses_cursor( lua_State *L )
 	int c = lua_tointeger( L, -1 );
 
 	curs_set( c );
+
+	return 0;
+}
+
+/* curses.vline(int length) - draw down from current cursor position */
+static int curses_vline( lua_State *L )
+{
+	int length = luaL_checkinteger( L, 1 );
+	vline( 0, length );
+	return 0;
+}
+
+/* curses.hline(int length) - draw across from current cursor position */
+static int curses_hline( lua_State *L )
+{
+	int length = luaL_checkinteger( L, 1 );
+	hline( 0, length );
+	return 0;
+}
+
+/* curses.box(int width, int height) - draw a box down-right from current
+   cursor position */
+static int curses_box( lua_State *L )
+{
+	int x, y;
+	getyx( stdscr, y, x);
+	int width = luaL_checkinteger( L, 1 );
+	int height = luaL_checkinteger( L, 2 );
+
+	/* Drawing using box characters (vt100 or DOS codepage or fallback) */
+	int xoff, yoff;
+	addch( ACS_ULCORNER );
+	for ( xoff = 1; xoff < width - 1; xoff++ )
+		addch( ACS_HLINE );
+	addch( ACS_URCORNER );
+	for ( yoff = 1; yoff < height - 1; yoff++ )
+	{
+		mvaddch( y + yoff, x, ACS_VLINE );
+		mvaddch( y + yoff, x + width - 1, ACS_VLINE );
+	}
+	move( y + height - 1, x );
+	addch( ACS_LLCORNER );
+	for ( xoff = 1; xoff < width - 1; xoff++ )
+		addch( ACS_HLINE );
+	addch( ACS_LRCORNER );
 
 	return 0;
 }
@@ -437,6 +481,9 @@ luaL_Reg curses[] = {
 	{	"redraw",		curses_redraw },
 	{	"move",			curses_move },
 	{	"cursor",		curses_cursor },
+	{	"vline",		curses_vline },
+	{	"hline",		curses_hline },
+	{	"box",			curses_box },
 	{	"getstr",		curses_getstr },
 	{	NULL,			NULL }
 };
