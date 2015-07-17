@@ -307,7 +307,7 @@ function UI:colorWrite(x, y, text)
 	end
 
 	--	Expand `hightlights' (maybe this should be specific to helpScreen()?)
-	text = string.gsub(text, "`(%g-)'", "{{WHITE}}%1{{pop}}")
+	text = string.gsub(text, "`(%S-)'", "{{WHITE}}%1{{pop}}")
 
 	--	Break text into pieces delimited by color tokens
 	local pos = 1
@@ -350,7 +350,7 @@ end
 --	UI:removeMarkup() - Returns copy of a string with all markup codes such
 --	as {{white}} removed, for determining its length when drawn
 function UI:removeMarkup(text)
-	text = string.gsub(text, "`(%g-)'", "%1")
+	text = string.gsub(text, "`(%S-)'", "%1")
 	return string.gsub(text, "{{(%a+)}}", "")
 end
 
