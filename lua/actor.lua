@@ -617,6 +617,7 @@ function Actor:handleKey(key)
 
 	--	make the whole map temporarily visible to the player
 	if key == "$" then
+		UI:message("{{red}}(DEBUG) Map made temporarily visible.")
 		for i = 1, 80 do
 			for j = 1, 20 do
 				Game.player.sightMap[i][j] = true
@@ -626,11 +627,13 @@ function Actor:handleKey(key)
 
 	--	teleport player to next/previous map
 	if key == "(" then
+		UI:message("{{red}}(DEBUG) Teleported to next level.")
 		Game.player.map = Game.mapList[Game.player.map.num + 1]
 		Game.player.x, Game.player.y = Game.player.map:findRandomEmptySpace()
 		Game.player:updateSight()
 	end
 	if key == ")" then
+		UI:message("{{red}}(DEBUG) Teleported to previous level.")
 		Game.player.map = Game.mapList[Game.player.map.num - 1]
 		Game.player.x, Game.player.y = Game.player.map:findRandomEmptySpace()
 		Game.player:updateSight()
