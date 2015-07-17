@@ -431,6 +431,17 @@ function Actor:fireWeapon(direction)
 				hit = true
 			end
 		end
+
+		--	shooting a locked door has a chance of breaking the lock
+		if self.map.tile[x][y].locked then
+			if math.random() < 0.1 then
+				self.map.tile[x][y] = Tile.closedDoor
+				UI:message("You break the lock!")
+			else
+				UI:message("You hit the lock, but it resists.")
+			end
+		end
+
 		if self.map:isSolid(x, y) then
 			--bullet:setFace('%')
 			hit = true
