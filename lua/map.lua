@@ -545,27 +545,12 @@ function Map:linkWith(what)
 		x, y = self:findRandomEmptySpace()
 	until	not what:isSolid(x, y) and
 				not what:isOccupied(x, y)
-	
-	self.tile[x][y] = {
-		["name"] = "Stairs up",
-		["face"] = "<",
-		["color"] = curses.white,
-		["solid"] = false,
-		["opaque"] = false,
-		["role"] = "stairs",
-		["destination-map"] = what
-	}
 
-	what.tile[x][y] = {
-		["name"] = "Stairs down",
-		["face"] = ">",
-		["color"] = curses.white,
-		["solid"] = false,
-		["opaque"] = false,
-		["role"] = stairs,
-		["destination-map"] = self
-	}
+	self.tile[x][y] = Util.copyTable(Tile.upStairs)
+	self.tile[x][y]["destination-map"] = what
 
+	self.tile[x][y] = Util.copyTable(Tile.downStairs)
+	self.tile[x][y]["destination-map"] = self
 end
 
 --	Map:findRandomEmptySpace() - searches for a random empty space;

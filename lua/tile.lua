@@ -55,6 +55,26 @@ Tile.wall = {
 	["opaque"] = true
 }
 
+Tile.upStairs = {
+	["name"] = "Stairs up",
+	["face"] = "<",
+	["color"] = curses.white,
+	["solid"] = false,
+	["opaque"] = false,
+	["role"] = "stairs",
+	--"destination-map" added to copy
+}
+
+Tile.downStairs = {
+	["name"] = "Stairs down",
+	["face"] = ">",
+	["color"] = curses.white,
+	["solid"] = false,
+	["opaque"] = false,
+	["role"] = "stairs",
+	--"destination-map" added to copy
+}
+
 Tile.grass = {
 	["name"] = "Grass",
 	["face"] = ",",
@@ -165,6 +185,7 @@ Tile.lockedDoor = {
 	["solid"] = true,
 	["opaque"] = true,
 	["role"] = "door"
+	--"locked" added to copy
 }
 
 Tile.brokenComputer = {
