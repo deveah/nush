@@ -263,8 +263,15 @@ end
 
 --	UI:colorWrite() - draws a string of text at a given position on-screen,
 --	allowing the use of in-text color changing by parsing color codes like
---	{{cyan}}, and also `text' (without inner spaces) as a shortcut for WHITE.
+--	{{cyan}}.
 --	Does not return anything.
+--
+--	Markup codes:
+--		black red green yellow blue magenta cyan white
+--		BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE
+--		normal bold reverse
+--  	`text' (without inner spaces) as a shortcut for {{WHITE}}text{{pop}}
+--		Also available, but not portable: underline standout blink
 function UI:colorWrite(x, y, text)
 	local currentX = x
 	--	Stack of previous markup codes, starting with default
@@ -303,20 +310,8 @@ function UI:colorWrite(x, y, text)
 			table.insert(markupStack, word)
 		end
 
-		if		 word == "white" then		curses.attr(curses.white)
-		elseif word == "red" then			curses.attr(curses.red)
-		elseif word == "green" then		curses.attr(curses.green)
-		elseif word == "blue" then		curses.attr(curses.blue)
-		elseif word == "yellow" then	curses.attr(curses.yellow)
-		elseif word == "magenta" then	curses.attr(curses.magenta)
-		elseif word == "cyan" then		curses.attr(curses.cyan)
-		elseif word == "WHITE" then		curses.attr(curses.white + curses.bold)
-		elseif word == "RED" then			curses.attr(curses.red + curses.bold)
-		elseif word == "GREEN" then		curses.attr(curses.green + curses.bold)
-		elseif word == "BLUE" then		curses.attr(curses.blue + curses.bold)
-		elseif word == "YELLOW" then	curses.attr(curses.yellow + curses.bold)
-		elseif word == "MAGENTA" then	curses.attr(curses.magenta + curses.bold)
-		elseif word == "CYAN" then		curses.attr(curses.cyan + curses.bold)
+		if curses[word] and type(curses[word]) == "number" then
+			curses.attr(curses[word])
 		else
 			write(text:sub(startpos, nextpos))
 		end

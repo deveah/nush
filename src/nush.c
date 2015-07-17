@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <ctype.h>
 #include <time.h>
 #include <unistd.h>
 #include <signal.h>
@@ -49,6 +50,9 @@
 lua_State *L = NULL;
 bool curses_running = 0;
 int num_interrupts = 0;
+
+
+/******************************** Utility Functions *************************/
 
 /* milliseconds since some arbitrary reference point */
 #ifdef __WIN32
@@ -83,6 +87,17 @@ static void log_printf( char *fmt, ... )
 	fprintf( file, "\n" );
 	fclose( file );
 }
+
+/* If a table is at the top of the lua stack, sets a field of it with an
+   integer value; the table remains */
+static void setfield_int( char *key, int val )
+{
+	lua_pushinteger( L, val );
+	lua_setfield( L, -2, key );
+}
+
+
+/***************************** Curses IO library ****************************/
 
 static void curses_set_running( lua_State *L, int state )
 {
@@ -431,42 +446,41 @@ static int curses_getstr( lua_State *L )
 	return 1;
 }
 
+static void push_color_pair( char *name, int pairnum )
+{
+	setfield_int( name, COLOR_PAIR( pairnum ) );
+
+	/* Convert 'name' to all-caps and push the bold version */
+	char allcaps[32], *outch = allcaps;
+	do {
+		*outch++ = toupper( *name++ );
+	} while ( *name );
+	*outch = '\0';
+	setfield_int( allcaps, COLOR_PAIR( pairnum ) + A_BOLD );
+}
+
 void init_constants( lua_State *L )
 {
 	lua_getglobal( L, "curses" );
 
-	lua_pushinteger( L, COLOR_PAIR( C_BLACK ) );
-	lua_setfield( L, -2, "black" );
+	push_color_pair( "black",   C_BLACK );
+	push_color_pair( "red",	    C_RED );
+	push_color_pair( "green",   C_GREEN );
+	push_color_pair( "yellow",  C_YELLOW );
+	push_color_pair( "blue",    C_BLUE );
+	push_color_pair( "magenta", C_MAGENTA );
+	push_color_pair( "cyan",    C_CYAN );
+	push_color_pair( "white",   C_WHITE );
 
-	lua_pushinteger( L, COLOR_PAIR( C_RED ) );
-	lua_setfield( L, -2, "red" );
+	setfield_int( "normal",     A_NORMAL );
+	setfield_int( "bold",       A_BOLD );
+	setfield_int( "reverse",    A_REVERSE );
+	/* The following three don't work widely, avoid using!! */
+	setfield_int( "underline",  A_UNDERLINE ); /* Not on Windows */
+	setfield_int( "standout",   A_STANDOUT );  /* Unpredictable */
+	setfield_int( "blink",      A_BLINK );
 
-	lua_pushinteger( L, COLOR_PAIR( C_GREEN ) );
-	lua_setfield( L, -2, "green" );
-
-	lua_pushinteger( L, COLOR_PAIR( C_YELLOW ) );
-	lua_setfield( L, -2, "yellow" );
-
-	lua_pushinteger( L, COLOR_PAIR( C_BLUE ) );
-	lua_setfield( L, -2, "blue" );
-	
-	lua_pushinteger( L, COLOR_PAIR( C_MAGENTA ) );
-	lua_setfield( L, -2, "magenta" );
-	
-	lua_pushinteger( L, COLOR_PAIR( C_CYAN ) );
-	lua_setfield( L, -2, "cyan" );
-	
-	lua_pushinteger( L, COLOR_PAIR( C_WHITE ) );
-	lua_setfield( L, -2, "white" );
-
-	lua_pushinteger( L, A_NORMAL );
-	lua_setfield( L, -2, "normal" );
-
-	lua_pushinteger( L, A_BOLD );
-	lua_setfield( L, -2, "bold" );
-
-	lua_pushinteger( L, A_REVERSE );
-	lua_setfield( L, -2, "reverse" );
+	lua_pop( L, 1 );
 }
 
 luaL_Reg curses[] = {
@@ -487,6 +501,9 @@ luaL_Reg curses[] = {
 	{	"getstr",		curses_getstr },
 	{	NULL,			NULL }
 };
+
+
+/*************************** clib extended library **************************/
 
 /* clib.sleep(seconds) - sleep for some number of seconds, with precision
    of at least 10 milliseconds */
@@ -527,6 +544,9 @@ static void lstop( lua_State *L, lua_Debug *ar ) {
 	luaL_error( L, "interrupted!" );
 }
 */
+
+
+/************************************ main() ********************************/
 
 #ifndef __WIN32
 void interrupt_handler( int i )
@@ -591,7 +611,7 @@ int main( int argc, char **argv )
 	#endif
 
 	init_constants( L );
-	log_printf("Registered curses namespace.");
+	log_printf("Registered C libraries.");
 
 	/* Set ctrl-C handler, portably */
 #ifndef __WIN32
