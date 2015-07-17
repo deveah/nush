@@ -210,29 +210,33 @@ function UI:writeCentered(y, str)
 	self:colorWrite((Global.screenWidth - #self:removeMarkup(str) - 2) / 2, y, " " .. str .. " ")
 end
 
---  UI:messageLogScreen() - display message log with interactive scrolling;
---  does not return anything
-function UI:messageLogScreen()
-	--  number of message that can be shown at once
+--  UI:scrollableTextScreen() - display text with	interactive scrolling; does
+--	not return anything.
+--	title:  Text shown at top of screen
+--	text:   A list of lines
+--	toEnd:  If true, start scrolled to end rather than beginning
+function UI:scrollableTextScreen(title, text, toEnd)
+	--  number of lines that can be shown at once
 	local windowHeight = Global.screenHeight - 2
 	--  maximum 'scroll' value (fully scrolled to end)
-	local maxScroll = math.max(1, #(self.messageList) - (windowHeight - 1))
+	local maxScroll = math.max(1, #text - (windowHeight - 1))
 	--  index of scroll-back buffer at top of window
-	local scroll = maxScroll
+	local scroll = 1
+	if toEnd then scroll = maxScroll end
 
-	local function drawMessageLog()
+	local function drawMessages()
 		for i = 0, windowHeight - 1 do
 			curses.clearLine(1 + i)
 			local messageLine = i + scroll
-			if messageLine >= 1 and messageLine <= #(self.messageList) then
-				self:colorWrite(0, 1 + i, self:getMessage(messageLine))
+			if messageLine >= 1 and messageLine <= #text then
+				self:colorWrite(0, 1 + i, text[messageLine])
 			end
 		end
 
 		--  draw the window decoration
 		local banner = string.rep("-", Global.screenWidth)
 		curses.write(0, 0, banner)
-		self:writeCentered(0, "Previous messages")
+		self:writeCentered(0, "{{WHITE}}" .. title)
 		curses.write(0, Global.screenHeight - 1, banner)
 		self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}jk {{white}}navigate {{cyan}}other {{white}}exit ")
 		if scroll > 1 then
@@ -247,12 +251,20 @@ function UI:messageLogScreen()
 	curses.cursor(0)
 
 	while true do
-		drawMessageLog()
+		drawMessages()
 		key = curses.getch()
 		if key == "j" or key == "down" then
 			scroll = math.min(scroll + 1, maxScroll)
 		elseif key == "k" or key == "up" then
 			scroll = math.max(scroll - 1, 1)
+		elseif key == "pageup" or key == "upright" then
+			scroll = math.max(scroll - (windowHeight - 2), 1)
+		elseif key == "pagedown" or key == "downright" then
+			scroll = math.min(scroll + (windowHeight - 2), maxScroll)
+		elseif key == "home" or key == "upleft" then
+			scroll = 1
+		elseif key == "end" or key == "downleft" then
+			scroll = maxScroll
 		else
 			break
 		end
@@ -260,6 +272,16 @@ function UI:messageLogScreen()
 
 	--	restore the state of the cursor
 	curses.cursor(1)
+end
+
+--  UI:messageLogScreen() - display message log with interactive scrolling;
+--  does not return anything
+function UI:messageLogScreen()
+	local lines = {}
+	for line = 1, #(self.messageList) do
+		lines[line] = self:getMessage(line)
+	end
+	self:scrollableTextScreen("Previous messages", lines, true)
 end
 
 --	UI:colorWrite() - draws a string of text at a given position on-screen,
