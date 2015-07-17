@@ -206,7 +206,7 @@ end
 
 --  writeCentered() - Draws a string at the center of a line; does not return anything
 function UI:writeCentered(y, str)
-	curses.write((Global.screenWidth - #str - 1) / 2, y, " " .. str .. " ")
+	self:colorWrite((Global.screenWidth - #self:removeMarkup(str) - 2) / 2, y, " " .. str .. " ")
 end
 
 --  UI:messageLogScreen() - display message log with interactive scrolling;
@@ -262,7 +262,8 @@ function UI:messageLogScreen()
 end
 
 --	UI:colorWrite() - draws a string of text at a given position on-screen,
---	allowing the use of in-text color changing by parsing color codes like {{cyan}}
+--	allowing the use of in-text color changing by parsing color codes like
+--	{{cyan}}, and also `text' (without inner spaces) as a shortcut for WHITE.
 --	Does not return anything.
 function UI:colorWrite(x, y, text)
 	local currentX = x
@@ -273,6 +274,9 @@ function UI:colorWrite(x, y, text)
 		curses.write(currentX, y, str)
 		currentX = currentX + str:len()
 	end
+
+	--	Expand `hightlights' (maybe this should be specific to helpScreen()?)
+	text = string.gsub(text, "`(%g-)'", "{{WHITE}}%1{{pop}}")
 
 	--	Break text into pieces delimited by color tokens
 	local pos = 1
@@ -290,7 +294,8 @@ function UI:colorWrite(x, y, text)
 			write(text:sub(pos, startpos - 1))
 		end
 
-		--	Push or pop from the markup stack
+		--	Push or pop from the markup stack (we assume repeating the most previous
+		--	markup is enough to undo
 		if word == "pop" then
 			table.remove(markupStack)
 			word = markupStack[#markupStack]
@@ -321,6 +326,13 @@ function UI:colorWrite(x, y, text)
 
 	--	reset to default color
 	curses.attr(curses.white)
+end
+
+--	UI:removeMarkup() - Returns copy of a string with all markup codes such
+--	as {{white}} removed, for determining its length when drawn
+function UI:removeMarkup(text)
+	text = string.gsub(text, "`(%g-)'", "%1")
+	return string.gsub(text, "{{(%a+)}}", "")
 end
 
 --	UI:drawTitleScreen() - draws the title screen, asking the player for a
