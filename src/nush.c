@@ -1,4 +1,10 @@
 
+#ifdef CURSESW
+	/* Wide-char curses is an X/Open extension, but defining this
+	   apparently isn't needed just to get utf8 support. */
+	#define _XOPEN_SOURCE_EXTENDED 1
+#endif
+
 #ifdef USE_LUAJIT
 	#include <luajit-2.0/lua.h>
 	#include <luajit-2.0/lualib.h>
@@ -16,6 +22,7 @@
 	#include <windows.h>
 #else
 	#include <sys/time.h>
+	#include <langinfo.h>
 #endif
 
 #include <stdio.h>
@@ -23,6 +30,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <locale.h>
 #include <time.h>
 #include <unistd.h>
 #include <signal.h>
@@ -31,7 +39,6 @@
 	/* bool defined by PDcurses */
 	#include <stdbool.h>
 #endif
-
 
 #define ERROR_STRING 		"Error: %s"
 #define MAX_STRING_LENGTH 	80
@@ -49,6 +56,7 @@
 
 lua_State *L = NULL;
 bool curses_running = 0;
+bool utf8_enabled = 0;
 int num_interrupts = 0;
 
 
@@ -115,8 +123,15 @@ static int curses_init( lua_State *L )
 	noecho();
 	keypad( stdscr, TRUE );
 
+#ifdef NCURSES_VERSION
+	log_printf( "ncurses %s.%d  NCURSES_WIDECHAR=%d", NCURSES_VERSION, NCURSES_VERSION_PATCH, NCURSES_WIDECHAR );
+#elif defined(PDCURSES)
+	log_printf( "pdcurses %d", PDC_BUILD );
+#endif
+
 #ifndef PDCURSES
 	char *term = getenv("TERM");
+	log_printf( "TERM=%s", term );
 	/* Include screen because it also needs more keys defined */
 	bool is_xterm = term && (strstr(term, "xterm") || strstr(term, "screen"));
 	if (is_xterm) {
@@ -150,6 +165,7 @@ static int curses_init( lua_State *L )
 #endif
 	
 	start_color();
+	log_printf( "COLORS=%d, COLOR_PAIRS=%d", COLORS, COLOR_PAIRS );
 
 #ifndef __WIN32
 	init_pair( C_BLACK, COLOR_BLACK, -1 );
@@ -480,6 +496,10 @@ void init_constants( lua_State *L )
 	setfield_int( "standout",   A_STANDOUT );  /* Unpredictable */
 	setfield_int( "blink",      A_BLINK );
 
+	/* curses.utf8 says whether outputting utf8 is OK */
+	lua_pushboolean( L, utf8_enabled );
+	lua_setfield( L, -2, "utf8" );
+
 	lua_pop( L, 1 );
 }
 
@@ -572,14 +592,24 @@ void interrupt_handler( int i )
 
 int main( int argc, char **argv )
 {
+	/* Delete log file here rather than in lua so that we can log to it
+	   before log.lua runs */
+	remove( LOGFILE );
+
 	/* Reduce Esc delay to 100ms (there is no delay on Windows) */
 #ifdef NCURSES_VERSION
 	ESCDELAY = 100;
 #endif
 
-	/* Delete log file here rather than in lua so that we can log to it
-	   before log.lua runs */
-	remove( LOGFILE );
+	setlocale( LC_CTYPE, "" );
+#ifdef __WIN32
+	/* Seems to lie, maybe pdcurses changes something */
+	log_printf( "Codepage is %d", GetConsoleOutputCP() );
+#else
+	char *codeset = nl_langinfo( CODESET );
+	utf8_enabled = strcmp( codeset, "UTF-8" ) == 0;
+	log_printf( "Character set %s", codeset );
+#endif
 
 	#ifdef USE_LUAJIT
 		L = lua_open();

@@ -1,7 +1,17 @@
 
 CC = gcc
 CFLAGS = -Wall -Wextra -g
-CURSES_LIBS = -lcurses
+# Whether to link with cursew for unicode support
+CURSESW = 1
+ifeq ($(OS),Windows_NT)
+	CURSESW = 0
+endif
+ifeq ($(CURSESW),1)
+	CURSES_LIBS = -lcursesw
+	CFLAGS := $(CFLAGS) -DCURSESW
+else
+	CURSES_LIBS = -lcurses
+endif
 LUA52_LIBS = -llua
 LUA51_LIBS = -llua
 LUAJIT_LIBS = -lluajit-5.1

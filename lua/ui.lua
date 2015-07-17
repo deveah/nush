@@ -22,7 +22,8 @@ local Game = require "lua/game"
 function UI:init()
 	self.width, self.height = curses.init()
 	self.messageList = {}
-	Log:write("Initialized curses interface.")
+	Log:write("Initialized curses interface. curses.utf8=" .. tostring(curses.utf8))
+	Log:write("Curses w/h: " .. self.width .. "x" .. self.height)
 	Log:write("Screen w/h: " .. Global.screenWidth .. "x" .. Global.screenHeight)
 end
 
