@@ -66,6 +66,43 @@ Tile.grass = {
 	end
 }
 
+Tile.waterVine = {
+	["name"] = "Water vine",
+	["face"] = "7",
+	["color"] = curses.green,
+	["solid"] = false,
+	["opaque"] = true,
+	["on-walk"] = function(actor)
+		if actor == Game.player then
+			UI:message("{{cyan}}Your feet are mushing through the water vine.")
+		end
+	end
+}
+
+Tile.mushroom = {
+	["name"] = "Mushroom",
+	["face"] = ":",
+	["color"] = curses.white,
+	["solid"] = false,
+	["opaque"] = false
+}
+
+Tile.dirt = {
+	["name"] = "Dirt",
+	["face"] = ".",
+	["color"] = curses.yellow,
+	["solid"] = false,
+	["opaque"] = false
+}
+
+Tile.spaceBerry = {
+	["name"] = "Space berry",
+	["face"] = "%",
+	["color"] = curses.magenta,
+	["solid"] = false,
+	["opaque"] = false
+}
+
 Tile.shallowWater = {
 	["name"] = "Shallow water",
 	["face"] = "~",

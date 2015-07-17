@@ -5,6 +5,7 @@
 --
 
 local Log = require "lua/log"
+local Global = require "lua/global"
 
 local Util = {}
 
@@ -82,6 +83,16 @@ function Util.dumpGlobals()
 	Log:write("Contents of _G:")
 	for k,v in pairs(_G) do
 		Log:write("  " .. k)
+	end
+end
+
+function Util.debugDumpMap(map)
+	Log:write("Dumping map " .. map:toString())
+	for j = 1, Global.mapHeight do
+		for i = 1, Global.mapWidth do
+			Log.file:write(map.tile[i][j].face)
+		end
+		Log.file:write("\n")
 	end
 end
 

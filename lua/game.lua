@@ -68,16 +68,20 @@ function Game:start()
 	Log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
 		local map = Map.new(i, "Dungeon:" .. i)
-		if math.random() < 0.3 then
+		local levelType = math.random()
+		if levelType < 0.3 then
 			map:generateCave(40, 4, 8)
 			map:spawnPoolsOfWater(3, 0.8)
 			map:spawnPatchesOfGrass(1, 0.9)
-		else
+		elseif levelType < 0.8 then
 			map:generateRoomsAndCorridors(15, 4, 5)
 			map:spawnPoolsOfWater(5, 0.25)
 			map:spawnPatchesOfGrass(10, 0.5)
+		else
+			map:generateBSP()
 		end
 		self:addMap(map)
+		Util.debugDumpMap(map)
 
 		--	link with the previously created map (if it exists)
 		if i > 1 then

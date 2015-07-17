@@ -585,5 +585,102 @@ function Map:spawnPatchesOfGrass(nPatches, chanceToSpread)
 	end
 end
 
+function Map:generateBSP()
+	local rooms = {}
+	local doors = {}
+
+	local function split(room, iter)
+		--	avoid splitting rooms that are too small
+		if iter > 4 or room.w < 6 or room.h < 6 then
+			return false
+		end
+
+		--	either split depending on the ratio, or on a chance to generate irregular rooms
+		if room.w > room.h or math.random() < 0.1 then
+			--	vertical split
+			local splitWhere = math.random(3, room.w - 3)
+			local newRoom = {
+				x = room.x + splitWhere - 1,
+				y = room.y,
+				w = room.w - splitWhere + 1,
+				h = room.h
+			}
+			room.w = splitWhere
+
+			table.insert(rooms, newRoom)
+			table.insert(doors, { x = room.x + splitWhere - 1, y = math.random(room.y + 1, room.y + room.h - 2) })
+			split(room, iter+1)
+			split(newRoom, iter+1)
+			return true
+		else
+			--	horizontal split
+			local splitWhere = math.random(3, room.h - 3)
+			local newRoom = {
+				x = room.x,
+				y = room.y + splitWhere - 1,
+				w = room.w,
+				h = room.h - splitWhere + 1
+			}
+			room.h = splitWhere
+
+			table.insert(rooms, newRoom)
+			table.insert(doors, { x = math.random(room.x + 1, room.x + room.w - 2), y = room.y + splitWhere - 1 })
+			split(room, iter+1)
+			split(newRoom, iter+1)
+			return true
+		end
+	end
+
+	local function makePlantRoom(room, roomType)
+		local roomTypes = { "watervine", "berry", "mushroom" }
+		if not roomType then roomType = roomTypes[math.random(1, #roomTypes)] end
+
+		for i = room.x + 2, room.x + room.w - 3 do
+			for j = room.y + 2, room.y + room.h - 3 do
+				if roomType == "watervine" then
+					if math.random() < 0.3 then
+						self.tile[i][j] = Tile.waterVine
+					else
+						self.tile[i][j] = Tile.grass
+					end
+				end
+
+				if roomType == "berry" then
+					if math.random() < 0.5 then
+						self.tile[i][j] = Tile.spaceBerry
+					else
+						self.tile[i][j] = Tile.grass
+					end
+				end
+
+				if roomType == "mushroom" then
+					if math.random() < 0.6 then
+						self.tile[i][j] = Tile.mushroom
+					else
+						self.tile[i][j] = Tile.dirt
+					end
+				end
+			end
+		end
+	end
+
+	table.insert(rooms, {
+		x = 1,
+		y = 1,
+		w = Global.mapWidth,
+		h = Global.mapHeight
+	})
+	split(rooms[1], 0)
+
+	for i = 1, #rooms do
+		self:digRoom(rooms[i].x, rooms[i].y, rooms[i].w, rooms[i].h, Tile.roomFloor, Tile.wall)
+		makePlantRoom(rooms[i])
+	end
+
+	for i = 1, #doors do
+		self.tile[doors[i].x][doors[i].y] = Tile.closedDoor
+	end
+end
+
 return Map
 
