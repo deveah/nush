@@ -230,21 +230,22 @@ function UI:scrollableTextScreen(title, text, toEnd)
 			curses.clearLine(1 + i)
 			local messageLine = i + scroll
 			if messageLine >= 1 and messageLine <= #text then
-				self:colorWrite(0, 1 + i, text[messageLine])
+				self:colorWrite(1, 1 + i, text[messageLine])
 			end
 		end
 
 		--  draw the window decoration
-		local banner = string.rep("-", Global.screenWidth)
-		curses.write(0, 0, banner)
+		curses.move(0, 0)
+		curses.hline(Global.screenWidth)
 		self:writeCentered(0, "{{WHITE}}" .. title)
-		curses.write(0, Global.screenHeight - 1, banner)
+		curses.move(0, Global.screenHeight - 1)
+		curses.hline(Global.screenWidth)
 		self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}jk {{white}}navigate {{cyan}}other {{white}}exit ")
 		if scroll > 1 then
-			curses.write(Global.screenWidth - 5, 0, " ^ ")
+			self:colorWrite(Global.screenWidth - 5, 0, " {{YELLOW}}^ ")
 		end
 		if scroll < maxScroll then
-			curses.write(Global.screenWidth - 5, Global.screenHeight - 1, " v ")
+			self:colorWrite(Global.screenWidth - 5, Global.screenHeight - 1, " {{YELLOW}}v ")
 		end
 	end
 
@@ -397,10 +398,11 @@ function UI:drawInventoryScreen(actor)
 
 	curses.clear()
 
-	local banner = string.rep("-", Global.screenWidth)
-	curses.write(0, 0, banner)
+	curses.move(0, 0)
+	curses.hline(Global.screenWidth)
 	self:writeCentered(0, "Inventory")
-	curses.write(0, Global.screenHeight - 1, banner)
+	curses.move(0, Global.screenHeight - 1)
+	curses.hline(Global.screenWidth)
 	self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}any key {{white}}exit ")
 
 
