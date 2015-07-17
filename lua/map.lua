@@ -229,6 +229,7 @@ end
 --	with a given number of rooms, a given number of redundant links
 --	between rooms, and a given number of locker rooms; does not return anything
 function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
+	local lockedDoorChance = 0.05
 	local rooms = {}
 
 	--	roomDistance() - calculates the distance between two rooms
@@ -248,6 +249,22 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 			end
 		end
 		return minIndex
+	end
+
+	--	createLockedDoor() - creates a locked door at a given location,
+	--	using a given lock type, or a random one if none is given
+	local function createLockedDoor(x, y, lockType)
+		local lockTypes = { "Red", "Green", "Blue", "Silver", "Gold" }
+		local lockType = lockType or lockTypes[math.random(1, #lockType)]
+		local door = {
+			["name"] = "Locked door",
+			["face"] = "+",
+			["color"] = curses.red + curses.bold,
+			["solid"] = true,
+			["opaque"] = true,
+			["locked"] = lockType
+		}
+		self.tile[x][y] = door
 	end
 	
 	--	create the rooms
@@ -371,19 +388,35 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 	for i = 1, #rooms do
 		for j = rooms[i].x, rooms[i].x + rooms[i].w - 1 do
 			if self.tile[j][rooms[i].y] == Tile.floor then
-				self.tile[j][rooms[i].y] = Tile.closedDoor
+				if math.random() < lockedDoorChance then
+					createLockedDoor(j, rooms[i].y, "Red")
+				else
+					self.tile[j][rooms[i].y] = Tile.closedDoor
+				end
 			end
 			if self.tile[j][rooms[i].y + rooms[i].h - 1] == Tile.floor then
-				self.tile[j][rooms[i].y + rooms[i].h - 1] = Tile.closedDoor
+				if math.random() < lockedDoorChance then
+					createLockedDoor(j, rooms[i].y + rooms[i].h - 1, "Red")
+				else
+					self.tile[j][rooms[i].y + rooms[i].h - 1] = Tile.closedDoor
+				end
 			end
 		end
 
 		for j = rooms[i].y, rooms[i].y + rooms[i].h - 1 do
 			if self.tile[rooms[i].x][j] == Tile.floor then
-				self.tile[rooms[i].x][j] = Tile.closedDoor
+				if math.random() < lockedDoorChance then
+					createLockedDoor(rooms[i].x, j, "Red")
+				else
+					self.tile[rooms[i].x][j] = Tile.closedDoor
+				end
 			end
 			if self.tile[rooms[i].x + rooms[i].w - 1][j] == Tile.floor then
-				self.tile[rooms[i].x + rooms[i].w - 1][j] = Tile.closedDoor
+				if math.random() < lockedDoorChance then
+					createLockedDoor(rooms[i].x + rooms[i].w - 1, j, "Red")
+				else
+					self.tile[rooms[i].x + rooms[i].w - 1][j] = Tile.closedDoor
+				end
 			end
 		end
 	end

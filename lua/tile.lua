@@ -132,7 +132,7 @@ Tile.ceilingDrip = {
 Tile.openDoor = {
 	["name"] = "Open door",
 	["face"] = "/",
-	["color"] = "white",
+	["color"] = curses.white,
 	["solid"] = false,
 	["opaque"] = false
 }
@@ -140,7 +140,7 @@ Tile.openDoor = {
 Tile.closedDoor = {
 	["name"] = "Closed door",
 	["face"] = "+",
-	["color"] = "white",
+	["color"] = curses.white,
 	["solid"] = true,
 	["opaque"] = true
 }

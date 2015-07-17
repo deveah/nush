@@ -101,7 +101,7 @@ function Game:start()
 
 		--	populate each map with a few items
 		for j = 1, 10 do
-			local item = Itemdefs.SugarBombs:new()
+			local item = Itemdefs.RedKeycard:new()
 			self:addItem(item)
 			item:setMap(map)
 			item:setPosition(map:findRandomEmptySpace())

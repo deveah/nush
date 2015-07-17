@@ -34,6 +34,38 @@ Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
 	equipAs = "weapon",
 })
 
+--------------------------------- Keycards ------------------------------------
+
+Itemdefs.Keycard = defineItem(Itemdefs.BaseItem, {
+	category = "Keycards",
+	face = "$",
+})
+
+Itemdefs.RedKeycard = defineItem(Itemdefs.Keycard, {
+	name = "Red keycard",
+	color = curses.red,
+})
+
+Itemdefs.GreenKeycard = defineItem(Itemdefs.Keycard, {
+	name = "Green keycard",
+	color = curses.green,
+})
+
+Itemdefs.BlueKeycard = defineItem(Itemdefs.Keycard, {
+	name = "Blue keycard",
+	color = curses.blue,
+})
+
+Itemdefs.SilverKeycard = defineItem(Itemdefs.Keycard, {
+	name = "Red keycard",
+	color = curses.white + curses.bold,
+})
+
+Itemdefs.GoldKeycard = defineItem(Itemdefs.Keycard, {
+	name = "Gold keycard",
+	color = curses.yellow + curses.bold
+})
+
 -------------------------------- Consumables ----------------------------------
 
 Itemdefs.Consumable = defineItem(Itemdefs.BaseItem, {

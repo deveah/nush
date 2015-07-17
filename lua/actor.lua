@@ -165,6 +165,17 @@ function Actor:findItem(item_or_slot)
 	return nil
 end
 
+--	Actor:hasItem() - searches the actor's inventory for an item of a given
+--	name; returns true or false, indicating the existance of the item
+function Actor:hasItem(itemName)
+	for slot, item in pairs(self.inventory) do
+		if item.name == itemName then
+			return true
+		end
+	end
+	return false
+end
+
 --	Actor:addItem() - tries to add an item to the Actor's inventory, returns the
 --	inventory slot (character) it was added in, or nil if there is no room.
 function Actor:addItem(item)
@@ -306,6 +317,19 @@ function Actor:move(x, y)
 	--	bumping into a closed door opens it
 	if self.map.tile[x][y] == Tile.closedDoor then
 		return self:openDoor(x, y)
+	end
+
+	--	bumping into a locked door (for now) simply opens it
+	if self.map.tile[x][y].name == "Locked door" then
+		if self:hasItem(self.map.tile[x][y].locked .. " keycard") then
+			UI:message("{{green}}You open the locked door using your {{GREEN}}" ..
+				self.map.tile[x][y].locked .. "{{pop}} keycard.")
+			self.map.tile[x][y] = Tile.openDoor
+			return true
+		else
+			UI:message("The door requires a `" .. self.map.tile[x][y].locked .. "' keycard, which you do not have.")
+			return false
+		end
 	end
 
 	--	bumping into a hidden door reveals it
@@ -488,8 +512,6 @@ function Actor:dropItem(item)
 		UI:message("You drop the " .. item:describe())
 	end
 end
-
-
 
 --	Actor:act() - makes the given Actor object spend its turn; if the actor
 --	is player-controlled, it requests input from the player and acts according
