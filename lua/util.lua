@@ -36,6 +36,33 @@ function Util.xyFromDirection(dir)
 	end
 end
 
+Util.dirToInt = {
+	u = 0, ur = 1, r = 2, dr = 3, d = 4, dl = 5, l = 6, ul = 7, ['.'] = 8
+}
+
+Util.intToDir = {
+	[0] = 'u', [1] = 'ur', [2] = 'r', [3] = 'dr', [4] = 'd',
+	[5] = 'dl', [6] = 'l', [7] = 'ul', [8] = '.'
+}
+
+--	Util.clockwise() - returns the direction (e.g. "dr") rotated clockwise by
+--	n/8 of a full circle.
+function Util.clockwise(dir, n)
+	if dir == "." then
+		return "."
+	end
+	n = n or 1
+	print(dir, n)
+	print(Util.dirToInt[dir])
+	return Util.intToDir[(Util.dirToInt[dir] + n) % 8]
+end
+
+--	Util.anticlockwise() - returns the direction (e.g. "dr") rotated
+--	anticlockwise by n/8 of a full circle.
+function Util.anticlockwise(dir, n)
+	return Util.clockwise(dir, -n)
+end
+
 --	Util.iteratorToList() - given an iterator, exhaust it, returning a table
 function Util.iteratorToList(iterator)
 	local ret = {}
