@@ -390,11 +390,15 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 
 end
 
---	TODO: doc.
+--	Map:generateCave() - generates a cave-like level with a given number of
+--	rooms and redundant loops, through the cavernization of regular rooms-
+--	-and-cooridors maps; does not return anything
 function Map:generateCave(nRooms, nLoops, cavernization)
 	local rooms = {}
 
-	--	TODO: doc.
+	--	getTileCost() - calculates the cost of collapsing a tile (used in
+	--	calculating which tiles to collapse in order to make the walls
+	--	look more like cave walls)
 	local function getTileCost(x, y)
 		local cost = 2 * self:countNeighbours(x, y, Tile.roomFloor)
 		if self.tile[x][y] == Tile.roomFloor then cost = cost + 16 end
@@ -484,8 +488,8 @@ function Map:generateCave(nRooms, nLoops, cavernization)
 			end
 		end
 	end
-
 end
+
 --	Map:linkWith() - links together two maps through the use of stairs;
 --	the algorithm searches for stair spawning positions which are availible
 --	on both maps, so that taking stairs is a strictly vertical movement;
@@ -535,6 +539,10 @@ function Map:findRandomEmptySpace()
 	return x, y
 end
 
+--	Map:spawnMachinery() - spawns a given number of broken machinery
+--	around the given map, with a given chance of the machinery to spread to the
+--	neighbouring tiles; spread tiles include broken computers and piles of
+--	electronics; does not return anything
 function Map:spawnMachinery(nMachinery, chanceToSpread)
 	for i = 1, nMachinery do
 		local x, y
