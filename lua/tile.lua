@@ -14,6 +14,8 @@
 --	*	on-walk (function, optional) - an event which is triggered when an actor
 --			steps on the tile; the function takes a single argument, the actor object
 --	* role (string, optional) - used to categorise different classes of tiles
+--	*	locked (string, optional) - if it exists, it denotes the name of the keycard
+--		which is used to unlock the door
 --
 
 local Game = require "lua/game"
@@ -134,7 +136,8 @@ Tile.openDoor = {
 	["face"] = "/",
 	["color"] = curses.white,
 	["solid"] = false,
-	["opaque"] = false
+	["opaque"] = false,
+	["role"] = "door"
 }
 
 Tile.closedDoor = {
@@ -142,7 +145,8 @@ Tile.closedDoor = {
 	["face"] = "+",
 	["color"] = curses.white,
 	["solid"] = true,
-	["opaque"] = true
+	["opaque"] = true,
+	["role"] = "door"
 }
 
 Tile.hiddenDoor = {
@@ -150,7 +154,17 @@ Tile.hiddenDoor = {
 	["face"] = "#",
 	["color"] = curses.yellow,
 	["solid"] = true,
-	["opaque"] = true
+	["opaque"] = true,
+	["role"] = "door"
+}
+
+Tile.lockedDoor = {
+	["name"] = "Locked door",
+	["face"] = "+",
+	["color"] = curses.red + curses.bold,
+	["solid"] = true,
+	["opaque"] = true,
+	["role"] = "door"
 }
 
 Tile.brokenComputer = {

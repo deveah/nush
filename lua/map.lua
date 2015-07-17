@@ -15,6 +15,7 @@ local Global = require "lua/global"
 local Log = require "lua/log"
 local Game = require "lua/game"
 local Tile = require "lua/tile"
+local Util = require "lua/util"
 
 local Map = {}
 Map.__index = Map
@@ -225,6 +226,23 @@ function Map:countNeighbours(x, y, tile)
 	return count
 end
 
+--	Map:countNeighboursByRole() - returns the number of a given role of neighbouring
+--	tiles that surround a given coordinate
+function Map:countNeighboursByRole(x, y, role)
+	local count = 0
+	for i = x-1, x+1 do
+		for j = y-1, y+1 do
+			if	self:isInBounds(i, j) and
+					not (i == x and j == y) and
+					self.tile[i][j].role == role then
+				count = count + 1
+			end
+		end
+	end
+
+	return count
+end
+
 --	Map:generateRoomsAndCorridors() - generates a rooms-and-corridors map
 --	with a given number of rooms, a given number of redundant links
 --	between rooms, and a given number of locker rooms; does not return anything
@@ -255,15 +273,9 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 	--	using a given lock type, or a random one if none is given
 	local function createLockedDoor(x, y, lockType)
 		local lockTypes = { "Red", "Green", "Blue", "Silver", "Gold" }
-		local lockType = lockType or lockTypes[math.random(1, #lockType)]
-		local door = {
-			["name"] = "Locked door",
-			["face"] = "+",
-			["color"] = curses.red + curses.bold,
-			["solid"] = true,
-			["opaque"] = true,
-			["locked"] = lockType
-		}
+		local lockType = lockType or lockTypes[math.random(1, #lockTypes)]
+		local door = Util.copyTable(Tile.lockedDoor)
+		door.locked = lockType
 		self.tile[x][y] = door
 	end
 	
@@ -389,14 +401,14 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 		for j = rooms[i].x, rooms[i].x + rooms[i].w - 1 do
 			if self.tile[j][rooms[i].y] == Tile.floor then
 				if math.random() < lockedDoorChance then
-					createLockedDoor(j, rooms[i].y, "Red")
+					createLockedDoor(j, rooms[i].y)
 				else
 					self.tile[j][rooms[i].y] = Tile.closedDoor
 				end
 			end
 			if self.tile[j][rooms[i].y + rooms[i].h - 1] == Tile.floor then
 				if math.random() < lockedDoorChance then
-					createLockedDoor(j, rooms[i].y + rooms[i].h - 1, "Red")
+					createLockedDoor(j, rooms[i].y + rooms[i].h - 1)
 				else
 					self.tile[j][rooms[i].y + rooms[i].h - 1] = Tile.closedDoor
 				end
@@ -406,14 +418,14 @@ function Map:generateRoomsAndCorridors(nRooms, nLoops, nLockers)
 		for j = rooms[i].y, rooms[i].y + rooms[i].h - 1 do
 			if self.tile[rooms[i].x][j] == Tile.floor then
 				if math.random() < lockedDoorChance then
-					createLockedDoor(rooms[i].x, j, "Red")
+					createLockedDoor(rooms[i].x, j)
 				else
 					self.tile[rooms[i].x][j] = Tile.closedDoor
 				end
 			end
 			if self.tile[rooms[i].x + rooms[i].w - 1][j] == Tile.floor then
 				if math.random() < lockedDoorChance then
-					createLockedDoor(rooms[i].x + rooms[i].w - 1, j, "Red")
+					createLockedDoor(rooms[i].x + rooms[i].w - 1, j)
 				else
 					self.tile[rooms[i].x + rooms[i].w - 1][j] = Tile.closedDoor
 				end
@@ -583,7 +595,7 @@ function Map:spawnMachinery(nMachinery, chanceToSpread)
 			x = math.random(1, Global.mapWidth)
 			y = math.random(1, Global.mapHeight)
 		until		self.tile[x][y] == Tile.roomFloor
-				and	self:countNeighbours(x, y, Tile.closedDoor) == 0
+				and	self:countNeighboursByRole(x, y, "door") == 0
 				and	self:countNeighbours(x, y, Tile.wall) >= 3
 
 		self.tile[x][y] = Tile.brokenMachinery

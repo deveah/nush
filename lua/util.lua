@@ -105,4 +105,20 @@ function Util.debugDumpMap(map)
 	end
 end
 
+function Util.copyTable(tbl)
+	if type(tbl) ~= "table" then
+		return nil
+	end
+
+	local t = {}
+	for k, v in pairs(tbl) do
+		if type(v) == "table" then
+			t[k] = Util.copyTable(v)
+		else
+			t[k] = v
+		end
+	end
+	return t
+end
+
 return Util

@@ -321,15 +321,7 @@ function Actor:move(x, y)
 
 	--	bumping into a locked door (for now) simply opens it
 	if self.map.tile[x][y].name == "Locked door" then
-		if self:hasItem(self.map.tile[x][y].locked .. " keycard") then
-			UI:message("{{green}}You open the locked door using your {{GREEN}}" ..
-				self.map.tile[x][y].locked .. "{{pop}} keycard.")
-			self.map.tile[x][y] = Tile.openDoor
-			return true
-		else
-			UI:message("The door requires a `" .. self.map.tile[x][y].locked .. "' keycard, which you do not have.")
-			return false
-		end
+		return self:unlockDoor(x, y)
 	end
 
 	--	bumping into a hidden door reveals it
@@ -744,6 +736,42 @@ function Actor:closeDoor(x, y)
 
 	--	the action has been completed successfully
 	return true
+end
+
+--	Actor:unlockDoor() - makes the given actor unlock the door at a given
+--	location; returns true if the action has been completed successfully,
+--	and false otherwise
+function Actor:unlockDoor(x, y)
+	if not self.map:isInBounds(x, y) then
+		return false
+	end
+
+	--	only doors can be unlocked
+	if self.map.tile[x][y].role ~= "door" then
+		if self == Game.player then
+			UI:message("There's no door there!")
+		end
+		return false
+	end
+
+	--	only locked doors can be unlocked
+	if not self.map.tile[x][y].locked then
+		if self == Game.player then
+			UI:message("That door isn't locked!")
+		end
+		return false
+	end
+
+	--	check to see if the actor has the right keycard
+	if self:hasItem(self.map.tile[x][y].locked .. " keycard") then
+		UI:message("{{green}}You open the locked door using your {{GREEN}}" ..
+			self.map.tile[x][y].locked .. "{{pop}} keycard.")
+		self.map.tile[x][y] = Tile.openDoor
+		return true
+	else
+		UI:message("The door requires a `" .. self.map.tile[x][y].locked .. "' keycard, which you do not have.")
+		return false
+	end
 end
 
 return Actor

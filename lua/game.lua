@@ -101,7 +101,21 @@ function Game:start()
 
 		--	populate each map with a few items
 		for j = 1, 10 do
-			local item = Itemdefs.RedKeycard:new()
+			local item
+			local wh = math.random()
+			if wh < 0.1 then
+				item = Itemdefs.RedKeycard:new()
+			elseif wh < 0.2 then
+				item = Itemdefs.GreenKeycard:new()
+			elseif wh < 0.3 then
+				item = Itemdefs.BlueKeycard:new()
+			elseif wh < 0.4 then
+				item = Itemdefs.SilverKeycard:new()
+			elseif wh < 0.5 then
+				item = Itemdefs.GoldKeycard:new()
+			else
+				item = Itemdefs.SugarBombs:new()
+			end
 			self:addItem(item)
 			item:setMap(map)
 			item:setPosition(map:findRandomEmptySpace())
