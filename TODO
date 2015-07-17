@@ -1,10 +1,10 @@
 
-	TODO
-	--
+High Priority:
+	* ranged combat
+	* weapon stats
+	* actor stats
+	* actor HP
+	* enemy AI
 
-	*	concatenate messages within the same turn into one big message
-	*	complete using stairs - how to place actor on next map?
-	*	melee damage
-	*	ranged damage
-	*	dungeon generators
-
+Low Priority:
+	* concatenate messages within the same turn into one big message
