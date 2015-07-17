@@ -27,8 +27,8 @@ to open it.
 
 Debug keys:
        `$' - Show map
-       `(' - Teleport to next map
-       `)' - Teleport to previous map
+       `)' - Teleport to next map
+       `(' - Teleport to previous map
       `F2' - Dump globals
       `F3' - Show curses test screen
 

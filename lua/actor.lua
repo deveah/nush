@@ -662,22 +662,27 @@ function Actor:handleKey(key)
 	end
 
 	--	teleport player to next/previous map
-	if key == "(" then
-		UI:message("{{red}}(DEBUG) Teleported to next level.")
-		Game.player.map = Game.mapList[Game.player.map.num + 1]
-		Game.player.x, Game.player.y = Game.player.map:findRandomEmptySpace()
-		Game.player:updateSight()
-	end
 	if key == ")" then
+		UI:message("{{red}}(DEBUG) Teleported to next level.")
+		self:teleportToMap(Game.mapList[self.map.num + 1])
+	end
+	if key == "(" then
 		UI:message("{{red}}(DEBUG) Teleported to previous level.")
-		Game.player.map = Game.mapList[Game.player.map.num - 1]
-		Game.player.x, Game.player.y = Game.player.map:findRandomEmptySpace()
-		Game.player:updateSight()
+		self:teleportToMap(Game.mapList[self.map.num - 1])
 	end
 
 	--	there was no known action corresponding to the given key, so signal that
 	--	there hasn't been taken any action to spend the turn with
 	return false
+end
+
+--	Actor:teleportToMap() - place the actor on a random tile of the map (mainly
+--	for debugging); does not return anything
+function Actor:teleportToMap(map)
+	if map then
+		self.map = map
+		self:setPosition(map:findRandomEmptySpace())
+	end
 end
 
 --	Actor:openDoor() - makes the given actor open a door at a given location;
