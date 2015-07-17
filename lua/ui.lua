@@ -14,6 +14,7 @@ local UI = {}
 package.loaded['lua/ui'] = UI
 
 local Global = require 'lua/global'
+local Util = require 'lua/util'
 local Log = require "lua/log"
 local Game = require "lua/game"
 
@@ -422,6 +423,18 @@ function UI:drawInventoryScreen(actor)
 	end
 
 	curses.getch()
+end
+
+--	UI:helpScreen() - Display scrollable help file; returns nothing
+function UI:helpScreen()
+	local text = Util.iteratorToList(io.lines(Global.helpFilename))
+	self:scrollableTextScreen("Help", text)
+end
+
+--	UI:testScreen() - Display screen with test graphics; returns nothing
+function UI:testScreen()
+	local text = Util.iteratorToList(io.lines("testscreen.txt"))
+	self:scrollableTextScreen("Curses tests", text)
 end
 
 return UI

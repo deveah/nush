@@ -36,7 +36,16 @@ function Util.xyFromDirection(dir)
 	end
 end
 
---	Util.seqDelete() - removes an object from a numerical sequence, to go with
+--	Util.iteratorToList() - given an iterator, exhaust it, returning a table
+function Util.iteratorToList(iterator)
+	local ret = {}
+	for item in iterator do
+		table.insert(ret, item)
+	end
+	return ret
+end
+
+--	Util.seqRemove() - removes an object from a list, to go with
 --	table.insert and table.remove.
 --	Returns true on success, false if it didn't exist.
 function Util.seqRemove(seq, item)
@@ -54,8 +63,8 @@ function Util.seqRemove(seq, item)
 	return true
 end
 
---	Util.listMethods() - Dump to the log the list of methods on an object
-function Util.listMethods(obj)
+--	Util.printMethods() - Dump to the log the list of methods on an object
+function Util.printMethods(obj)
 	Log:write("Listing methods...")
 	while obj do
 		for k,v in pairs(obj) do

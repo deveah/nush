@@ -1,0 +1,41 @@
+Welcome to Nush!
+
+You can scroll this and other screens up and down using the `arrow' keys,
+`j' and `k', `pageup' and `pagedown', or `home' and `end'.
+
+   {{YELLOW}} Controls
+
+You can move in 8 directions using vi keys or the numpad (plus arrow keys):
+ {{WHITE}} 7 8 9     y k u  {{pop}}
+ {{WHITE}} 4 5 6     h . l  {{pop}}
+ {{WHITE}} 1 2 3     b j n  {{pop}}
+`5' or `.' waits for a turn, or targets self if targetting.
+Please turn off Numlock to use the numpad.
+
+Move onto an enemy to perform a melee attack, or onto a closed door
+to open it.
+
+       `f' - Fire weapon
+  `<' or `>' - Ascend/descend stairs
+  `g' or `,' - Pick up items
+       `c' - Close door
+       `i' - Inventory
+`Q' or `Esc' - Quit
+       `p' - Show message log
+ `F1' or `?' - This screen
+ `R' or `^R' - Redraw the screen
+
+Debug keys:
+       `$' - Show map
+       `(' - Teleport to next map
+       `)' - Teleport to previous map
+      `F2' - Dump globals
+      `F3' - Show curses test screen
+
+   {{YELLOW}} Map icons
+
+     {{yellow}}#{{pop}} - Wall
+     {{BLUE}}~{{pop}} - Shallow water
+     {{WHITE}}+{{pop}} - Closed door
+     {{WHITE}}/{{pop}} - Open door
+

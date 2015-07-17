@@ -1,0 +1,46 @@
+   {{YELLOW}}Markup test
+nothing        abcd +++ 1234567890
+normal       {{normal}}  abcd +++ 1234567890
+normal bold  {{normal}}{{bold}}  abcd +++ 1234567890
+white        {{white}}  abcd +++ 1234567890
+white bold   {{white}}{{bold}}  abcd +++ 1234567890
+bold white   {{bold}}{{white}}  abcd +++ 1234567890
+WHITE        {{WHITE}}  abcd +++ 1234567890
+yellow       {{yellow}}  abcd +++ 1234567890
+YELLOW       {{YELLOW}}  abcd +++ 1234567890
+black        {{black}}  abcd +++ 1234567890
+BLACK        {{BLACK}}  abcd +++ 1234567890
+blink        {{blink}}  abcd +++ 1234567890
+blink yellow {{blink}}{{yellow}}  abcd +++ 1234567890
+blink YELLOW {{blink}}{{YELLOW}}  abcd +++ 1234567890
+standout     {{standout}}  abcd +++ 1234567890
+reverse      {{reverse}}  abcd +++ 1234567890
+red reverse  {{red}}{{reverse}}  abcd +++ 1234567890
+reverse red  {{reverse}}{{red}}  abcd +++ 1234567890
+underline    {{underline}}  abcd +++ 1234567890
+
+
+   {{YELLOW}}Unicode test
+â”  â”‘  â”’  â”“  â””  â”•  â”–  â”—  â”˜  â”™  â”š  â”›  â”œ  â”  â”  â”Ÿ
+â•   â•¡  â•¢  â•£  â•¤  â•¥  â•¦  â•§  â•¨  â•©  â•ª  â•«  â•¬  â•­  â•®  â•¯
+â•°  â•±  â•²  â•³  â•´  â•µ  â•¶  â•·  â•¸  â•¹  â•º  â•»  â•¼  â•½  â•¾  â•¿
+
+   {{YELLOW}}Codepage 437 pipe characters
+³ ´ µ ¶ · ¸ ¹ º » ¼ ½ ¾ ¿ À Á Â Ã Ä Å Æ
+Ç È É Ê Ë Ì Í Î Ï Ğ Ñ Ò Ó Ô Õ Ö × Ø Ù Ú
+
+   {{YELLOW}}All of high-ASCII
+  ! " # $ % & ' ( ) * + , - . / 
+0 1 2 3 4 5 6 7 8 9 : ; < = > ? 
+@ A B C D E F G H I J K L M N O 
+P Q R S T U V W X Y Z [ \ ] ^ _ 
+` a b c d e f g h i j k l m n o 
+p q r s t u v w x y z { | } ~  
+€  ‚ ƒ „ … † ‡ ˆ ‰ Š ‹ Œ    
+ ‘ ’ “ ” • – — ˜ ™ š › œ   Ÿ 
+  ¡ ¢ £ ¤ ¥ ¦ § ¨ © ª « ¬ ­ ® ¯ 
+° ± ² ³ ´ µ ¶ · ¸ ¹ º » ¼ ½ ¾ ¿ 
+À Á Â Ã Ä Å Æ Ç È É Ê Ë Ì Í Î Ï 
+Ğ Ñ Ò Ó Ô Õ Ö × Ø Ù Ú Û Ü İ Ş ß 
+à á â ã ä å æ ç è é ê ë ì í î ï 
+ğ ñ ò ó ô õ ö ÷ ø ù ú û ü ı ş ÿ

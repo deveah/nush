@@ -24,6 +24,9 @@ Global.defaultName = "Player"
 --	Name of the file used for logging (Note: also defined in nush.c)
 Global.logFilename = "log.txt"
 
+--	The help file shown with '?'
+Global.helpFilename = "helpfile.txt"
+
 --  Size of the screen. This could be initialised from curses.init(),
 --  but that seems like a bad idea
 Global.screenWidth =  80

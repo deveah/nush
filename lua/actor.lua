@@ -555,6 +555,11 @@ function Actor:handleKey(key)
 		return false
 	end
 
+	if key == "?" or key == "/" or key == "F1" then
+		UI:helpScreen()
+		return false
+	end
+
 	--  message log
 	if key == "p" then
 		UI:messageLogScreen()
@@ -609,9 +614,15 @@ function Actor:handleKey(key)
 
 	--	debug keys
 	--	dump globals
-	if key == "#" then
+	if key == "F2" then
 		UI:message("{{red}}(DEBUG) Dumped globals to logfile.")
 		Util.dumpGlobals()
+		return false
+	end
+
+	--	test graphics
+	if key == "F3" then
+		UI:testScreen()
 		return false
 	end
 
