@@ -230,12 +230,21 @@ static int curses_write( lua_State *L )
 
 static int curses_getch( lua_State *L )
 {
-	char s[2];
-	int c = getch();
+	char s[4];
+	int fkey, c = getch();
+
+	for ( fkey = 1; fkey <= 15; fkey++ )
+	{
+		if ( c == KEY_F(fkey) ) {
+			sprintf( s, "F%d", fkey );
+			lua_pushstring( L, s );
+			return 1;
+		}
+	}
 
 	switch( c )
 	{
-	case '\x1b':  /* ^[ */
+	case '\x1b':  /* ESC / ^[ */
 		lua_pushstring( L, "escape" );
 		break;
 
