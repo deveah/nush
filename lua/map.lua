@@ -535,6 +535,34 @@ function Map:findRandomEmptySpace()
 	return x, y
 end
 
+function Map:spawnMachinery(nMachinery, chanceToSpread)
+	for i = 1, nMachinery do
+		local x, y
+		repeat
+			x = math.random(1, Global.mapWidth)
+			y = math.random(1, Global.mapHeight)
+		until		self.tile[x][y] == Tile.roomFloor
+				and	self:countNeighbours(x, y, Tile.closedDoor) == 0
+				and	self:countNeighbours(x, y, Tile.wall) >= 3
+
+		self.tile[x][y] = Tile.brokenMachinery
+	end
+
+	for i = 1, Global.mapWidth do
+		for j = 1, Global.mapHeight do
+			if		self:countNeighbours(i, j, Tile.brokenMachinery) > 0
+				and	self.tile[i][j] == Tile.roomFloor
+				and	math.random() < chanceToSpread then
+				if math.random() < 0.2 then
+					self.tile[i][j] = Tile.brokenComputer
+				else
+					self.tile[i][j] = Tile.pileOfElectronics
+				end
+			end
+		end
+	end
+end
+
 --	Map:spawnPoolsOfWater() - spawns a given number of pools of water around
 --	the given map, with a given chance of the water to spread to the
 --	neighbouring tiles; does not return anything

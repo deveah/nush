@@ -153,5 +153,29 @@ Tile.hiddenDoor = {
 	["opaque"] = true
 }
 
+Tile.brokenComputer = {
+	["name"] = "Broken computer",
+	["face"] = "&",
+	["color"] = curses.cyan,
+	["solid"] = true,
+	["opaque"] = false
+}
+
+Tile.pileOfElectronics = {
+	["name"] = "Pile of electronics",
+	["face"] = ";",
+	["color"] = curses.cyan,
+	["solid"] = false,
+	["opaque"] = false
+}
+
+Tile.brokenMachinery = {
+	["name"] = "Broken machinery",
+	["face"] = "#",
+	["color"] = curses.cyan,
+	["solid"] = true,
+	["opaque"] = false
+}
+
 return Tile
 

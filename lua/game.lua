@@ -75,8 +75,7 @@ function Game:start()
 			map:spawnPatchesOfGrass(1, 0.9)
 		elseif levelType < 0.8 then
 			map:generateRoomsAndCorridors(15, 4, 5)
-			map:spawnPoolsOfWater(5, 0.25)
-			map:spawnPatchesOfGrass(10, 0.5)
+			map:spawnMachinery(20, 0.1)
 		else
 			map:generateBSP()
 		end
