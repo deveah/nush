@@ -104,6 +104,14 @@ static void setfield_int( char *key, int val )
 	lua_setfield( L, -2, key );
 }
 
+/* If the nth function argument is a string, returns it, otherwise throw an
+   error. Like luaL_checkstring() but that accepts integers */
+static char *checkstring( lua_State *L, int arg )
+{
+	luaL_checktype( L, arg, LUA_TSTRING );
+	return (char *)luaL_checkstring( L, arg );
+}
+
 
 /***************************** Curses IO library ****************************/
 
@@ -219,9 +227,9 @@ static int curses_terminate( lua_State *L )
 
 static int curses_write( lua_State *L )
 {
-	int x = lua_tointeger( L, -3 ),
-		y = lua_tointeger( L, -2 );
-	char *s = (char*)lua_tostring( L, -1 );
+	int x = luaL_checkinteger( L, 1 ),
+		y = luaL_checkinteger( L, 2 );
+	char *s = checkstring( L, 3 );
 
 	mvaddstr( y, x, s );
 
@@ -349,7 +357,7 @@ static int curses_getch( lua_State *L )
 
 static int curses_attr( lua_State *L )
 {
-	int a = lua_tointeger( L, -1 );
+	int a = luaL_checkinteger( L, 1 );
 	attrset( a );
 
 	return 0;
@@ -366,7 +374,7 @@ static int curses_clear( lua_State *L )
 
 static int curses_clearline( lua_State *L )
 {
-	int y = lua_tointeger(L, -1);
+	int y = luaL_checkinteger( L, 1 );
 	
 	move( y, 0 );
 	clrtoeol();
@@ -395,8 +403,8 @@ static int curses_redraw( lua_State *L )
 
 static int curses_move( lua_State *L )
 {
-	int x = lua_tointeger( L, -2 ),
-		y = lua_tointeger( L, -1 );
+	int x = luaL_checkinteger( L, 1 ),
+		y = luaL_checkinteger( L, 2 );
 
 	move( y, x );
 
@@ -405,7 +413,7 @@ static int curses_move( lua_State *L )
 
 static int curses_cursor( lua_State *L )
 {
-	int c = lua_tointeger( L, -1 );
+	int c = luaL_checkinteger( L, 1 );
 
 	curs_set( c );
 
