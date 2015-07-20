@@ -44,10 +44,10 @@ function UI:drawScreen()
 	--	is currently on
 	local map = Game.player.map
 
-	--	draw the terrain
+	--	draw the terrain and memory
 	for i = 1, Global.mapWidth do
 		for j = 1, Global.mapHeight do
-			--	draw only tiles visible by the player, or in the player's memory
+			--	draw only tiles visible by the player, or tiles and items in the player's memory
 			if Game.player.sightMap[i][j] then
 				curses.attr(map.tile[i][j].color)
 				curses.write(i + xOffset, j + yOffset, map.tile[i][j].face)
@@ -63,12 +63,12 @@ function UI:drawScreen()
 
 	--	draw the items on the same map as the player, who are visible from the
 	--	player character's point of view
+	--	(Note: Actor:updateSight() also draws items onto map.memory)
 	for i = 1, #(Game.itemList) do
-		if	Game.itemList[i].map == map
-				and Game.player.sightMap[Game.itemList[i].x][Game.itemList[i].y] then
-			curses.attr(Game.itemList[i].color)
-			curses.write(Game.itemList[i].x + xOffset, Game.itemList[i].y + yOffset,
-				Game.itemList[i].face)
+		local item = Game.itemList[i]
+		if item.map == map and Game.player.sightMap[item.x][item.y] then
+			curses.attr(item.color)
+			curses.write(item.x + xOffset, item.y + yOffset, item.face)
 		end
 	end
 

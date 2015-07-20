@@ -294,6 +294,16 @@ function Actor:updateSight()
 		traceRay(xOffset, yOffset, self.sightRange)
 	end
 
+	--	Update the player's memory of item positions
+	if self == Game.player then
+		for i = 1, #(Game.itemList) do
+			local item = Game.itemList[i]
+			if item.map == self.map and self.sightMap[item.x][item.y] then
+				self.map.memory[item.x][item.y] = item.face
+			end
+		end
+	end
+
 	Log:write("Sight map calculated for " .. self:toString())
 end
 
