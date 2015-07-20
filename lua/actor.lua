@@ -117,6 +117,21 @@ function Actor:setPosition(x, y)
 		f(self)
 	end
 
+	--	List items laying on this tile
+	if self == Game.player then
+		local items = self.map:itemsAtTile(self.x, self.y)
+		if #items > 0 then
+			local itemlist = ""
+			for idx, item in ipairs(items) do
+				if idx > 1 then
+					itemlist = itemlist .. ", "
+				end
+				itemlist = itemlist .. item:describe()
+			end
+			UI:message("You see here " .. itemlist .. ".")
+		end
+	end
+
 	--	each repositioning triggers the recalculation of the sight map
 	self:updateSight()
 end
