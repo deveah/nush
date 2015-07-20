@@ -10,11 +10,15 @@ You can move in 8 directions using vi keys or the numpad (plus arrow keys):
  {{WHITE}} 4 5 6     h . l  {{pop}}
  {{WHITE}} 1 2 3     b j n  {{pop}}
 `5' or `.' waits for a turn, or targets self if targetting.
-Please turn off Numlock to use the numpad.
+Please turn off `Numlock' to use the numpad.
+
+Press `/' and then a direction, or `shift' plus a vi key (`YKUHLBJN'), to move in
+a straight line until you reach a wall or something interesting such as an item.
 
 Move onto an enemy to perform a melee attack, or onto a closed door
 to open it.
 
+       `/' - Followed by direction: move in straight line until hitting a wall
        `f' - Fire weapon
   `<' or `>' - Ascend/descend stairs
   `g' or `,' - Pick up items
@@ -32,10 +36,16 @@ Debug keys:
       `F2' - Dump globals
       `F3' - Show curses test screen
 
+   {{YELLOW}} Tips
+
+You can attempt to break through a locked door by shooting it.
+
    {{YELLOW}} Map icons
 
      {{yellow}}#{{pop}} - Wall
      {{BLUE}}~{{pop}} - Shallow water
-     {{WHITE}}+{{pop}} - Closed door
-     {{WHITE}}/{{pop}} - Open door
+     {{normal}}+{{pop}} - Closed door
+     {{normal}}/{{pop}} - Open door
+     {{normal}}<{{pop}} - Stairs up (previous level)
+     {{normal}}>{{pop}} - Stairs down (next level)
 

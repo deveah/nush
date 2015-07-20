@@ -9,6 +9,11 @@
 --	*	color (curses constant) - the color of the actor in-game
 --	*	map (Map object)  - the map on which the Actor is currently
 --	* x, y (integers)   - the position of the Actor on the map
+--	* runDir (direction string, optional)
+--	                    - (player only) if not nil, then in which
+--	                      direction the player is moving in a straight line
+--	* runStartX, runStartY  (integers, optional)
+--	                    - (player only) From where running started
 --	*	sightMap (2D boolean table) - a map showing the tiles
 --	                      currently visible to the actor
 --	* sightRange (int)  - Number of tiles the actor can see
@@ -40,6 +45,7 @@ function Actor.new()
 	a.map = nil
 	a.x = 0	--	although 0 is not a valid coordinate for the Actor to be on,
 	a.y = 0	--	the value signifies that an actual position has not been set
+	a.runDir = nil
 	a.alive = true
 	a.inventory = {}
 	a.sightRange = 5
@@ -286,6 +292,17 @@ end
 
 ------------------------------ Actor actions ----------------------------------
 
+
+--	Actor:canMoveTo() - returns whether this actor can enter a tile on the
+--	current map, without having to attack the occupant or any other action.
+function Actor:canMoveTo(x, y)
+	if not self.map:isInBounds(x, y) or self.map:isSolid(x, y)
+			or self.map:isOccupied(x, y) then
+		return false
+	end
+	return true
+end
+
 --	Actor:move() - attempts to move the given Actor object onto the tile
 --	at the given pair of coordinates (x, y) of the same map it is currently
 --	on; returns either true or false, depending on whether the move was
@@ -316,7 +333,7 @@ function Actor:move(x, y)
 
 	--	bumping into a closed door opens it
 	if self.map.tile[x][y] == Tile.closedDoor then
-		return self:openDoor(x, y)
+		return (self:openDoor(x, y))
 	end
 
 	--	bumping into a locked door (for now) simply opens it
@@ -344,7 +361,7 @@ function Actor:move(x, y)
 	--	the actor cannot move onto a tile that is occupied by another actor;
 	--	instead, the actor who occupies that certain tile is attacked
 	local actor = self.map:isOccupied(x, y)
-	if actor and actor.alive then
+	if actor then
 		return (self:meleeAttack(actor))
 	end
 
@@ -516,6 +533,42 @@ function Actor:dropItem(item)
 	end
 end
 
+--	Actor:straightMovement() - continue moving in a straight line (aka running)
+--	until encountering something. Returns true if turn taken.
+function Actor:straightMovement()
+	local dirx, diry = Util.xyFromDirection(self.runDir)
+	Log:write("player:straightMovement() continuing run in direction " .. self.runDir)
+
+	--	Stop if any adjacent tile has something 'interesting' on it
+	for x, y in self.map:neighbours(self.x, self.y) do
+		--	Only consider tiles not adjacent to the starting one
+		if Util.dist(x, y, self.runStartX, self.runStartY) > 1 then
+			if	self.map:isOccupied(x, y) or
+					#self.map:itemsAtTile(x, y) > 0 or
+					self.map.tile[x][y].role == "stairs" or
+					self.map.tile[x][y].role == "door" then
+				self.runDir = nil
+				return false
+			end
+		end
+	end
+
+	--	Try move; first check the tile is clear, otherwise would automatically
+	--	open doors, attack enemies, etc.
+	if self:canMoveTo(self.x + dirx, self.y + diry) then
+		local moved = self:move(self.x + dirx, self.y + diry)
+		if moved then
+			return moved
+		end
+		--	This unexpected failure probably isn't a bug/error
+		Log:write("While running, move() failed although canMoveTo()==true")
+	end
+
+	--	Cancel if couldn't move
+	self.runDir = nil
+	return false
+end
+
 --	Actor:act() - makes the given Actor object spend its turn; if the actor
 --	is player-controlled, it requests input from the player and acts according
 --	to the command(s) given; if the actor is not player-controlled, it
@@ -524,14 +577,21 @@ end
 function Actor:act()
 	if self == Game.player then
 		--	the actor is player controlled, so first inform the player of the
-		--	current state of the game
+		--	current state of the game, even if running (redrawing the screen for
+		--	each step is slow but useful to the player)
 		UI:drawScreen()
+		curses.refresh()
 
-		--	and then request for input
-		local k = curses.getch()
-		Log:write("Read character: " .. k)
+		if self.runDir then
+			--	The player is moving in a straight line
+			return (self:straightMovement())
+		else
+			--	otherwise request for input
+			local k = curses.getch()
+			Log:write("Read character: " .. k)
 
-		return (self:handleKey(k))
+			return (self:handleKey(k))
+		end
 	else
 		--	the actor is not player-controlled, so let the AI functions take over
 		--	(not implemented, so return that the turn was successfully spent)
@@ -559,6 +619,30 @@ function Actor:playerFires()
 	end
 end
 
+--	Actor:handleRunKey() - Check whether the pressed key is a run key, if so, enters run mode and returns true, but this doesn't take any time
+function Actor:handleRunKey(key)
+	--	Check HJKL, etc
+	local dir = UI:directionFromKey(key:lower())
+	if dir then
+		self.runDir = dir
+		self.runStartX, self.runStartY = self.x, self.y
+		return true
+	end
+
+	--	Check run prefix
+	if key == "/" then
+		dir = UI:promptDirection(nil)
+		if dir == "." then
+			UI:message("Not running in place.")
+		elseif dir then
+			self.runDir = dir
+			self.runStartX, self.runStartY = self.x, self.y
+		end
+		return true --	handled '/'
+	end
+	return false  --	not handled
+end
+
 --	Actor:handleKey() - makes the given actor spend its turn with a command
 --	specified by the given key; returns true or false, depending on whether
 --	the action was successful or not
@@ -580,7 +664,7 @@ function Actor:handleKey(key)
 		return false
 	end
 
-	if key == "?" or key == "/" or key == "F1" then
+	if key == "?" or key == "F1" then
 		UI:helpScreen()
 		return false
 	end
@@ -595,6 +679,11 @@ function Actor:handleKey(key)
 	local dir, dirx, diry = UI:directionFromKey(key)
 	if dir then
 		return (self:move(self.x + dirx, self.y + diry))
+	end
+
+	--	straight-line movement
+	if self:handleRunKey(key) then
+		return false
 	end
 
 	--	fire

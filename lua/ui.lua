@@ -162,9 +162,12 @@ function UI:directionFromKey(key)
 end
 
 --	UI:promptDirection() - prompts the player to enter a direction; returns
---	nil if invalid, or dir,x,y; see UI:directionFromKey()
+--	nil if invalid, or dir,x,y; see UI:directionFromKey().
+--	The prompt is invisible if reason isn't given
 function UI:promptDirection(reason)
-	self:message(reason or "Which direction?")
+	if reason then
+		self:message(reason)
+	end
 	self:drawScreen()
 
 	local key = curses.getch()

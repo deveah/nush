@@ -10,6 +10,12 @@ local Global = require "lua/global"
 local Util = {}
 
 
+--	Util.dist() - return straight-line distance between two tiles, counting
+--	diagonals as distance 1.
+function Util.dist(x1, y1, x2, y2)
+	return math.max(math.abs(x1 - x2), math.abs(y1 - y2))
+end
+
 --	Util.xyFromDirection() - given a direction code like "l", "ul" (up-left),
 --	or "." (self), returns x,y with -1 <= x,y <= 1
 function Util.xyFromDirection(dir)
