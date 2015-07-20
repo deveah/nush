@@ -255,36 +255,29 @@ function Actor:updateSight()
 	local function traceRay(xOffset, yOffset, maxLength)
 		--	the center of a tile is at (+0.5, +0.5)
 		local currentX, currentY = self.x + 0.5, self.y + 0.5
+		local x, y = math.floor(currentX), math.floor(currentY)
 		local currentLength = 0
 
-		--	the point of origin is always visible
-		self.sightMap[math.floor(currentX)][math.floor(currentY)] = true
-
 		--	loop while advancing the ray's path
-		while self.map:isInBounds(math.floor(currentX), math.floor(currentY))
-			and not self.map:isOpaque(math.floor(currentX), math.floor(currentY)) 
-			and currentLength < maxLength do
-			self.sightMap[math.floor(currentX)][math.floor(currentY)] = true
+		repeat
+			self.sightMap[x][y] = true
 
 			--	update the map memory for the player character
 			if self == Game.player then
-				self.map.memory[math.floor(currentX)][math.floor(currentY)] =
-					self.map.tile[math.floor(currentX)][math.floor(currentY)].face
+				self.map.memory[x][y] = self.map.tile[x][y].face
+			end
+
+			--	the point of origin and opaque obstacles are always visible
+			if currentLength > 0 and self.map:isOpaque(x, y) then
+				break
 			end
 
 			currentX = currentX + xOffset
 			currentY = currentY + yOffset
+			x = math.floor(currentX)
+			y = math.floor(currentY)
 			currentLength = currentLength + 1
-		end
-
-		--	make sure the final point in the ray's path is visible
-		if self.map:isInBounds(math.floor(currentX), math.floor(currentY)) then
-			self.sightMap[math.floor(currentX)][math.floor(currentY)] = true
-			if self == Game.player then
-				self.map.memory[math.floor(currentX)][math.floor(currentY)] =
-					self.map.tile[math.floor(currentX)][math.floor(currentY)].face
-			end
-		end
+		until currentLength > maxLength or not self.map:isInBounds(x, y)
 	end
 
 	--	clear the previously calculated sight map
