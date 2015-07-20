@@ -382,6 +382,30 @@ static int curses_clearline( lua_State *L )
 	return 0;
 }
 
+
+/* curses.clearbox(int width, int height) - clear every position in a box down-right from current
+   cursor position. Doesn't move cursor; resets attributes. */
+static int curses_clearbox( lua_State *L )
+{
+	int x, y;
+	getyx( stdscr, y, x );
+	int width = luaL_checkinteger( L, 1 );
+	int height = luaL_checkinteger( L, 2 );
+
+	/*chtype bkgd = getbkgd( stdscr );*/
+	int xoff, yoff;
+	attrset( A_NORMAL );
+	for ( yoff = 0; yoff < height; yoff++ )
+	{
+		move( y + yoff, x );
+		for ( xoff = 0; xoff < width; xoff++ )
+			addch( ' ' );
+	}
+
+	move( y, x );
+	return 0;
+}
+
 static int curses_refresh( lua_State *L )
 {
 	(void) L;
@@ -437,11 +461,11 @@ static int curses_hline( lua_State *L )
 }
 
 /* curses.box(int width, int height) - draw a box down-right from current
-   cursor position */
+   cursor position. Doesn't move cursor. */
 static int curses_box( lua_State *L )
 {
 	int x, y;
-	getyx( stdscr, y, x);
+	getyx( stdscr, y, x );
 	int width = luaL_checkinteger( L, 1 );
 	int height = luaL_checkinteger( L, 2 );
 
@@ -462,6 +486,7 @@ static int curses_box( lua_State *L )
 		addch( ACS_HLINE );
 	addch( ACS_LRCORNER );
 
+	move( y, x );
 	return 0;
 }
 
@@ -528,6 +553,7 @@ luaL_Reg curses[] = {
 	{	"attr",			curses_attr },
 	{	"clear",		curses_clear },
 	{	"clearLine",	curses_clearline },
+	{	"clearBox",		curses_clearbox },
 	{	"refresh",		curses_refresh },
 	{	"redraw",		curses_redraw },
 	{	"move",			curses_move },
