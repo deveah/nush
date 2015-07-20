@@ -80,12 +80,12 @@ function Game:start()
 			map:generateBSP()
 		end
 		self:addMap(map)
-		Util.debugDumpMap(map)
 
 		--	link with the previously created map (if it exists)
 		if i > 1 then
 			map:linkWith(self.mapList[i-1])
 		end
+		Util.debugDumpMap(map)
 
 		--	populate each map with other actors
 		Log:write("Populating level " .. i .. " of the dungeon...")

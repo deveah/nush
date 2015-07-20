@@ -597,8 +597,10 @@ function Map:linkWith(what)
 	self.tile[x][y] = Util.copyTable(Tile.upStairs)
 	self.tile[x][y]["destination-map"] = what
 
-	self.tile[x][y] = Util.copyTable(Tile.downStairs)
-	self.tile[x][y]["destination-map"] = self
+	what.tile[x][y] = Util.copyTable(Tile.downStairs)
+	what.tile[x][y]["destination-map"] = self
+
+	Log:write("Linked maps: " .. self:toString() .. " and " .. what:toString())
 end
 
 --	Map:spawnMachinery() - spawns a given number of broken machinery
