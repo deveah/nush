@@ -96,6 +96,17 @@ function Util.seqRemove(seq, item)
 	return true
 end
 
+--	Util.tableFind() - Search for a value in a table, returning its key if
+--	found, otherwise nil.
+function Util.tableFind(tbl, value)
+	for k,v in pairs(tbl) do
+		if v == value then
+			return k
+		end
+	end
+	return nil
+end
+
 --	Util.printMethods() - Dump to the log the list of methods on an object
 function Util.printMethods(obj)
 	Log:write("Listing methods...")
