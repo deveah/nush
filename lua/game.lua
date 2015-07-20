@@ -97,6 +97,7 @@ function Game:start()
 			actor:setColor(curses.red)
 			actor:setMap(map)
 			actor:setPosition(map:findRandomEmptySpace())
+			actor:setHp(3)
 		end
 
 		--	populate each map with a few items

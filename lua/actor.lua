@@ -49,6 +49,8 @@ function Actor.new()
 	a.alive = true
 	a.inventory = {}
 	a.sightRange = 5
+	a.hp = 1
+	a.maxHp = 1
 
 	a.sightMap = {}
 	for i = 1, Global.mapWidth do
@@ -136,6 +138,12 @@ function Actor:setPosition(x, y)
 	self:updateSight()
 end
 
+--	Actor:setHp() - sets the hp of a given actor; returns nothing
+function Actor:setHp(val)
+	Log:write("Actor " .. self:toString() .. " set hp to " .. val)
+	self.hp = val
+end
+
 --	Actor:visible() - returns whether this actor is visible to the player
 function Actor:visible()
 	return self.map == Game.player.map and Game.player.sightMap[self.x][self.y]
@@ -147,6 +155,30 @@ function Actor:draw(xOffset, yOffset)
 	if self:visible() then
 		curses.attr(self.color)
 		curses.write(self.x + xOffset, self.y + yOffset, self.face)
+	end
+end
+
+--	Actor:dead() - checks if the given actor is still alive; if not,
+--	triggers the 'die' method; returns true if the actor has died, and
+--	false otherwise
+function Actor:dead(reason)
+	if self.hp <= 0 then
+		self:die(reason)
+		return true
+	end
+	return false
+end
+
+--	Actor:takeDamage() - makes the given actor take a given amount of damage;
+--	also checks for death; does not return anything
+function Actor:takeDamage(quantity, reason)
+	self.hp = self.hp - quantity
+	if self:dead() then
+		if self:visible() then
+			UI:message("{{red}}The " .. self.name .. " dies!")
+		else
+			UI:message("{{red}}Something died.")
+		end
 	end
 end
 
@@ -400,9 +432,8 @@ end
 function Actor:meleeAttack(defender)
 	if self == Game.player then
 		UI:message("You attack the " .. defender.name .. ".")
-		UI:message("{{red}}The " .. defender.name .. " dies!")
 	end
-	defender:die("hit by " .. self.name)
+	defender:takeDamage(1, "hit by " .. self.name)
 	return true
 end
 
@@ -416,12 +447,11 @@ function Actor:rangedAttack(defender)
 	if self == Game.player then
 		if defender:visible() then
 			UI:message("You hit the " .. defender.name .. ".")
-			UI:message("{{red}}The " .. defender.name .. " dies!")
 		else
 			UI:message("You hit something.")
 		end
 	end
-	defender:die("shot by " .. self.name)
+	defender:takeDamage(1, "shot by " .. self.name)
 	return true
 end
 
@@ -636,7 +666,7 @@ function Actor:playerFires()
 	end
 	if dir == '.' then
 		UI:message("You shoot yourself in the foot!")
-		self:die("shot self in foot")
+		self:takeDamage(1, "shot self in foot")
 		return true
 	else
 		return (self:fireWeapon(dir))
