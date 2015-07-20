@@ -52,7 +52,7 @@ function UI:drawScreen()
 				curses.attr(map.tile[i][j].color)
 				curses.write(i + xOffset, j + yOffset, map.tile[i][j].face)
 			elseif map.memory[i][j] ~= " " then
-				curses.attr(curses.white)
+				curses.attr(curses.BLACK)
 				curses.write(i + xOffset, j + yOffset, map.memory[i][j])
 			else
 				curses.attr(curses.black)
