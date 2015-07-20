@@ -198,6 +198,20 @@ function UI:message(text)
 	end
 end
 
+--	UI:deleteMessage() - delete the last n messages, defaulting to 1.
+--	Returns nothing.
+function UI:deleteMessage(n)
+	n = n or 1
+	for i = 1, n do
+		--	Delete one repetition of the last message
+		local lastmsg = self.messageList[#self.messageList]
+		lastmsg.times = lastmsg.times - 1
+		if lastmsg.times <= 0 then
+			table.remove(self.messageList)
+		end
+	end
+end
+
 --	UI:getMessage() - returns the message at a given index, mentioning the
 --	times the message has been repeated
 function UI:getMessage(index)
