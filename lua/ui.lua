@@ -18,6 +18,7 @@ local Util = require 'lua/util'
 local Log = require "lua/log"
 local Game = require "lua/game"
 
+
 --	UI.init() - initialises a new UI object, and also initializes the curses
 --	interface; returns nothing
 function UI:init()
@@ -228,6 +229,17 @@ function UI:writeCentered(y, str)
 	self:colorWrite((Global.screenWidth - #self:removeMarkup(str) - 2) / 2, y, " " .. str .. " ")
 end
 
+--	UI:centeredWindow() - Draw a box in the center of the screen, and
+--	return x,y position of top-left corner
+function UI:centeredWindow(width, height)
+	local xOffset, yOffset = (Global.screenWidth - width) / 2, (Global.screenHeight - height) / 2
+	curses.move(xOffset, yOffset)
+	curses.clearBox(width, height)
+	curses.attr(curses.WHITE)
+	curses.box(width, height)
+	return xOffset, yOffset
+end
+
 --  UI:scrollableTextScreen() - display text with	interactive scrolling; does
 --	not return anything.
 --	title:  Text shown at top of screen
@@ -271,7 +283,7 @@ function UI:scrollableTextScreen(title, text, toEnd)
 
 	while true do
 		drawMessages()
-		key = curses.getch()
+		local key = curses.getch()
 		if key == "j" or key == "down" then
 			scroll = math.min(scroll + 1, maxScroll)
 		elseif key == "k" or key == "up" then
@@ -408,40 +420,84 @@ function UI:drawTitleScreen()
 	end
 end
 
---	UI:drawInventoryScreen() - draws a screen showing the contents of a given actor's
---	inventory; does not return anything
-function UI:drawInventoryScreen(actor)
-	local currentLine = 1
+--	UI:itemMenu() - Display info on an item and wait for player to select from
+--	a list of actions. Returns nothing.
+function UI:itemMenu(actor, item)
+	--	Draw display while preserving whatever is already on-screen
+	--	(TODO: size should probably be auto-adjusting)
+	local width, height = 50, 6
+	local xOffset, yOffset = self:centeredWindow(width, height)
+	self:writeCentered(yOffset, item:describe())
+	if item.info then
+		self:colorWrite(xOffset + 1, yOffset + 2, item.info)
+	end
+	self:colorWrite(xOffset + 1, yOffset + 4, " Actions: [{{YELLOW}}d{{pop}}]rop")
 
-	curses.clear()
+	local key = curses.getch()
 
-	curses.move(0, 0)
-	curses.hline(Global.screenWidth)
-	self:writeCentered(0, "Inventory")
-	curses.move(0, Global.screenHeight - 1)
-	curses.hline(Global.screenWidth)
-	self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}any key {{pop}}exit ")
+	--	Drop
+	if key == "d" then
+		actor:dropItem(item)
+	end
+
+	--	quit, whether a valid action or not
+	return
+end
 
 
-	--	a-z
-	for i = 0, 25 do
-		local char = string.char(97 + i)
-		if actor.inventory[char] then
-			self:colorWrite(1, currentLine, "{{yellow}}" .. char .. "{{pop}} - " .. actor.inventory[char].name)
-			currentLine = currentLine + 1
+--	UI:inventoryScreen() - draws a screen showing the contents of a given actor's
+--	inventory; does not return anything.
+--	TODO: add scrolling and show items in categories
+function UI:inventoryScreen(actor)
+
+	local messageline = nil
+
+	local function drawInventoryScreen()
+		local currentLine = 1
+
+		curses.clear()
+
+		--	Draw window decoration
+		curses.attr(curses.normal)
+		curses.move(0, 0)
+		curses.hline(Global.screenWidth)
+		self:writeCentered(0, "{{WHITE}}Inventory")
+		curses.move(0, Global.screenHeight - 2)
+		curses.hline(Global.screenWidth)
+		self:colorWrite(1, Global.screenHeight - 2, " {{cyan}}slot{{pop}} examine/use item  {{cyan}}other{{pop}} exit ")
+		if messageline then
+			self:colorWrite(1, Global.screenHeight - 1, messageline)
+		end
+
+		--	List items
+		for _, slot in ipairs(actor.inventorySlots) do
+			local item = actor.inventory[slot]
+			if item then
+				self:colorWrite(2, currentLine, "{{yellow}}" .. slot .. "{{pop}} - " .. item:describe())
+				currentLine = currentLine + 1
+			end
 		end
 	end
 
-	--	A-Z
-	for i = 0, 25 do
-		local char = string.char(65 + i)
-		if actor.inventory[char] then
-			self:colorWrite(1, currentLine, "{{yellow}}" .. char .. "{{pop}} - " .. actor.inventory[char].name)
-			currentLine = currentLine + 1
+	while true do
+		drawInventoryScreen()
+		messageline = nil
+		local key = curses.getch()
+
+		if Util.tableFind(actor.inventorySlots, key) then
+			--	This is a valid item slot
+			local slot = key
+			local item = actor.inventory[slot]
+			if item then
+				self:itemMenu(actor, item)
+				return
+			else
+				messageline = "{{normal}}No item in slot '" .. slot .. "'"
+			end
+		else
+			break
 		end
 	end
-
-	curses.getch()
 end
 
 --	UI:helpScreen() - Display scrollable help file; returns nothing

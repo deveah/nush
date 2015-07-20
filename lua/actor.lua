@@ -220,7 +220,7 @@ end
 function Actor:removeItem(item_or_slot)
 	local slot = self:findItem(item_or_slot)
 	if slot then
-		self.inventory[item] = nil
+		self.inventory[slot] = nil
 		return
 	end
 	error(item_or_slot:toString() .. " not in inventory")
@@ -746,7 +746,7 @@ function Actor:handleKey(key)
 
 	--	show inventory
 	if key == "i" then
-		UI:drawInventoryScreen(Game.player)
+		UI:inventoryScreen(Game.player)
 		return false
 	end
 

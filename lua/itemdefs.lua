@@ -39,6 +39,7 @@ Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
 Itemdefs.Keycard = defineItem(Itemdefs.BaseItem, {
 	category = "Keycards",
 	face = "$",
+	info = "Opens a door of the corresponding color.",
 })
 
 Itemdefs.RedKeycard = defineItem(Itemdefs.Keycard, {
@@ -58,13 +59,14 @@ Itemdefs.BlueKeycard = defineItem(Itemdefs.Keycard, {
 
 Itemdefs.SilverKeycard = defineItem(Itemdefs.Keycard, {
 	name = "White keycard",
-	color = curses.white + curses.bold,
+	color = curses.WHITE,
 })
 
 Itemdefs.GoldKeycard = defineItem(Itemdefs.Keycard, {
 	name = "Gold keycard",
-	color = curses.yellow + curses.bold
+	color = curses.YELLOW,
 })
+
 
 -------------------------------- Consumables ----------------------------------
 
@@ -76,7 +78,8 @@ Itemdefs.Consumable = defineItem(Itemdefs.BaseItem, {
 
 Itemdefs.SugarBombs = defineItem(Itemdefs.Consumable, {
 	name = "Sugar Bombs",
-	color = curses.cyan + curses.bold,
+	info = "Excessively sugary breakfast cereal.",
+	color = curses.CYAN,
 })
 
 return Itemdefs
