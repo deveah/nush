@@ -62,7 +62,7 @@ function Game:start()
 	local playerName = UI:drawTitleScreen()
 
 	--	show a friendly welcome message
-	UI:message("Welcome to {{green}}Nush{{white}}! Please do not die often.")
+	UI:message("Welcome to {{green}}Nush{{pop}}! Please do not die often.")
 
 	--	create the dungeon
 	Log:write("Creating the dungeon...")
@@ -128,7 +128,7 @@ function Game:start()
 	self:addActor(self.player)
 	self.player:setName(playerName)
 	self.player:setFace("@")
-	self.player:setColor(curses.white)
+	self.player:setColor(curses.normal)
 	self.player:setMap(self.mapList[1])
 	self.player:setPosition(self.player.map:findRandomEmptySpace())
 

@@ -18,6 +18,10 @@ Global.animations = true
 --	so less than 0.03 causes lost frames
 Global.animationFrameLength = 0.02
 
+--	The default color (curses attr) for text.
+--	Note that 'normal' and 'white' are the same under Windows
+Global.defaultColor = "white"
+
 --	the default name of the player character
 Global.defaultName = "Player"
 

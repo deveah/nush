@@ -90,7 +90,7 @@ function UI:drawScreen()
 	end
 
 	--	set the default color back
-	curses.attr(curses.white)
+	curses.attr(curses[Global.defaultColor])
 
 	--	clear the message lines
 	for i = 0, 2 do
@@ -118,7 +118,7 @@ end
 --	true if the player has responded "ok", and false for every other reason
 function UI:prompt(reason)
 	--	show the user the reason for prompting
-	self:message(reason .. " ({{WHITE}}o{{white}}k/{{WHITE}}c{{white}}ancel)")
+	self:message(reason .. " ({{WHITE}}o{{pop}}k/{{WHITE}}c{{pop}}ancel)")
 
 	--	update the screen so the prompt is visible
 	self:drawScreen()
@@ -257,7 +257,7 @@ function UI:scrollableTextScreen(title, text, toEnd)
 		self:writeCentered(0, "{{WHITE}}" .. title)
 		curses.move(0, Global.screenHeight - 1)
 		curses.hline(Global.screenWidth)
-		self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}jk {{white}}navigate {{cyan}}other {{white}}exit ")
+		self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}jk {{pop}}navigate {{cyan}}other {{pop}}exit ")
 		if scroll > 1 then
 			self:colorWrite(Global.screenWidth - 5, 0, " {{YELLOW}}^ ")
 		end
@@ -317,7 +317,7 @@ end
 function UI:colorWrite(x, y, text)
 	local currentX = x
 	--	Stack of previous markup codes, starting with default
-	local markupStack = {"white"}
+	local markupStack = {Global.defaultColor}
 
 	local function write(str)
 		curses.write(currentX, y, str)
@@ -325,7 +325,7 @@ function UI:colorWrite(x, y, text)
 	end
 
 	--	Expand `hightlights' (maybe this should be specific to helpScreen()?)
-	text = string.gsub(text, "`(%S-)'", "{{WHITE}}%1{{pop}}")
+	text = string.gsub(text, "`(%S-)'", "{{bold}}%1{{pop}}")
 
 	--	Break text into pieces delimited by color tokens
 	local pos = 1
@@ -362,7 +362,7 @@ function UI:colorWrite(x, y, text)
 	end
 
 	--	reset to default color
-	curses.attr(curses.white)
+	curses.attr(curses[Global.defaultColor])
 end
 
 --	UI:removeMarkup() - Returns copy of a string with all markup codes such
@@ -391,7 +391,7 @@ function UI:drawTitleScreen()
 	curses.write(10, 5, logo[3])
 	curses.attr(curses.cyan)
 	curses.write(10, 6, "A coffeebreak roguelike")
-	curses.attr(curses.white)
+	curses.attr(curses.normal)
 	curses.write(10, 7, "http://github.com/deveah/nush")
 
 	--	ask the player for a name
@@ -420,14 +420,14 @@ function UI:drawInventoryScreen(actor)
 	self:writeCentered(0, "Inventory")
 	curses.move(0, Global.screenHeight - 1)
 	curses.hline(Global.screenWidth)
-	self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}any key {{white}}exit ")
+	self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}any key {{pop}}exit ")
 
 
 	--	a-z
 	for i = 0, 25 do
 		local char = string.char(97 + i)
 		if actor.inventory[char] then
-			self:colorWrite(1, currentLine, "{{yellow}}" .. char .. "{{white}} - " .. actor.inventory[char].name)
+			self:colorWrite(1, currentLine, "{{yellow}}" .. char .. "{{pop}} - " .. actor.inventory[char].name)
 			currentLine = currentLine + 1
 		end
 	end
@@ -436,7 +436,7 @@ function UI:drawInventoryScreen(actor)
 	for i = 0, 25 do
 		local char = string.char(65 + i)
 		if actor.inventory[char] then
-			self:colorWrite(1, currentLine, "{{yellow}}" .. char .. "{{white}} - " .. actor.inventory[char].name)
+			self:colorWrite(1, currentLine, "{{yellow}}" .. char .. "{{pop}} - " .. actor.inventory[char].name)
 			currentLine = currentLine + 1
 		end
 	end

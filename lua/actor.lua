@@ -511,7 +511,7 @@ function Actor:tryPickupItem(item)
 	if slot then
 		Log:write(self:toString() .. " picked up " .. item:toString())
 		if self == Game.player then
-			UI:message("Picked up {{yellow}}" .. slot .. "{{white}} - " .. item:describe())
+			UI:message("Picked up {{yellow}}" .. slot .. "{{pop}} - " .. item:describe())
 		end
 		return true
 	end
