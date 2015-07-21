@@ -5,12 +5,12 @@ You can scroll this and other screens up and down using the `arrow' keys,
 
    {{YELLOW}} Controls
 
-You can move in 8 directions using vi keys or the numpad (plus arrow keys):
- {{WHITE}} 7 8 9     y k u  {{pop}}
- {{WHITE}} 4 5 6     h . l  {{pop}}
- {{WHITE}} 1 2 3     b j n  {{pop}}
-`5' or `.' waits for a turn, or targets self if targetting.
-Please turn off `Numlock' to use the numpad.
+You can move in 8 directions using vi keys, the numpad (please turn off
+`Numlock'), or cursor and navigation keys:
+   {{WHITE}} 7 8 9      y k u      Home Up   PgUp  {{pop}}
+   {{WHITE}} 4 5 6      h . l      Left .    Right {{pop}}
+   {{WHITE}} 1 2 3      b j n      End  Down PgDn  {{pop}}
+`5' or `.' waits for a turn, or targets self when targetting.
 
 Press `/' and then a direction, or `shift' plus a vi key (`YKUHLBJN'), to move in
 a straight line until you reach a wall or something interesting such as an item.
