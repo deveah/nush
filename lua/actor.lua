@@ -497,6 +497,11 @@ function Actor:meleeAttack(defender)
 		weapon = Itemdefs.Fists
 	end
 
+	--	calculate chance to hit
+	if math.random() > weapon.accuracy then
+		return false
+	end
+
 	local damage = math.random(weapon.minDamage, weapon.maxDamage)
 
 	--	Report to player
