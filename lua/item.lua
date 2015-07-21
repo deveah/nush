@@ -3,6 +3,15 @@
 --	item.lua
 --	Item object definition and methods
 --
+--	Item types have the following members:
+--	* equipSlot  (Actor.EquipSlots.*) - equipment slot, nil if not equippable
+--	TODO: list the other non-itemtype specific members here
+--
+--	Item instances additionally have the following members:
+--	* map        (Map) - nil if the item has been picked up or not on a map
+--	* x/y       (ints) - meaningless if not on a map
+--	* equipped  (bool) - whether equipped (in equipSlot)
+--	TODO: list the other members here
 
 local Global = require "lua/global"
 local Game = require "lua/game"
@@ -16,9 +25,10 @@ function Item:new()
 	local i = {}
 	setmetatable(i, {__index = self})
 
-	i.map = nil     --  map is nil if the item has been picked up or not on a map
-	i.x = 0         --  x/y meaningless if not a the map
+	i.map = nil
+	i.x = 0
 	i.y = 0
+	i.equipped = false
 
 	return i
 end
@@ -31,7 +41,13 @@ function Item:toString()
 	else
 		location = "not on a map"
 	end
-	return "<item " .. tostring(self) .. " (" .. self:describe(true) .. ") " .. location .. ">"
+	local equippedAs = ""
+	if self.equipped then
+		--	It could end up in a different slot due to a bug, but we don't have
+		--	a reference to the owner to check with.
+		equippedAs = " equipped (equipSlot=" .. self.equipSlot .. ")"
+	end
+	return "<item " .. tostring(self) .. " (" .. self:describe(true) .. ") " .. location .. equippedAs .. ">"
 end
 
 --	Item:describe() - returns the player-visible name/description of the item.

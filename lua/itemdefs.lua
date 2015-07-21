@@ -5,11 +5,16 @@
 --	item.lua)
 --
 
-local Log = require "lua/log"
-local Item = require "lua/item"
 
 --	Collection of all item and item type definitions
 local Itemdefs = {}
+
+--	This allows recursively requiring actor.lua
+package.loaded['lua/itemdefs'] = Itemdefs
+
+local Log = require "lua/log"
+local Item = require "lua/item"
+local Actor = require "lua/actor"
 
 --	defineItem() - Given the base item type to inherit from, and a table with
 --	overridden data members, returns an item definition

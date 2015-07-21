@@ -423,16 +423,46 @@ end
 --	UI:itemMenu() - Display info on an item and wait for player to select from
 --	a list of actions. Returns nothing.
 function UI:itemMenu(actor, item)
+	--	First build list of available actions
+	local actionKeys = {}
+	local actionString = " Actions:"
+
+	--	Add the name of an action to the list of available actions.
+	--	The letter to be highlighted should be surrounded by [], eg [d]rop
+	function addAction(name)
+		local key = name:match("%[(%a)%]")
+		actionKeys[key] = true
+		actionString = actionString .. " " .. name:gsub("%[(%a)%]", "[{{YELLOW}}%1{{pop}}]")
+	end
+
+	addAction("[d]rop")
+
+	if item.equipped then
+		addAction("[u]nequip")
+	elseif item.equipSlot then
+		-- if item.category == "Weapons" then
+		-- 	addAction("[w]ield")
+		addAction("[e]quip")
+	end
+
 	--	Draw display while preserving whatever is already on-screen
 	--	(TODO: size should probably be auto-adjusting)
-	local width, height = 50, 6
+	local width, height = 50, 8
 	local xOffset, yOffset = self:centeredWindow(width, height)
 	self:writeCentered(yOffset, item:describe())
 	if item.info then
-		self:colorWrite(xOffset + 1, yOffset + 2, item.info)
+		self:colorWrite(xOffset + 1, yOffset + 1, item.info)
 	end
-	self:colorWrite(xOffset + 1, yOffset + 4, " Actions: [{{YELLOW}}d{{pop}}]rop")
+	if item.equipped then
+		self:colorWrite(xOffset + 1, yOffset + 3, "Equipped as " .. item.equipSlot)
+	end
+	if item.examine then
+		self:colorWrite(xOffset + 1, yOffset + 4, item:examine())
+	end
 
+	self:colorWrite(xOffset + 1, yOffset + 6, actionString)
+
+	--	Controls
 	local key = curses.getch()
 
 	--	Drop
@@ -440,6 +470,14 @@ function UI:itemMenu(actor, item)
 		actor:dropItem(item)
 	end
 
+	--	Equip
+	if key == "e" and actionKeys["e"] then
+		actor:equip(item)
+	end
+
+	if key == "u" and actionKeys["u"] then
+		actor:unequip(item)
+	end
 	--	quit, whether a valid action or not
 	return
 end
@@ -473,7 +511,11 @@ function UI:inventoryScreen(actor)
 		for _, slot in ipairs(actor.InventorySlots) do
 			local item = actor.inventory[slot]
 			if item then
-				self:colorWrite(2, currentLine, "{{yellow}}" .. slot .. "{{pop}} - " .. item:describe())
+				local description = item:describe()
+				if item.equipped then
+					description = description .. " (equipped)"
+				end
+				self:colorWrite(2, currentLine, "{{yellow}}" .. slot .. "{{pop}} - " .. description)
 				currentLine = currentLine + 1
 			end
 		end

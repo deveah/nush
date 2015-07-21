@@ -18,7 +18,12 @@
 --	                      currently visible to the actor
 --	* sightRange (int)  - Number of tiles the actor can see
 --	* inventory (table) - Mapping from inventory slot (letter) to Items
+--	* equipment (table) - Mapping from equipment slot to Items.
 --	*	alive (boolean)   - true if the actor can act
+--
+--  Also, Actor has the following enums:
+--	* InventorySlots    - List of inventory slots (e.g. "a")
+--	* EquipSlots        - Table of equip slots (e.g. .meleeWeapon)
 --
 
 local Global = require "lua/global"
@@ -45,6 +50,7 @@ function Actor:new()
 	a.runDir = nil
 	a.alive = true
 	a.inventory = {}
+	a.equipment = {}
 	a.sightRange = 5
 
 	a.sightMap = {}
@@ -125,7 +131,7 @@ function Actor:setPosition(x, y)
 				end
 				itemlist = itemlist .. item:describe()
 			end
-			UI:message("You see here " .. itemlist .. ".")
+			UI:message("You see here a " .. itemlist .. ".")
 		end
 	end
 
@@ -193,6 +199,10 @@ Util.seqRemove(Actor.InventorySlots, "j")
 Util.seqRemove(Actor.InventorySlots, "k")
 Util.seqRemove(Actor.InventorySlots, "q")
 
+--	set of all equipment slots
+Actor.EquipSlots = {meleeWeapon = "meleeWeapon", rangedWeapon = "rangedWeapon"}
+Util.makeStrict(Actor.EquipSlots)
+
 
 --	Actor:unusedInventSlot() - returns the first unused inventory slot, or nil
 --	none are free.
@@ -245,21 +255,70 @@ end
 
 --	Actor:removeItem() - removes an item from the Actor's inventory (the caller
 --	must ensure the item gets a new owner itself); does not return anything.
-function Actor:removeItem(item_or_slot)
-	local slot = self:findItem(item_or_slot)
+function Actor:removeItem(item)
+	local slot = self:findItem(item)
+	Log:write(self:toString() .. ":removeItem(" .. item:toString() .. ") from slot " .. tostring(slot))
 	if slot then
+		self:unequip(item)
+
 		self.inventory[slot] = nil
 		return
 	end
-	error(item_or_slot:toString() .. " not in inventory")
+	error(item:toString() .. " not in inventory")
+end
+
+--	Actor:equip() - Equips an item in the inventory in the slot item.equipSlot,
+--	after unequipping existing equipment. Does not return anything.
+function Actor:equip(item)
+	Log:write(self:toString() .. " equipping " .. item:toString() .. " in " .. item.equipSlot)
+
+	--	unequip existing
+	if self.equipment[item.equipSlot] then
+		self:unequip(self.equipment[item.equipSlot])
+	end
+
+	self.equipment[item.equipSlot] = item
+	item.equipped = true
+
+	if self == Game.player then
+		if item.category == "Weapons" then
+			UI:message("You now wield the " .. item:describe() .. ".")
+		else
+			UI:message("You equip on " .. item:describe() .. ".")
+		end
+	end
+end
+
+--	Actor:unequip() - Unequip an equipped item if it is equipped (otherwise
+--	does nothing), ending any effects, etc. Returns true if it was unequipped.
+function Actor:unequip(item)
+	Log:write(self:toString() .. " unequipping " .. item:toString())
+	local eqslot = Util.tableFind(self.equipment, item)
+	if not eqslot then
+		Log:write("...not equipped")
+		return false
+	end
+
+	self.equipment[eqslot] = nil
+	item.equipped = false
+
+	if self == Game.player then
+		--local weaponslots = {Actor.EquipSlots.meleeWeapon, Actor.EquipSlots.rangedWeapon}
+		--if Util.tableFind(weaponslots, eqslot) then
+		if item.category == "Weapons" then
+			UI:message("You no longer wield the " .. item:describe() .. ".")
+		else
+			UI:message("You unequip the " .. item:describe() .. ".")
+		end
+	end
+	return true
 end
 
 --	Actor:die() - kills the given actor, making it unable to act;
 --	'reason' is an optional parameter which is used to trace the cause of death;
 --	does not return anything
 function Actor:die(reason)
-	Log:write("Actor " .. self:toString() ..
-		" has died.")
+	Log:write("Actor " .. self:toString() .. " has died.")
 	self.alive = false
 	--	By default, everything they were carrying is dropped.
 	for _, item in pairs(self.inventory) do
@@ -581,6 +640,7 @@ end
 --	Actor:dropItem() - Removes an item from the inventory, places it on the
 --	floor below the actor; returns nothing
 function Actor:dropItem(item)
+	--	This unequips the item if needed
 	self:removeItem(item)
 	item:setMap(self.map)
 	item:setPosition(self.x, self.y)
