@@ -470,7 +470,7 @@ function UI:inventoryScreen(actor)
 		end
 
 		--	List items
-		for _, slot in ipairs(actor.inventorySlots) do
+		for _, slot in ipairs(actor.InventorySlots) do
 			local item = actor.inventory[slot]
 			if item then
 				self:colorWrite(2, currentLine, "{{yellow}}" .. slot .. "{{pop}} - " .. item:describe())
@@ -484,7 +484,7 @@ function UI:inventoryScreen(actor)
 		messageline = nil
 		local key = curses.getch()
 
-		if Util.tableFind(actor.inventorySlots, key) then
+		if Util.tableFind(actor.InventorySlots, key) then
 			--	This is a valid item slot
 			local slot = key
 			local item = actor.inventory[slot]

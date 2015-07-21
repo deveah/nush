@@ -181,23 +181,24 @@ end
 
 
 --	list of all inventory slots
-Actor.inventorySlots = {}
+Actor.InventorySlots = {}
 for i = 0, 25 do
-	table.insert(Actor.inventorySlots, string.char(97 + i)) --	a-z
+	table.insert(Actor.InventorySlots, string.char(97 + i)) --	a-z
 end
 for i = 0, 25 do
-	table.insert(Actor.inventorySlots, string.char(65 + i)) --	A-Z
+	table.insert(Actor.InventorySlots, string.char(65 + i)) --	A-Z
 end
 --	Disallow certain letters, for menu scrolling and exit
-Util.seqRemove(Actor.inventorySlots, "j")
-Util.seqRemove(Actor.inventorySlots, "k")
-Util.seqRemove(Actor.inventorySlots, "q")
+Util.seqRemove(Actor.InventorySlots, "j")
+Util.seqRemove(Actor.InventorySlots, "k")
+Util.seqRemove(Actor.InventorySlots, "q")
+
 
 --	Actor:unusedInventSlot() - returns the first unused inventory slot, or nil
 --	none are free.
 function Actor:unusedInventSlot()
 	--	First try a-z, excluding jk for scrolling
-	for _, slot in ipairs(Actor.inventorySlots) do
+	for _, slot in ipairs(Actor.InventorySlots) do
 		if not self.inventory[slot] then
 			return slot
 		end
