@@ -26,6 +26,9 @@
 --	* EquipSlots        - Table of equip slots (e.g. .meleeWeapon)
 --
 
+local Actor = {}
+package.loaded['lua/actor'] = Actor
+
 local Global = require "lua/global"
 local Log = require "lua/log"
 local Game = require "lua/game"
@@ -34,8 +37,6 @@ local Particle = require "lua/particle"
 local Tile = require "lua/tile"
 local Util = require "lua/util"
 local Itemdefs = require "lua/itemdefs"
-
-local Actor = {}
 
 --	Actor:new() - creates a new Actor object, initializing its members with
 --	default data; returns the created Actor object

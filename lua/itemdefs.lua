@@ -61,13 +61,15 @@ Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
 
 Itemdefs.MeleeWeapon = defineItem(Itemdefs.Weapon, {
 	color = curses.red,
-	equipSlot = Actor.EquipSlots.meleeWeapon,
+	--equipSlot = Actor.EquipSlots.meleeWeapon,
+	equipSlot = "meleeWeapon",
 	range = 0,
 })
 
 Itemdefs.RangedWeapon = defineItem(Itemdefs.Weapon, {
 	color = curses.green,
-	equipSlot = Actor.EquipSlots.rangedWeapon,
+	--equipSlot = Actor.EquipSlots.rangedWeapon,
+	equipSlot = "rangedWeapon",
 })
 
 --	Default melee weapon for the player if none equipped
