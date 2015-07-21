@@ -91,7 +91,12 @@ function Game:start()
 		--	populate each map with other actors
 		Log:write("Populating level " .. i .. " of the dungeon...")
 		for j = 1, 10 do
-			local actor = Actordefs.Boogeyman:new()
+			local actor
+			if math.random() < 0.9 then
+				actor = Actordefs.Savage:new()
+			else
+				actor = Actordefs.SavageChief:new()
+			end
 			self:addActor(actor)
 			actor:setMap(map)
 			actor:setPosition(map:findRandomEmptySpace())

@@ -41,11 +41,18 @@ Actordefs.Player = defineActor(Actordefs.Humanoid, {
 	maxHp = 10,
 })
 
-Actordefs.Boogeyman = defineActor(Actordefs.Humanoid, {
-	name = "Boogeyman",
+Actordefs.Savage = defineActor(Actordefs.Humanoid, {
+	name = "Savage",
 	color = curses.red,
 	hp = 3,
-	maxHp = 3
+	maxHp = 3,
+})
+
+Actordefs.SavageChief = defineActor(Actordefs.Humanoid, {
+	name = "Savage Chief",
+	color = curses.RED,
+	hp = 5,
+	maxHp = 5,
 })
 
 return Actordefs
