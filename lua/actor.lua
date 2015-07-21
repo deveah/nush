@@ -31,18 +31,14 @@ local Util = require "lua/util"
 local Itemdefs = require "lua/itemdefs"
 
 local Actor = {}
-Actor.__index = Actor
 
---	Actor.new() - creates a new Actor object, initializing its members with
+--	Actor:new() - creates a new Actor object, initializing its members with
 --	default data; returns the created Actor object
-function Actor.new()
+function Actor:new()
 	local a = {}
-	setmetatable(a, Actor)
+	setmetatable(a, {__index = self})
 
 	--	initialize members
-	a.name = ""
-	a.face = ""
-	a.color = ""
 	a.map = nil
 	a.x = 0	--	although 0 is not a valid coordinate for the Actor to be on,
 	a.y = 0	--	the value signifies that an actual position has not been set
@@ -50,8 +46,6 @@ function Actor.new()
 	a.alive = true
 	a.inventory = {}
 	a.sightRange = 5
-	a.hp = 1
-	a.maxHp = 1
 
 	a.sightMap = {}
 	for i = 1, Global.mapWidth do

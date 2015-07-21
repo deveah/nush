@@ -35,6 +35,7 @@ local UI = require "lua/ui"
 local Tile = require "lua/tile"
 local Item = require "lua/item"
 local Itemdefs = require "lua/itemdefs"
+local Actordefs = require "lua/actordefs"
 
 
 --	Game:init() - initialize members of a Game object with default data
@@ -90,14 +91,10 @@ function Game:start()
 		--	populate each map with other actors
 		Log:write("Populating level " .. i .. " of the dungeon...")
 		for j = 1, 10 do
-			local actor = Actor.new()
+			local actor = Actordefs.Boogeyman:new()
 			self:addActor(actor)
-			actor:setName("Boogeyman")
-			actor:setFace("b")
-			actor:setColor(curses.red)
 			actor:setMap(map)
 			actor:setPosition(map:findRandomEmptySpace())
-			actor:setHp(3)
 		end
 
 		--	populate each map with a few items
@@ -125,11 +122,9 @@ function Game:start()
 
 	--	create the player character
 	Log:write("Creating the player character...")
-	self.player = Actor.new()
+	self.player = Actordefs.Player:new()
 	self:addActor(self.player)
 	self.player:setName(playerName)
-	self.player:setFace("@")
-	self.player:setColor(curses.normal)
 	self.player:setMap(self.mapList[1])
 	self.player:setPosition(self.player.map:findRandomEmptySpace())
 
