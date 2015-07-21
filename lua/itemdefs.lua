@@ -14,6 +14,10 @@ local Itemdefs = {}
 --	defineItem() - Given the base item type to inherit from, and a table with
 --	overridden data members, returns an item definition
 local function defineItem(inheritFrom, definition)
+	--	Check for mistakes
+	if inheritFrom.new ~= Item.new then
+		error("Parent object does not inherit from Item")
+	end
 	setmetatable(definition, {__index = inheritFrom})
 	return definition
 end

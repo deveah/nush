@@ -166,4 +166,27 @@ function Util.copyTable(tbl)
 	return t
 end
 
+--	Util.makeStrict() - Sets the metatable of a table so that attempting to
+--	access non-existent members throws an error. Returns the same table.
+function Util.makeStrict(tbl)
+	local meta = getmetatable(tbl)
+	if not meta then
+		meta = {}
+		setmetatable(tbl, meta)
+	end
+	if meta.__index then
+		--	We could make the prototype strict instead, but that would be pretty dangerous
+		error("Can't make strick; already has an __index metamethod")
+	end
+
+	meta.__index = function(tbl, key)
+		error("Tried to retrieve non-existent member " .. tostring(key) .. " of strict table " .. tostring(tbl))
+	end
+	meta.__newindex = function(tbl, key, value)
+		error("Tried to set non-existent member " .. tostring(key) .. " = " .. tostring(value) .. " of strict table " .. tostring(tbl))
+	end
+
+	return tbl
+end
+
 return Util

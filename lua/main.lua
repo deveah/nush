@@ -4,11 +4,14 @@
 --	Entry point of application
 --
 
-local Game = require "lua/game"
-local Log = require "lua/log"
+local Log
+local Game
 
 --	main() - Errors are caught from within here
 local function main()
+	Game = require "lua/game"
+	Log = require "lua/log"
+
 	--	the Game object is instantiated
 	Game:init()
 	Game:start()
