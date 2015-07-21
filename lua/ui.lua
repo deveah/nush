@@ -226,7 +226,7 @@ end
 
 --  writeCentered() - Draws a string at the center of a line; does not return anything
 function UI:writeCentered(y, str)
-	self:colorWrite((Global.screenWidth - #self:removeMarkup(str) - 2) / 2, y, " " .. str .. " ")
+	self:colorWrite(math.floor((Global.screenWidth - #self:removeMarkup(str) - 2) / 2), y, " " .. str .. " ")
 end
 
 --	UI:centeredWindow() - Draw a box in the center of the screen, and
