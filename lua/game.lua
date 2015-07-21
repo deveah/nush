@@ -134,7 +134,6 @@ function Game:start()
 			else
 				item = Itemdefs.SugarBombs:new()
 			end
-			self:addItem(item)
 			item:setMap(map)
 			item:setPosition(map:findRandomEmptySpace())
 		end

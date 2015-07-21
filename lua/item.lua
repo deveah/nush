@@ -30,7 +30,18 @@ function Item:new()
 	i.y = 0
 	i.equipped = false
 
+	Game:addItem(i)
+
 	return i
+end
+
+--	Item:destroy() - remove an item from anything that holds a reference to it
+--	so that it effectively ceases to exist and is garbage collected. Must not
+--	be called twice.Returns nothing.
+--	FIXME: does not remove self from actor inventory and equipment!
+function Item:destroy()
+	self:setMap(nil)
+	Game:removeItem(self)
 end
 
 --	Item:toString() - returns a string describing the Item object
@@ -105,6 +116,14 @@ function Item:setPosition(x, y)
 	self.x = x
 	self.y = y
 end
+
+--	Item:combineStack() - combine another stack of items into this one; the
+--	other stack is destroyed. Returns nothing.
+function Item:combineStack(otherStack)
+	self.count = self.count + otherStack.count
+	otherStack:destroy()
+end
+
 
 return Item
 

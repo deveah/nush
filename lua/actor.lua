@@ -246,11 +246,10 @@ end
 --	Actor:addItem() - tries to add an item to the Actor's inventory, returns the
 --	inventory slot (character) it was added in, or nil if there is no room.
 function Actor:addItem(item)
-	--	try stacking the item if possible
+	--	try stacking the item if possible (which destroys 'item')
 	local slot = self:hasItem(item.name)
 	if item.stackable and slot then
-		self.inventory[slot].count = self.inventory[slot].count + item.count
-		item:setMap(nil)
+		self.inventory[slot]:combineStack(item)
 		return slot
 	else
 		--	create a new slot in the inventory
@@ -258,10 +257,10 @@ function Actor:addItem(item)
 		if not slot then
 			return nil
 		end
-		--	map is changed before copying the table because otherwise the recursive
-		--	copying would turn into an infinite loop
+
 		item:setMap(nil)
-		self.inventory[slot] = Util.copyTable(item)
+		self.inventory[slot] = item
+
 		return slot
 	end
 end
@@ -579,9 +578,11 @@ function Actor:fireWeapon(direction)
 			UI:message("You are out of ammo!")
 			return false
 		else
-			self.inventory[slot].count = self.inventory[slot].count - 1
-			if self.inventory[slot].count == 0 then
-				self:removeItem(self.inventory[slot])
+			local ammo = self.inventory[slot]
+			ammo.count = ammo.count - 1
+			if ammo.count == 0 then
+				self:removeItem(ammo)
+				ammo:destroy()
 			end
 		end
 	end
