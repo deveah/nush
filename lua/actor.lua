@@ -517,7 +517,7 @@ end
 --	damage), false if it flies past.
 function Actor:rangedAttack(defender, weapon)
 	--	Calc hit
-	if math.random() > 0.6 then --	temp 60% chance to hit
+	if math.random() > weapon.accuracy then
 		return false
 	end
 

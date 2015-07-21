@@ -77,6 +77,7 @@ Itemdefs.Fists = defineItem(Itemdefs.MeleeWeapon, {
 	name = "Fists",
 	minDamage = 0,
 	maxDamage = 1,
+	accuracy = 0.95,
 })
 
 --	These are pretty much placeholders.
@@ -86,6 +87,7 @@ Itemdefs.ShockBaton = defineItem(Itemdefs.MeleeWeapon, {
 	info = "A damaging electrified club without the hassle of lugging heavy equipment.",
 	minDamage = 1,
 	maxDamage = 3,
+	accuracy = 0.95,
 })
 
 Itemdefs.DilithiumRazor = defineItem(Itemdefs.MeleeWeapon, {
@@ -93,6 +95,7 @@ Itemdefs.DilithiumRazor = defineItem(Itemdefs.MeleeWeapon, {
 	info = "As sharp as it is light.",
 	minDamage = 2,
 	maxDamage = 5,
+	accuracy = 0.9,
 })
 
 Itemdefs.Pistol = defineItem(Itemdefs.RangedWeapon, {
@@ -101,6 +104,7 @@ Itemdefs.Pistol = defineItem(Itemdefs.RangedWeapon, {
 	range = 10,
 	minDamage = 1,
 	maxDamage = 5,
+	accuracy = 0.6,
 })
 
 Itemdefs.Phaser = defineItem(Itemdefs.RangedWeapon, {
@@ -109,6 +113,7 @@ Itemdefs.Phaser = defineItem(Itemdefs.RangedWeapon, {
 	range = 6,
 	minDamage = 2,
 	maxDamage = 8,
+	accuracy = 0.7,
 })
 
 
