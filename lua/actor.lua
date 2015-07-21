@@ -705,6 +705,12 @@ function Actor:handleKey(key)
 	if key == "Q" or key == "escape" then	--	quit
 		if UI:prompt("Are you sure you want to exit?") then
 			Game:halt("Player requested game termination.")
+
+			--	output to the highscores file
+			local f = io.open("scores.txt", "a")
+			f:write(Game.player.name .. " quit on " .. Game.player.map.name .. "\n")
+			f:close()
+
 			return true	--	an exit request still spends a turn
 		else
 			return false
