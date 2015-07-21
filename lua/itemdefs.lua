@@ -185,4 +185,23 @@ Itemdefs["Savage Chief corpse"] = defineItem(Itemdefs.Corpse, {
 	color = curses.red,
 })
 
+-------------------------------------- Ammo -----------------------------------
+
+Itemdefs.Ammo = defineItem(Itemdefs.BaseItem, {
+	category = "Ammo",
+	face = "=",
+	stackable = true,
+	count = 1,
+})
+
+Itemdefs.Bullet = defineItem(Itemdefs.Ammo, {
+	name = "Bullet",
+	color = curses.yellow,
+})
+
+Itemdefs.EnergyCell = defineItem(Itemdefs.Ammo, {
+	name = "Energy Cell",
+	color = curses.cyan,
+})
+
 return Itemdefs

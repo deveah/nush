@@ -103,24 +103,34 @@ function Game:start()
 		for j = 1, 10 do
 			local item
 			local wh = math.random()
-			if wh < 0.1 then
-				item = Itemdefs.RedKeycard:new()
-			elseif wh < 0.2 then
-				item = Itemdefs.GreenKeycard:new()
-			elseif wh < 0.3 then
-				item = Itemdefs.BlueKeycard:new()
-			elseif wh < 0.4 then
-				item = Itemdefs.SilverKeycard:new()
-			elseif wh < 0.5 then
-				item = Itemdefs.GoldKeycard:new()
-			elseif wh < 0.6 then
-				item = Itemdefs.Pistol:new()
-			elseif wh < 0.7 then
-				item = Itemdefs.Phaser:new()
-			elseif wh < 0.8 then
-				item = Itemdefs.ShockBaton:new()
+			if wh < 0.5 then
+				wh = math.random()
+				if wh < 0.1 then
+					item = Itemdefs.RedKeycard:new()
+				elseif wh < 0.2 then
+					item = Itemdefs.GreenKeycard:new()
+				elseif wh < 0.3 then
+					item = Itemdefs.BlueKeycard:new()
+				elseif wh < 0.4 then
+					item = Itemdefs.SilverKeycard:new()
+				elseif wh < 0.5 then
+					item = Itemdefs.GoldKeycard:new()
+				elseif wh < 0.6 then
+					item = Itemdefs.Pistol:new()
+				elseif wh < 0.7 then
+					item = Itemdefs.Phaser:new()
+				elseif wh < 0.8 then
+					item = Itemdefs.ShockBaton:new()
+				else
+					item = Itemdefs.DilithiumRazor:new()
+				end
 			elseif wh < 0.9 then
-				item = Itemdefs.DilithiumRazor:new()
+				wh = math.random()
+				if wh < 0.5 then
+					item = Itemdefs.Bullet:new()
+				else
+					item = Itemdefs.EnergyCell:new()
+				end
 			else
 				item = Itemdefs.SugarBombs:new()
 			end

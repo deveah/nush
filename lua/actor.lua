@@ -232,26 +232,39 @@ function Actor:findItem(item_or_slot)
 end
 
 --	Actor:hasItem() - searches the actor's inventory for an item of a given
---	name; returns true or false, indicating the existance of the item
+--	name; returns either nil, in case the actor doesn't have such an item,
+--	or the slot in which the item is placed
 function Actor:hasItem(itemName)
 	for slot, item in pairs(self.inventory) do
 		if item.name == itemName then
-			return true
+			return slot
 		end
 	end
-	return false
+	return nil
 end
 
 --	Actor:addItem() - tries to add an item to the Actor's inventory, returns the
 --	inventory slot (character) it was added in, or nil if there is no room.
 function Actor:addItem(item)
-	local slot = self:unusedInventSlot()
-	if not slot then
-		return nil
+	--	try stacking the item if possible
+	local slot = self:hasItem(item.name)
+	if item.stackable and slot then
+		self.inventory[slot].count = self.inventory[slot].count + item.count
+		item:setMap(nil)
+		return slot
+	else
+		Util.dumpMembers(item)
+		--	create a new slot in the inventory
+		slot = self:unusedInventSlot()
+		if not slot then
+			return nil
+		end
+		--	map is changed before copying the table because otherwise the recursive
+		--	copying would turn into an infinite loop
+		item:setMap(nil)
+		self.inventory[slot] = Util.copyTable(item)
+		return slot
 	end
-	self.inventory[slot] = item
-	item:setMap(nil)
-	return slot
 end
 
 --	Actor:removeItem() - removes an item from the Actor's inventory (the caller
