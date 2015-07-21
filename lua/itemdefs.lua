@@ -105,6 +105,7 @@ Itemdefs.Pistol = defineItem(Itemdefs.RangedWeapon, {
 	minDamage = 1,
 	maxDamage = 5,
 	accuracy = 0.6,
+	ammo = "Bullet",
 })
 
 Itemdefs.Phaser = defineItem(Itemdefs.RangedWeapon, {
@@ -114,6 +115,7 @@ Itemdefs.Phaser = defineItem(Itemdefs.RangedWeapon, {
 	minDamage = 2,
 	maxDamage = 8,
 	accuracy = 0.7,
+	ammo = "Energy Cell",
 })
 
 

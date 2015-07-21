@@ -253,7 +253,6 @@ function Actor:addItem(item)
 		item:setMap(nil)
 		return slot
 	else
-		Util.dumpMembers(item)
 		--	create a new slot in the inventory
 		slot = self:unusedInventSlot()
 		if not slot then
@@ -571,6 +570,20 @@ function Actor:fireWeapon(direction)
 		--	self should not be Player, as Actor:playerFires() already checks
 		--	whether nothing is equipped
 		return false
+	end
+
+	--	consume ammo if possible
+	if weapon.ammo then
+		local slot = self:hasItem(weapon.ammo)
+		if not slot then
+			UI:message("You are out of ammo!")
+			return false
+		else
+			self.inventory[slot].count = self.inventory[slot].count - 1
+			if self.inventory[slot].count == 0 then
+				self:removeItem(self.inventory[slot])
+			end
+		end
 	end
 
 	local bulletIcons = {
