@@ -82,4 +82,18 @@ Itemdefs.SugarBombs = defineItem(Itemdefs.Consumable, {
 	color = curses.CYAN,
 })
 
+
+----------------------------------- Corpses -----------------------------------
+
+Itemdefs.Corpse = defineItem(Itemdefs.BaseItem, {
+	category = "Corpses",
+	face = "%",
+})
+
+Itemdefs["Boogeyman corpse"] = defineItem(Itemdefs.Corpse, {
+	name = "Boogeyman corpse",
+	info = "The remaining carcass of a once living Boogeyman.",
+	color = curses.red,
+})
+
 return Itemdefs

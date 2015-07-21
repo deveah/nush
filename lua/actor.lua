@@ -28,6 +28,7 @@ local UI = require "lua/ui"
 local Particle = require "lua/particle"
 local Tile = require "lua/tile"
 local Util = require "lua/util"
+local Itemdefs = require "lua/itemdefs"
 
 local Actor = {}
 Actor.__index = Actor
@@ -269,6 +270,12 @@ function Actor:die(reason)
 	for _, item in pairs(self.inventory) do
 		self:dropItem(item)
 	end
+
+	--	drop a corpse
+	local corpse = Itemdefs[self.name .. " corpse"]:new()
+	Game:addItem(corpse)
+	corpse:setMap(self.map)
+	corpse:setPosition(self.x, self.y)
 
 	--	check if the dead actor is the player, and if so, terminate the game
 	if self == Game.player then
