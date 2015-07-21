@@ -491,37 +491,68 @@ end
 --	melee, killing the defending actor in the process; always returns true,
 --	even if the hit was a miss
 function Actor:meleeAttack(defender)
-	if self == Game.player then
-		UI:message("You attack the " .. defender.name .. ".")
+	local weapon = self.equipment.meleeWeapon
+	if not weapon then
+		weapon = Itemdefs.Fists
 	end
-	defender:takeDamage(1, "hit by " .. self.name)
+
+	local damage = math.random(weapon.minDamage, weapon.maxDamage)
+
+	--	Report to player
+	if self == Game.player then
+		local extrainfo = ""
+		if Global.debugInfo then
+			extrainfo = " {" .. damage .. " damage}"
+		end
+		UI:message("You attack the " .. defender.name .. "." .. extrainfo)
+	end
+
+	defender:takeDamage(damage, "hit by " .. self.name)
 	return true
 end
 
 --	Actor:rangedAttack() - called when the actor's projectile intercepts
 --	another actor; returns true if the projectile hit (whether or not it caused
 --	damage), false if it flies past.
-function Actor:rangedAttack(defender)
+function Actor:rangedAttack(defender, weapon)
+	--	Calc hit
 	if math.random() > 0.6 then --	temp 60% chance to hit
 		return false
 	end
+
+	--	Calc damage
+	local damage = math.random(weapon.minDamage, weapon.maxDamage)
+
+	--	Report to player
 	if self == Game.player then
+		local extrainfo = ""
+		if Global.debugInfo then
+			extrainfo = " {" .. damage .. " damage}"
+		end
+
 		if defender:visible() then
-			UI:message("You hit the " .. defender.name .. ".")
+			UI:message("You hit the " .. defender.name .. "." .. extrainfo)
 		else
-			UI:message("You hit something.")
+			UI:message("You hit something." .. extrainfo)
 		end
 	end
-	defender:takeDamage(1, "shot by " .. self.name)
+
+	defender:takeDamage(damage, "shot by " .. self.name)
 	return true
 end
 
 --	Actor:fireWeapon() - actor fires their weapon in some direction. Animates
 --	the weapon firing and calls self:rangedAttack() on all targets.
---	Returns true (always) if a turn consumed.
+--	Returns true if a turn was consumed.
 function Actor:fireWeapon(direction)
-	--	Range of the weapon
-	local range = 7
+	local weapon = self.equipment.rangedWeapon
+
+	Log:write(self:toString() .. " firing weapon " .. tostring(weapon) .. " in direction " .. direction)
+	if not weapon then
+		--	self should not be Player, as Actor:playerFires() already checks
+		--	whether nothing is equipped
+		return false
+	end
 
 	local bulletIcons = {
 		l = '-', r = '-', u = '|', d = '|',
@@ -539,7 +570,7 @@ function Actor:fireWeapon(direction)
 	local nexttick
 	local hit = false --	Have hit something
 
-	for i = 1, range do
+	for i = 1, weapon.range do
 		--	Aniamtion timing
 		nexttick = clib.time() + Global.animationFrameLength
 
@@ -550,7 +581,7 @@ function Actor:fireWeapon(direction)
 		--	Check for collisions
 		local actorHere = self.map:isOccupied(x, y)
 		if actorHere then
-			if self:rangedAttack(actorHere) then
+			if self:rangedAttack(actorHere, weapon) then
 				--bullet:setFace('%')
 				hit = true
 			end
@@ -722,6 +753,12 @@ end
 --	successful.
 --	TODO: allow proper targetting rather than only firing in a direction
 function Actor:playerFires()
+	local weapon = self.equipment.rangedWeapon
+	if not weapon then
+		UI:message("You don't have a gun equipped!")
+		return false
+	end
+
 	local dir = UI:promptDirection("Fire in which direction?")
 	if not dir then
 		return false

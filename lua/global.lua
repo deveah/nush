@@ -10,6 +10,9 @@ local Global = {}
 --	into the file designated by the `Global.logFilename` variable
 Global.debug = true
 
+--	Turns on the display of more info, like attack damage
+Global.debugInfo = true
+
 --	Whether to display animations, otherwise uses alternative visualisations
 Global.animations = true
 
@@ -34,7 +37,7 @@ Global.helpFilename = "helpfile.txt"
 --  Size of the screen. This could be initialised from curses.init(),
 --  but that seems like a bad idea
 Global.screenWidth =  80
-Global.screenHeight = 24
+Global.screenHeight = 25
 
 --	Map object terrain array dimensions
 Global.mapWidth =		80

@@ -38,10 +38,77 @@ Itemdefs.BaseItem = defineItem(Item, {
 })
 
 
+--------------------------------- Weapons -------------------------------------
+
+--	Weapons have the following additional members:
+--	* minDamage  (int) - min and max damage before modifiers, armour, etc.
+--	* maxDamage  (int) - ditto
+--	* range      (int) - 0 if melee, otherwise range in tiles
+
 Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
 	category = "Weapons",
-	equipAs = "weapon",
+	face = ")",
+	examine = function(self)
+		local ret
+		if self.range == 0 then
+			ret = "Melee"
+		else
+			ret = "Range: " .. self.range
+		end
+		return ret .. "   Damage: " .. self.minDamage .. "-" .. self.maxDamage
+	end
 })
+
+Itemdefs.MeleeWeapon = defineItem(Itemdefs.Weapon, {
+	color = curses.red,
+	equipSlot = Actor.EquipSlots.meleeWeapon,
+	range = 0,
+})
+
+Itemdefs.RangedWeapon = defineItem(Itemdefs.Weapon, {
+	color = curses.green,
+	equipSlot = Actor.EquipSlots.rangedWeapon,
+})
+
+--	Default melee weapon for the player if none equipped
+Itemdefs.Fists = defineItem(Itemdefs.MeleeWeapon, {
+	name = "Fists",
+	minDamage = 0,
+	maxDamage = 1,
+})
+
+--	These are pretty much placeholders.
+
+Itemdefs.ShockBaton = defineItem(Itemdefs.MeleeWeapon, {
+	name = "Shock baton",
+	info = "A damaging electrified club without the hassle of lugging heavy equipment.",
+	minDamage = 1,
+	maxDamage = 3,
+})
+
+Itemdefs.DilithiumRazor = defineItem(Itemdefs.MeleeWeapon, {
+	name = "Dilithium razor",
+	info = "As sharp as it is light.",
+	minDamage = 2,
+	maxDamage = 5,
+})
+
+Itemdefs.Pistol = defineItem(Itemdefs.RangedWeapon, {
+	name = "Pistol",
+	info = "Ancient and unreliable projectile weapon still effective at putting holes into things.",
+	range = 10,
+	minDamage = 1,
+	maxDamage = 5,
+})
+
+Itemdefs.Phaser = defineItem(Itemdefs.RangedWeapon, {
+	name = "Phaser pistol",
+	info = "Fires a concentrated blast of something or other.",
+	range = 6,
+	minDamage = 2,
+	maxDamage = 8,
+})
+
 
 --------------------------------- Keycards ------------------------------------
 

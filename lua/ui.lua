@@ -107,9 +107,24 @@ function UI:drawScreen()
 		end
 	end
 
-	--	draw the status line
+	--	draw the status lines
 	curses.clearLine(23)
+	curses.clearLine(24)
 	curses.write(Global.screenWidth - Game.player.map.name:len(), 23, Game.player.map.name)
+	local equip = Game.player.equipment
+	local weaponry = "Weapon: "
+	if equip.meleeWeapon then
+		weaponry = weaponry .. equip.meleeWeapon:describe()
+	else
+		weaponry = weaponry .. "None"
+	end
+	weaponry = weaponry .. "/"
+	if equip.rangedWeapon then
+		weaponry = weaponry .. equip.rangedWeapon:describe()
+	else
+		weaponry = weaponry .. "None"
+	end
+	curses.write(0, 24, weaponry)
 
 	--	position the cursor on the player, so it may be easily seen
 	curses.move(Game.player.x + xOffset, Game.player.y + yOffset)

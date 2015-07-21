@@ -90,7 +90,7 @@ function Game:start()
 
 		--	populate each map with other actors
 		Log:write("Populating level " .. i .. " of the dungeon...")
-		for j = 1, 10 do
+		for j = 1, 20 do
 			local actor
 			if math.random() < 0.9 then
 				actor = Actordefs.Savage:new()
@@ -116,6 +116,14 @@ function Game:start()
 				item = Itemdefs.SilverKeycard:new()
 			elseif wh < 0.5 then
 				item = Itemdefs.GoldKeycard:new()
+			elseif wh < 0.6 then
+				item = Itemdefs.Pistol:new()
+			elseif wh < 0.7 then
+				item = Itemdefs.Phaser:new()
+			elseif wh < 0.8 then
+				item = Itemdefs.ShockBaton:new()
+			elseif wh < 0.9 then
+				item = Itemdefs.DilithiumRazor:new()
 			else
 				item = Itemdefs.SugarBombs:new()
 			end
@@ -132,6 +140,7 @@ function Game:start()
 	self.player:setName(playerName)
 	self.player:setMap(self.mapList[1])
 	self.player:setPosition(self.player.map:findRandomEmptySpace())
+	self.player:addItem(Itemdefs.Phaser:new())
 
 	--	allow the event loop to run
 	self.running = true
