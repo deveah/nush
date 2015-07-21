@@ -90,9 +90,15 @@ Itemdefs.Corpse = defineItem(Itemdefs.BaseItem, {
 	face = "%",
 })
 
-Itemdefs["Boogeyman corpse"] = defineItem(Itemdefs.Corpse, {
-	name = "Boogeyman corpse",
-	info = "The remaining carcass of a once living Boogeyman.",
+Itemdefs["Savage corpse"] = defineItem(Itemdefs.Corpse, {
+	name = "Savage corpse",
+	info = "The remaining carcass of a once living Savage.",
+	color = curses.red,
+})
+
+Itemdefs["Savage Chief corpse"] = defineItem(Itemdefs.Corpse, {
+	name = "Savage Chief corpse",
+	info = "The remaining carcass of a once living Savage Chief.",
 	color = curses.red,
 })
 
