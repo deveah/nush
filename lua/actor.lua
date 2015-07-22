@@ -693,11 +693,16 @@ end
 function Actor:tryPickupItem(item)
 	local slot = self:addItem(item)
 	if slot then
-		--	changed from 'item' to 'self.inventory[slot]' because the latter
-		--	takes into account the item count after stacking it in inventory
-		Log:write(self:toString() .. " picked up " .. self.inventory[slot]:toString())
-		if self == Game.player then
-			UI:message("Picked up {{yellow}}" .. slot .. "{{pop}} - " .. self.inventory[slot]:describe())
+		if item.stackable then
+			Log:write(self:toString() .. " picked up " .. item:toString() .. " (now " .. self.inventory[slot].count .. ")")
+			if self == Game.player then
+				UI:message("Picked up {{yellow}}" .. slot .. "{{pop}} - " .. item:describe() .. ". You now have " .. self.inventory[slot].count .. ".")
+			end
+		else
+			Log:write(self:toString() .. " picked up " .. item:toString())
+			if self == Game.player then
+				UI:message("Picked up {{yellow}}" .. slot .. "{{pop}} - " .. item:describe())
+			end
 		end
 		return true
 	end
