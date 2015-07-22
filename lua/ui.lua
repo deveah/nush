@@ -555,7 +555,7 @@ function UI:itemMenu(actor, item)
 			--	applying a consumable consumes one piece of it
 			item.count = item.count - 1
 			if item.count == 0 then
-				actor:removeItem(item)
+				item:destroy()
 			end
 		end
 	end

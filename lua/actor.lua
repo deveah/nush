@@ -258,7 +258,7 @@ function Actor:addItem(item)
 			return nil
 		end
 
-		item:setMap(nil)
+		item:setOwner(self)
 		self.inventory[slot] = item
 
 		return slot
@@ -267,12 +267,15 @@ end
 
 --	Actor:removeItem() - removes an item from the Actor's inventory (the caller
 --	must ensure the item gets a new owner itself); does not return anything.
+--	Note: to destroy an item in inventory, just call item:destroy(), which then
+--	calls owner:removeItem()
 function Actor:removeItem(item)
 	local slot = self:findItem(item)
 	Log:write(self:toString() .. ":removeItem(" .. item:toString() .. ") from slot " .. tostring(slot))
 	if slot then
-		self:unequip(item)
+		self:unequip(item)  --	noop if not equipped
 
+		item:setOwner(nil)
 		self.inventory[slot] = nil
 		return
 	end
@@ -601,7 +604,6 @@ function Actor:fireWeapon(direction)
 			local ammo = self.inventory[slot]
 			ammo.count = ammo.count - 1
 			if ammo.count == 0 then
-				self:removeItem(ammo)
 				ammo:destroy()
 			end
 		end
