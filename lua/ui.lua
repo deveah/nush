@@ -569,5 +569,32 @@ function UI:testScreen()
 	self:scrollableTextScreen("Curses tests", text)
 end
 
+--	UI:highscoreScreen() - display screen with highscore table; returns nothing
+function UI:highscoreScreen()
+	local csv = require "lua/csv"
+	local f = csv.open("scores.csv")
+	local text = {}
+	
+	table.insert(text, "{{YELLOW}}  # Name        Place       Reason of death{{pop}}")
+
+	--	TODO: sort entries by score
+	for i = 2, #f.data do
+		local line = 
+			string.format("%3i", i-1) .. " " ..
+			f.data[i]["playerName"] .. string.rep(" ", 12 - f.data[i]["playerName"]:len()) ..
+			f.data[i]["placeOfDeath"] .. string.rep(" ", 12 - f.data[i]["placeOfDeath"]:len()) ..
+			f.data[i]["reasonOfDeath"]
+
+		--	highlight current event
+		if i == #f.data then
+			line = "{{WHITE}}" .. line .. "{{pop}}"
+		end
+
+		table.insert(text, line)
+	end
+
+	UI:scrollableTextScreen("High scores", text, false)
+end
+
 return UI
 

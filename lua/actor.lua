@@ -175,7 +175,7 @@ end
 --	also checks for death; does not return anything
 function Actor:takeDamage(quantity, reason)
 	self.hp = self.hp - quantity
-	if self:dead() then
+	if self:dead(reason) then
 		if self:visible() then
 			UI:message("{{red}}The " .. self.name .. " dies!")
 		else
@@ -337,10 +337,12 @@ function Actor:die(reason)
 		self:dropItem(item)
 	end
 
-	--	drop a corpse
-	local corpse = Itemdefs[self.name .. " corpse"]:new()
-	corpse:setMap(self.map)
-	corpse:setPosition(self.x, self.y)
+	--	drop a corpse; the player character doesn't drop a corpse
+	if self ~= Game.player then
+		local corpse = Itemdefs[self.name .. " corpse"]:new()
+		corpse:setMap(self.map)
+		corpse:setPosition(self.x, self.y)
+	end
 
 	--	check if the dead actor is the player, and if so, terminate the game
 	if self == Game.player then
@@ -349,13 +351,38 @@ function Actor:die(reason)
 		curses.getch()
 
 		--	output to the highscores file
-		local f = io.open("scores.txt", "a")
-		f:write(Game.player.name .. " died on " .. Game.player.map.name .. ", " .. reason .. "\n")
-		f:close()
+		self:dumpToHighscoreFile(reason)
+		UI:highscoreScreen()
 		Game.running = false
 	end
 end
 
+--	Actor:dumpToHighscoreFile() - dumps relevant data to scores.csv in
+--	comma-separated format; does not return anything
+function Actor:dumpToHighscoreFile(reasonOfDeath)
+	--	fileExists() - a naive approach to checking whether a file exists or not;
+	--	returns a boolean depending on the outcome of the check
+	local function fileExists(filename)
+		local f = io.open(filename, "r")
+		if f ~= nil then
+			f:close()
+			return true
+		else
+			return false
+		end
+	end
+
+	--	if the file doesn't exist, write the header
+	if not fileExists("scores.csv") then
+		local f = io.open("scores.csv", "w")
+		f:write("playerName,placeOfDeath,reasonOfDeath\n")
+		f:close()
+	end
+
+	local f = io.open("scores.csv", "a")
+	f:write(self.name .. "," .. self.map.name .. "," .. reasonOfDeath .. "\n")
+	f:close()
+end
 
 ----------------------------------- FOV --------------------------------------
 
@@ -851,9 +878,8 @@ function Actor:handleKey(key)
 			Game:halt("Player requested game termination.")
 
 			--	output to the highscores file
-			local f = io.open("scores.txt", "a")
-			f:write(Game.player.name .. " quit on " .. Game.player.map.name .. "\n")
-			f:close()
+			self:dumpToHighscoreFile("quit")
+			UI:highscoreScreen()
 
 			return true	--	an exit request still spends a turn
 		else
