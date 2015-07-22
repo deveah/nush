@@ -538,10 +538,10 @@ function Actor:meleeAttack(defender)
 		if Global.debugInfo then
 			extrainfo = " {" .. damage .. " damage}"
 		end
-		UI:message("You attack the " .. defender.name .. "." .. extrainfo)
+		UI:message("You " .. weapon.attack .. " the " .. defender.name .. "." .. extrainfo)
 	end
 
-	defender:takeDamage(damage, "hit by " .. self.name)
+	defender:takeDamage(damage, weapon.attack .. " by " .. self.name)
 	return true
 end
 
@@ -568,9 +568,9 @@ function Actor:rangedAttack(defender, weapon)
 		end
 
 		if defender:visible() then
-			UI:message("You hit the " .. defender.name .. "." .. extrainfo)
+			UI:message("You " .. weapon.attack .. " the " .. defender.name .. "." .. extrainfo)
 		else
-			UI:message("You hit something." .. extrainfo)
+			UI:message("You " .. weapon.attack .. " something." .. extrainfo)
 		end
 	end
 

@@ -48,6 +48,7 @@ Itemdefs.BaseItem = defineItem(Item, {
 Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
 	category = "Weapons",
 	face = ")",
+	attack = "hit",
 	examine = function(self)
 		local ret
 		if self.range == 0 then
@@ -70,6 +71,7 @@ Itemdefs.RangedWeapon = defineItem(Itemdefs.Weapon, {
 	color = curses.green,
 	--equipSlot = Actor.EquipSlots.rangedWeapon,
 	equipSlot = "rangedWeapon",
+	attack = "shot",
 })
 
 --	Default melee weapon for the player if none equipped
@@ -78,6 +80,7 @@ Itemdefs.Fists = defineItem(Itemdefs.MeleeWeapon, {
 	minDamage = 0,
 	maxDamage = 1,
 	accuracy = 0.95,
+	attack = "punched",
 })
 
 --	These are pretty much placeholders.
@@ -96,6 +99,7 @@ Itemdefs.DilithiumRazor = defineItem(Itemdefs.MeleeWeapon, {
 	minDamage = 2,
 	maxDamage = 5,
 	accuracy = 0.9,
+	attack = "cut",
 })
 
 Itemdefs.Pistol = defineItem(Itemdefs.RangedWeapon, {
@@ -116,6 +120,7 @@ Itemdefs.Phaser = defineItem(Itemdefs.RangedWeapon, {
 	maxDamage = 8,
 	accuracy = 0.7,
 	ammo = "Energy Cell",
+	attack = "lasered",
 })
 
 
