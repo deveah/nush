@@ -1,10 +1,10 @@
 
 High Priority:
-	* ranged combat
-	* weapon stats
 	* actor stats
-	* actor HP
 	* enemy AI
+	* winning condition and endgame
 
 Low Priority:
 	* concatenate messages within the same turn into one big message
+	* diversify loot
+	* fixed dungeon structure?
