@@ -619,6 +619,12 @@ function Actor:fireWeapon(direction)
 		end
 	end
 
+	if direction == "." then
+		UI:message("You shoot yourself in the foot!")
+		self:takeDamage(1, "shot self in foot")
+		return true
+	end
+
 	local bulletIcons = {
 		l = '-', r = '-', u = '|', d = '|',
 		ul = '\\', dr = '\\', ur = '/', dl = '/'
@@ -835,13 +841,7 @@ function Actor:playerFires()
 	if not dir then
 		return false
 	end
-	if dir == '.' then
-		UI:message("You shoot yourself in the foot!")
-		self:takeDamage(1, "shot self in foot")
-		return true
-	else
-		return (self:fireWeapon(dir))
-	end
+	return (self:fireWeapon(dir))
 end
 
 --	Actor:handleRunKey() - Check whether the pressed key is a run key, if so, enters run mode and returns true, but this doesn't take any time
