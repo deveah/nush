@@ -143,7 +143,7 @@ Itemdefs.BlueKeycard = defineItem(Itemdefs.Keycard, {
 })
 
 Itemdefs.SilverKeycard = defineItem(Itemdefs.Keycard, {
-	name = "White keycard",
+	name = "Silver keycard",
 	color = curses.WHITE,
 })
 
