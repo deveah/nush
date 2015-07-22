@@ -360,20 +360,8 @@ end
 --	Actor:dumpToHighscoreFile() - dumps relevant data to scores.csv in
 --	comma-separated format; does not return anything
 function Actor:dumpToHighscoreFile(reasonOfDeath)
-	--	fileExists() - a naive approach to checking whether a file exists or not;
-	--	returns a boolean depending on the outcome of the check
-	local function fileExists(filename)
-		local f = io.open(filename, "r")
-		if f ~= nil then
-			f:close()
-			return true
-		else
-			return false
-		end
-	end
-
 	--	if the file doesn't exist, write the header
-	if not fileExists("scores.csv") then
+	if not Util.fileExists("scores.csv") then
 		local f = io.open("scores.csv", "w")
 		f:write("playerName,placeOfDeath,reasonOfDeath\n")
 		f:close()

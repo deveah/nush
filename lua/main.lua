@@ -4,6 +4,11 @@
 --	Entry point of application
 --
 
+--	For compatibility with lua 5.1
+if not table.unpack then
+	table.unpack = unpack
+end
+
 local Log
 local Game
 

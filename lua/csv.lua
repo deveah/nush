@@ -11,6 +11,8 @@
 --		column names are placed on the first row of the file
 --
 
+local Util = require "lua/util"
+
 local csv = {}
 csv.__index = csv
 
@@ -24,20 +26,15 @@ function csv.open(filename)
 	assert(c.fd ~= nil, "Unable to open " .. filename .. " for reading.")
 
 	--	split file by lines
-	c.rows = {}
-	repeat
-		local row = c.fd:read("*line")
-		if row then table.insert(c.rows, row) end
-	until row == nil
+	c.rows = Util.iteratorToList(c.fd:lines())
 
 	c.data = {}
 	c.rawData = {}
 	for rowId, rowData in ipairs(c.rows) do
-		c.rawData[rowId] = {}
-		c.data[rowId] = {}
-		
 		--	split each line by comma
-		rowData:gsub("([^,]+)", function(a) table.insert(c.rawData[rowId], a) end)
+		c.rawData[rowId] = Util.stringSplit(rowData, ",")
+
+		c.data[rowId] = {}
 		if rowId > 1 then
 			--	save data in tables with named fields, for easy access
 			for columnId, columnData in ipairs(c.rawData[rowId]) do

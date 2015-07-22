@@ -69,6 +69,63 @@ function Util.anticlockwise(dir, n)
 	return Util.clockwise(dir, -n)
 end
 
+--	Util.stringSplit() - Given a string, returns a list of pieces split by a
+--	delimiter, which is a pattern.
+function Util.stringSplit(str, delimiter)
+	local ret = {}
+	local start = 1
+	for pos in str:gmatch("()" .. delimiter) do
+		table.insert(ret, str:sub(start, pos - 1))
+		start = pos + 1
+	end
+	table.insert(ret, str:sub(start))
+	return ret
+end
+
+--	Util.stringLastMatch() - like string.match() but returns last match.
+--	If there is a match, returns the captures from the pattern, otherwise
+--	returns nil. If pattern specifies no captures, then the whole match is
+--	returned.
+--	before:  if given, returns the last matching starting before this point
+function Util.stringLastMatch(str, pattern, init, before)
+	init = init or 1
+	before = before or #str + 1
+	local ret = {}
+	while true do
+		local captures = {str:match("()" .. pattern, init)}
+		local pos = captures[1]
+		--print("captures", table.unpack(captures))
+		if not pos or pos >= before then
+			--	Return previous match.
+			if #ret == 0 then
+				return nil  --	No match at all
+			end
+			--	First pop the pos of the last match
+			pos = table.remove(ret, 1)
+			--	If pattern contains no captures, then add whole match 
+			if #ret == 0 then
+				ret = {str:match(pattern, pos)}
+			end
+			return table.unpack(ret)
+		end
+		init = pos + 1
+		ret = captures
+	end
+end
+
+--	Test Util.stringLastMatch()
+local function _test_stringLastMatch()
+	assert(Util.tableEqual( {Util.stringLastMatch(" ", "1.")}, {nil} ))
+	assert(Util.tableEqual( {Util.stringLastMatch("12 13 14", "1.")}, {"14"} ))
+	assert(Util.tableEqual( {Util.stringLastMatch("12 13 14", "1.", 2)}, {"14"} ))
+	assert(Util.tableEqual( {Util.stringLastMatch("12 13 14", "()(1.)")}, {7, "14"} ))
+	assert(Util.tableEqual( {Util.stringLastMatch("12 13 14", "()(1.)", 1, 5)}, {4, "13"} ))
+	assert(Util.tableEqual( {Util.stringLastMatch("12 13 14", "()(1.)", 1, 4)}, {1, "12"} ))
+	assert(Util.tableEqual( {Util.stringLastMatch("12 13 14", "()(1.)", 5, 5)}, {nil} ))
+	assert(Util.tableEqual( {Util.stringLastMatch("12 13 14", "()(1.)", 4, 5)}, {4, "13"} ))
+	print("success")
+end
+
 --	Util.iteratorToList() - given an iterator, exhaust it, returning a table
 function Util.iteratorToList(iterator)
 	local ret = {}
@@ -105,6 +162,43 @@ function Util.tableFind(tbl, value)
 		end
 	end
 	return nil
+end
+
+--	Util.tableSize() - Number of keys in a table.
+--	Warning: can be less than #tbl if some of the list elements are nil!
+function Util.tableSize(tbl)
+	local ret = 0
+	for key, val in pairs(tbl) do
+		ret = ret + 1
+	end
+	return ret
+end
+
+--	Util.tableEqual() - Whether two tables are element-wise equal
+function Util.tableEqual(tbl1, tbl2)
+	local len1 = 0
+	for key, val in pairs(tbl1) do
+		if tbl2[key] ~= val then
+			return false
+		end
+		len1 = len1 + 1
+	end
+
+	-- Check whether there are any keys in tbl2 we didn't visit
+	if Util.tableSize(tbl2) ~= len1 then
+		return false
+	end
+	return true
+end
+
+local function _test_tableEqual()
+	assert(Util.tableEqual({1, nil, 3}, {1, nil, 3}) == true)
+	assert(Util.tableEqual({1, nil, 3}, {1, 2, 3}) == false)
+	assert(Util.tableEqual({1, 2, 3}, {1, nil, 3}) == false)
+	assert(Util.tableEqual({1, 2, 3, x = 4}, {1, 2, 3, x = 4}) == true)
+	assert(Util.tableEqual({1, 2, 3, x = 4}, {1, 2, 3}) == false)
+	assert(Util.tableEqual({1, 2, 3}, {1, 2, 3, x = 4}) == false)
+	print("success")
 end
 
 --	Util.printMethods() - Dump to the log the list of methods on an object
@@ -188,5 +282,21 @@ function Util.makeStrict(tbl)
 
 	return tbl
 end
+
+--	Util.fileExists() - a naive approach to checking whether a file exists or not;
+--	returns a boolean with the outcome.
+function Util.fileExists(filename)
+	local f = io.open(filename, "r")
+	if f ~= nil then
+		f:close()
+		return true
+	else
+		return false
+	end
+end
+
+-- _test_stringLastMatch()
+-- _test_tableEqual()
+-- os.exit()
 
 return Util
