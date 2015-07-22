@@ -126,6 +126,18 @@ function UI:drawScreen()
 	end
 	curses.write(0, 24, weaponry)
 
+	local healthStatus
+	if Game.player.hp == Game.player.maxHp then
+		--	green highlight if health is full
+		healthStatus = "({{GREEN}}" .. Game.player.hp .. "{{pop}}/" .. Game.player.maxHp .. ")"
+	elseif Game.player.hp <= math.floor(Game.player.maxHp / 4) then
+		--	red highlight if health is under 25%
+		healthStatus = "({{RED}}" .. Game.player.hp .. "{{pop}}/" .. Game.player.maxHp .. ")"
+	else
+		healthStatus = "(" .. Game.player.hp .. "/" .. Game.player.maxHp .. ")"
+	end
+	UI:colorWrite(0, 23, Game.player.name .. " " .. healthStatus)
+
 	--	position the cursor on the player, so it may be easily seen
 	curses.move(Game.player.x + xOffset, Game.player.y + yOffset)
 end
