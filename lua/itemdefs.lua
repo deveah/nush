@@ -15,6 +15,8 @@ package.loaded['lua/itemdefs'] = Itemdefs
 local Log = require "lua/log"
 local Item = require "lua/item"
 local Actor = require "lua/actor"
+local Game = require "lua/game"
+local UI = require "lua/ui"
 
 --	defineItem() - Given the base item type to inherit from, and a table with
 --	overridden data members, returns an item definition
@@ -164,12 +166,22 @@ Itemdefs.Consumable = defineItem(Itemdefs.BaseItem, {
 	category = "Consumables",
 	face = "&",
 	consumable = true,
+	stackable = true,
+	count = 1,
 })
 
 Itemdefs.SugarBombs = defineItem(Itemdefs.Consumable, {
 	name = "Sugar Bombs",
 	info = "Excessively sugary breakfast cereal.",
 	color = curses.CYAN,
+	apply = function(self, actor)
+		actor:setHp(math.min(actor.hp + 2, actor.maxHp))
+		if actor == Game.player then
+			UI:message("{{green}}Those sugar bombs were delicious!")
+		end
+		--	returns true to indicate that an item should be consumed
+		return true
+	end
 })
 
 

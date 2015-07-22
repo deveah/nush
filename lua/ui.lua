@@ -472,6 +472,10 @@ function UI:itemMenu(actor, item)
 		addAction("[e]quip")
 	end
 
+	if item.consumable then
+		addAction("[a]pply")
+	end
+
 	--	Draw display while preserving whatever is already on-screen
 	--	(TODO: size should probably be auto-adjusting)
 	local width, height = 50, 8
@@ -502,9 +506,22 @@ function UI:itemMenu(actor, item)
 		actor:equip(item)
 	end
 
+	--	Unequip
 	if key == "u" and actionKeys["u"] then
 		actor:unequip(item)
 	end
+
+	--	Apply
+	if key == "a" and actionKeys["a"] then
+		if item:apply(actor) then
+			--	applying a consumable consumes one piece of it
+			item.count = item.count - 1
+			if item.count == 0 then
+				actor:removeItem(item)
+			end
+		end
+	end
+
 	--	quit, whether a valid action or not
 	return
 end
