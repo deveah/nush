@@ -339,7 +339,6 @@ function Actor:die(reason)
 
 	--	drop a corpse
 	local corpse = Itemdefs[self.name .. " corpse"]:new()
-	Game:addItem(corpse)
 	corpse:setMap(self.map)
 	corpse:setPosition(self.x, self.y)
 
