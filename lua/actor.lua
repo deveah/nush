@@ -510,6 +510,9 @@ function Actor:meleeAttack(defender)
 
 	--	calculate chance to hit
 	if math.random() > weapon.accuracy then
+		if self == Game.player then
+			UI:message("You miss the " .. defender.name .. "!")
+		end
 		return false
 	end
 
@@ -534,6 +537,9 @@ end
 function Actor:rangedAttack(defender, weapon)
 	--	Calc hit
 	if math.random() > weapon.accuracy then
+		if self == Game.player then
+			UI:message("You miss the " .. defender.name .. "!")
+		end
 		return false
 	end
 
