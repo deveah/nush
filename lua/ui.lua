@@ -527,9 +527,6 @@ function UI:inventoryScreen(actor)
 			local item = actor.inventory[slot]
 			if item then
 				local description = item:describe()
-				if item.count then
-					description = description .. " (x" .. item.count .. ")"
-				end
 				if item.equipped then
 					description = description .. " (equipped)"
 				end

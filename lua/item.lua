@@ -64,7 +64,11 @@ end
 --	Item:describe() - returns the player-visible name/description of the item.
 --	If optional arg 'fullyVisible' is true, then treat as full identified
 function Item:describe(fullyVisible)
-	return self.name
+	if not self.count or self.count == 1 then
+		return "a " .. self.name
+	else
+		return self.name .. " (x" .. self.count .. ")"
+	end
 end
 
 --	Item:setName() - sets the name of the given Item object; does not return

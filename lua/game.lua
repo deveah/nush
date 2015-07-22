@@ -128,8 +128,10 @@ function Game:start()
 				wh = math.random()
 				if wh < 0.5 then
 					item = Itemdefs.Bullet:new()
+					item.count = math.random(1, 10)
 				else
 					item = Itemdefs.EnergyCell:new()
+					item.count = math.random(1, 10)
 				end
 			else
 				item = Itemdefs.SugarBombs:new()

@@ -132,7 +132,7 @@ function Actor:setPosition(x, y)
 				end
 				itemlist = itemlist .. item:describe()
 			end
-			UI:message("You see here a " .. itemlist .. ".")
+			UI:message("You see here " .. itemlist .. ".")
 		end
 	end
 
@@ -688,13 +688,15 @@ end
 function Actor:tryPickupItem(item)
 	local slot = self:addItem(item)
 	if slot then
-		Log:write(self:toString() .. " picked up " .. item:toString())
+		--	changed from 'item' to 'self.inventory[slot]' because the latter
+		--	takes into account the item count after stacking it in inventory
+		Log:write(self:toString() .. " picked up " .. self.inventory[slot]:toString())
 		if self == Game.player then
-			UI:message("Picked up {{yellow}}" .. slot .. "{{pop}} - " .. item:describe())
+			UI:message("Picked up {{yellow}}" .. slot .. "{{pop}} - " .. self.inventory[slot]:describe())
 		end
 		return true
 	end
-	Log:write(self:toString() .. " failed to pickup " .. item:toString())
+	Log:write(self:toString() .. " failed to pickup " .. self.inventory[slot]:toString())
 	if self == Game.player then
 		UI:message("Your inventory is already full!")
 	end
