@@ -342,9 +342,39 @@ function UI:messageLogScreen()
 	self:scrollableTextScreen("Previous messages", lines, true)
 end
 
+--	UI:wrapString() - Wraps a string around so that no line is longer than
+--	width characters; returns a string with new lines added.
+function UI:wrapString(text, width)
+	local ret = ""
+
+	--	First split into lines according to newlines already in the text, and
+	--	then wrap each of those.
+	local fullLines = Util.stringSplit(text, "\n")
+	for _, line in ipairs(fullLines) do
+		--	Split on the last space of the line
+		while #line > width do
+			--	Don't allow words almost as long as a line, only look for spaces in 2nd half
+			local pos = Util.stringLastMatch(line, "() ", math.floor(width/2), width + 2)
+			if not pos then
+				--	No spaces, just cut through a word
+				ret = ret .. line:sub(1, width) .. "\n"
+				pos = width
+			else
+				--	Remove the last space
+				ret = ret .. line:sub(1, pos - 1) .. "\n"
+			end
+			line = line:sub(pos + 1)
+		end
+
+		ret = ret .. line
+	end
+	return ret
+end
+
 --	UI:colorWrite() - draws a string of text at a given position on-screen,
 --	allowing the use of in-text color changing by parsing color codes like
---	{{cyan}}.
+--	{{cyan}}, and processing newlines.
+--	Note: doesn't wrap automatically, use UI:wrapString() if needed.
 --	Does not return anything.
 --
 --	Markup codes:
@@ -354,13 +384,21 @@ end
 --  	`text' (without inner spaces) as a shortcut for {{WHITE}}text{{pop}}
 --		Also available, but not portable: underline standout blink
 function UI:colorWrite(x, y, text)
-	local currentX = x
+	local currentX, currentY = x, y
 	--	Stack of previous markup codes, starting with default
 	local markupStack = {Global.defaultColor}
 
+	--	Write string to screen while processing newlines.
 	local function write(str)
-		curses.write(currentX, y, str)
-		currentX = currentX + str:len()
+		local lines = Util.stringSplit(str, "\n")
+		for line = 1, #lines do
+			if line > 1 then
+				currentX = x
+				currentY = currentY + 1
+			end
+			curses.write(currentX, currentY, lines[line])
+			currentX = currentX + lines[line]:len()
+		end
 	end
 
 	--	Expand `hightlights' (maybe this should be specific to helpScreen()?)
@@ -482,7 +520,7 @@ function UI:itemMenu(actor, item)
 	local xOffset, yOffset = self:centeredWindow(width, height)
 	self:writeCentered(yOffset, item:describe())
 	if item.info then
-		self:colorWrite(xOffset + 1, yOffset + 1, item.info)
+		self:colorWrite(xOffset + 1, yOffset + 1, UI:wrapString(item.info, width - 2))
 	end
 	if item.equipped then
 		self:colorWrite(xOffset + 1, yOffset + 3, "Equipped as " .. item.equipSlot)
