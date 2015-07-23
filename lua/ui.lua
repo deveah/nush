@@ -139,6 +139,7 @@ function UI:drawScreen()
 	UI:colorWrite(0, 23, Game.player.name .. " " .. healthStatus)
 
 	--	position the cursor on the player, so it may be easily seen
+	curses.cursor(1)
 	curses.move(Game.player.x + xOffset, Game.player.y + yOffset)
 end
 
@@ -684,7 +685,7 @@ function UI:playerScreen()
 	table.insert(text, "You have {{GREEN}}" .. Game.player.experience .. "{{pop}} experience points.")
 	table.insert(text, "")
 
-	table.insert(text, "You are wielding:")
+	table.insert(text, "{{WHITE}}Equipment:{{pop}}")
 	local equip = Game.player.equipment
 	local melee, ranged
 	if equip.meleeWeapon then
@@ -697,10 +698,61 @@ function UI:playerScreen()
 	else
 		ranged = "None"
 	end
-	table.insert(text, "   melee: " .. melee)
-	table.insert(text, "  ranged: " .. ranged)
+	table.insert(text, "     melee: " .. melee)
+	table.insert(text, "    ranged: " .. ranged)
+	table.insert(text, "")
+
+	table.insert(text, "{{WHITE}}Skills:{{pop}}")
+	table.insert(text, "     melee: " .. Game.player.skills.melee)
+	table.insert(text, "  handguns: " .. Game.player.skills.handguns)
 
 	UI:scrollableTextScreen("Player info", text, false)
+end
+
+--	UI:skillPointScreen() - display a screen on which the player can assign
+--	skill points; does not return anything
+function UI:skillPointScreen()
+	local width, height = 50, 15
+
+	local function displayPointDialog()
+		local xOffset, yOffset = self:centeredWindow(width, height)
+		self:writeCentered(yOffset, "Assign skill points")
+
+		if Game.player.experience == 0 then
+			self:colorWrite(xOffset + 2, yOffset + 2, "You have no experience points to assign.")
+		else
+			self:colorWrite(xOffset + 2, yOffset + 2,"You have {{green}}" .. Game.player.experience .. "{{pop}} assignable skill points.")
+			self:colorWrite(xOffset + 2, yOffset + 3, "You may upgrade the following skills:")
+			self:colorWrite(xOffset + 2, yOffset + 5, "[{{YELLOW}}a{{pop}}] melee (" .. Game.player.skills.melee .. ")")
+			self:colorWrite(xOffset + 2, yOffset + 6, "[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.skills.handguns .. ")")
+		end
+		self:colorWrite(xOffset + 2, yOffset + 14, " {{cyan}}ESC{{pop}} exit ")
+	end
+
+	local canUpgrade
+	local key
+
+	--	hide the cursor
+	curses.cursor(0)
+	repeat
+		canUpgrade = Game.player.experience > 0
+		displayPointDialog()
+		key = curses.getch()
+
+		--	upgrade melee
+		if canUpgrade and key == "a" then
+			Game.player.skills.melee = Game.player.skills.melee + 1
+			Game.player.experience = Game.player.experience - 1
+		end
+
+		if canUpgrade and key == "b" then
+			Game.player.skills.handguns = Game.player.skills.handguns + 1
+			Game.player.experience = Game.player.experience - 1
+		end
+	until key == "escape"
+
+	--	restore visibility to the cursor
+	curses.cursor(1)
 end
 
 return UI

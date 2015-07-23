@@ -40,6 +40,10 @@ Actordefs.Player = defineActor(Actordefs.Humanoid, {
 	hp = 10,
 	maxHp = 10,
 	experience = 0,
+	skills = {
+		melee = 0,
+		handguns = 0,
+	},
 })
 
 Actordefs.Savage = defineActor(Actordefs.Humanoid, {

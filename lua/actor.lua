@@ -909,6 +909,11 @@ function Actor:handleKey(key)
 		return false	-- no time taken.
 	end
 
+	if key == "!" then
+		UI:skillPointScreen()
+		return false
+	end
+
 	--  message log
 	if key == "p" then
 		UI:messageLogScreen()
