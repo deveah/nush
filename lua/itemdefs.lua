@@ -52,11 +52,11 @@ Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
 	face = ")",
 	attack = "hit",
 	examine = function(self)
-		local ret
+		local ret = "Class: {{cyan}}" .. self.class .. "{{pop}}\n"
 		if self.range == 0 then
-			ret = "Melee"
+			ret = ret .. "Range: immediate"
 		else
-			ret = "Range: " .. self.range
+			ret = ret .. "Range: " .. self.range
 		end
 		return ret .. "   Damage: " .. self.minDamage .. "-" .. self.maxDamage
 	end
@@ -67,6 +67,7 @@ Itemdefs.MeleeWeapon = defineItem(Itemdefs.Weapon, {
 	--equipSlot = Actor.EquipSlots.meleeWeapon,
 	equipSlot = "meleeWeapon",
 	range = 0,
+	class = "Melee",
 })
 
 Itemdefs.RangedWeapon = defineItem(Itemdefs.Weapon, {
@@ -104,7 +105,11 @@ Itemdefs.DilithiumRazor = defineItem(Itemdefs.MeleeWeapon, {
 	attack = "cut",
 })
 
-Itemdefs.Pistol = defineItem(Itemdefs.RangedWeapon, {
+Itemdefs.Handgun = defineItem(Itemdefs.RangedWeapon, {
+	class = "Handgun",
+})
+
+Itemdefs.Pistol = defineItem(Itemdefs.Handgun, {
 	name = "Pistol",
 	info = "Ancient and unreliable projectile weapon still effective at putting holes into things.",
 	range = 10,
@@ -114,7 +119,7 @@ Itemdefs.Pistol = defineItem(Itemdefs.RangedWeapon, {
 	ammo = "Bullet",
 })
 
-Itemdefs.Phaser = defineItem(Itemdefs.RangedWeapon, {
+Itemdefs.Phaser = defineItem(Itemdefs.Handgun, {
 	name = "Phaser pistol",
 	info = "Fires a concentrated blast of something or other.",
 	range = 6,
