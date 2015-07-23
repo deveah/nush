@@ -663,5 +663,45 @@ function UI:highscoreScreen()
 	UI:scrollableTextScreen("High scores", text, false)
 end
 
+--	UI:playerScreen() - display screen with player character information
+function UI:playerScreen()
+	local text = {}
+	table.insert(text, "{{YELLOW}}" .. Game.player.name)
+	table.insert(text, "")
+	
+	local healthStatus
+	if Game.player.hp == Game.player.maxHp then
+		healthStatus = "You have {{GREEN}}" .. Game.player.hp .. "{{pop}} out of " ..
+			Game.player.maxHp .. " hit points."
+	elseif Game.player.hp <= math.floor(Game.player.maxHp / 4) then
+		healthStatus = "You have {{RED}}" .. Game.player.hp .. "{{pop}} out of " ..
+			Game.player.maxHp .. " hit points."
+	else
+		healthStatus = "You have " .. Game.player.hp .. " out of " ..
+			Game.player.maxHp .. " hit points."
+	end
+	table.insert(text, healthStatus)
+	table.insert(text, "You have {{GREEN}}" .. Game.player.experience .. "{{pop}} experience points.")
+	table.insert(text, "")
+
+	table.insert(text, "You are wielding:")
+	local equip = Game.player.equipment
+	local melee, ranged
+	if equip.meleeWeapon then
+		melee = "{{yellow}}" .. equip.meleeWeapon:describe() .. "{{pop}}"
+	else
+		melee = "None"
+	end
+	if equip.rangedWeapon then
+		ranged = "{{yellow}}" .. equip.rangedWeapon:describe() .. "{{pop}}"
+	else
+		ranged = "None"
+	end
+	table.insert(text, "   melee: " .. melee)
+	table.insert(text, "  ranged: " .. ranged)
+
+	UI:scrollableTextScreen("Player info", text, false)
+end
+
 return UI
 

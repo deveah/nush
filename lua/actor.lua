@@ -896,12 +896,17 @@ function Actor:handleKey(key)
 	if key == "R" or  key == "\x12" or key == "\x0c" then  -- ^R or ^L
 		UI:drawScreen()
 		curses.redraw()
-		return false
+		return false	-- no time taken.
 	end
 
 	if key == "?" or key == "F1" then
 		UI:helpScreen()
-		return false
+		return false	-- no time taken.
+	end
+
+	if key == "@" then
+		UI:playerScreen()
+		return false	-- no time taken.
 	end
 
 	--  message log

@@ -28,6 +28,7 @@ to open it. Opening a locked door requires a matching key.
 `Q' or `Esc' - Quit
        `p' - Show message log
  `F1' or `?' - This screen
+       `@' - Show player information screen
  `R' or `^R' - Redraw the screen
 
 Debug keys:
