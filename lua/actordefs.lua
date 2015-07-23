@@ -39,6 +39,7 @@ Actordefs.Player = defineActor(Actordefs.Humanoid, {
 	color = curses.white,
 	hp = 10,
 	maxHp = 10,
+	experience = 0,
 })
 
 Actordefs.Savage = defineActor(Actordefs.Humanoid, {

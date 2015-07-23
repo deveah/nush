@@ -146,6 +146,15 @@ function Actor:setHp(val)
 	self.hp = val
 end
 
+--	Actor:addExperience() - adds an amount of experience points to the actor
+function Actor:addExperience(val)
+	self.experience = self.experience + val
+	--	TODO: is this check necessary? only the player is awarded experience points
+	if self == Game.player then
+		UI:message("{{WHITE}}You gain {{GREEN}}" .. val .. "{{pop}} experience points!")
+	end
+end
+
 --	Actor:visible() - returns whether this actor is visible to the player
 function Actor:visible()
 	return self.map == Game.player.map and Game.player.sightMap[self.x][self.y]
@@ -173,13 +182,19 @@ end
 
 --	Actor:takeDamage() - makes the given actor take a given amount of damage;
 --	also checks for death; does not return anything
-function Actor:takeDamage(quantity, reason)
+function Actor:takeDamage(attacker, quantity, reason)
 	self.hp = self.hp - quantity
 	if self:dead(reason) then
 		if self:visible() then
 			UI:message("{{red}}The " .. self.name .. " dies!")
 		else
 			UI:message("{{red}}Something died.")
+		end
+
+		--	award experience points to the player
+		if attacker == Game.player then
+			--	TODO: fixed number of experience points for now
+			Game.player:addExperience(10)
 		end
 	end
 end
@@ -544,7 +559,7 @@ function Actor:meleeAttack(defender)
 		UI:message("You " .. weapon.attack .. " the " .. defender.name .. "." .. extrainfo)
 	end
 
-	defender:takeDamage(damage, weapon.attack .. " by " .. self.name)
+	defender:takeDamage(self, damage, weapon.attack .. " by " .. self.name)
 	return true
 end
 
@@ -577,7 +592,7 @@ function Actor:rangedAttack(defender, weapon)
 		end
 	end
 
-	defender:takeDamage(damage, "shot by " .. self.name)
+	defender:takeDamage(self, damage, "shot by " .. self.name)
 	return true
 end
 
