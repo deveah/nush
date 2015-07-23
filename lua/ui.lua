@@ -268,6 +268,52 @@ function UI:centeredWindow(width, height)
 	return xOffset, yOffset
 end
 
+--	UI:drawMessageBox() - Display a block of text on-screen.
+--	Returns x, y, width, height (x,y being left and top of the box)
+--	 title (optional): string displayed on top edge
+--	 text: either a list of lines, or a single string. If it's a string
+--	       then it's wrapped, choosing box width automatically.
+--	 bottomLine (optional): string displayed on bottom-left edge
+function UI:drawMessageBox(title, text, bottomLine, minWidth)
+	local lines, wrapped, numLines
+	local x, y, width, height
+	width = minWidth or 30
+
+	if type(text) == "table" then
+		--	Already split into a list of lines, no wrapping done
+		height = #text + 2
+		for i = 1, #text do
+			width = math.max(width, #text[i] + 4)
+		end
+		wrapped = table.concat(text, "\n")
+
+	else
+		--	Decide how wide to make the box and wrap 'text', picking a width which
+		--	doesn't result in a too-tall box
+		for wid = width, Global.screenWidth, 6 do
+			width = wid
+			wrapped, numLines = self:wrapString(text, width - 4)
+			height = numLines + 2
+			Log:write("wudth " .. width ..  " height " .. height)
+			if height < Global.screenHeight - 2 and 2.5 * height < width then
+				break
+			end
+		end
+	end
+
+	--	Draw
+	local xOffset, yOffset = self:centeredWindow(width, height)
+	if title then
+		self:writeCentered(yOffset, "{{WHITE}}" .. title)
+	end
+	self:colorWrite(xOffset + 2, yOffset + 1, wrapped)
+	if bottomLine then
+		self:colorWrite(xOffset + 2, yOffset + height - 1, bottomLine)
+	end
+
+	return x, y, width, height
+end
+
 --  UI:scrollableTextScreen() - display text with	interactive scrolling; does
 --	not return anything.
 --	title:  Text shown at top of screen
@@ -297,7 +343,9 @@ function UI:scrollableTextScreen(title, text, toEnd)
 		self:writeCentered(0, "{{WHITE}}" .. title)
 		curses.move(0, Global.screenHeight - 1)
 		curses.hline(Global.screenWidth)
-		self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}jk {{pop}}navigate {{cyan}}other {{pop}}exit ")
+		if #text > windowHeight then
+			self:colorWrite(1, Global.screenHeight - 1, " {{cyan}}jk{{pop}} navigate {{cyan}}other{{pop}} exit ")
+		end
 		if scroll > 1 then
 			self:colorWrite(Global.screenWidth - 5, 0, " {{YELLOW}}^ ")
 		end
@@ -344,14 +392,19 @@ function UI:messageLogScreen()
 end
 
 --	UI:wrapString() - Wraps a string around so that no line is longer than
---	width characters; returns a string with new lines added.
+--	width characters; returns (wrapped, numLines), where wrapped is a string
+--	with "\n"s added and numLines is the number of \n characters + 1.
 function UI:wrapString(text, width)
 	local ret = ""
+	local numLines = 0
 
 	--	First split into lines according to newlines already in the text, and
 	--	then wrap each of those.
 	local fullLines = Util.stringSplit(text, "\n")
-	for _, line in ipairs(fullLines) do
+	for lineNum, line in ipairs(fullLines) do
+		--	Add back newlines stripped by stringSplit()
+		if lineNum > 1 then ret = ret .. "\n" end
+
 		--	Split on the last space of the line
 		while #line > width do
 			--	Don't allow words almost as long as a line, only look for spaces in 2nd half
@@ -365,11 +418,13 @@ function UI:wrapString(text, width)
 				ret = ret .. line:sub(1, pos - 1) .. "\n"
 			end
 			line = line:sub(pos + 1)
+			numLines = numLines + 1
 		end
 
 		ret = ret .. line
+		numLines = numLines + 1
 	end
-	return ret
+	return ret, numLines
 end
 
 --	UI:colorWrite() - draws a string of text at a given position on-screen,
@@ -388,6 +443,7 @@ function UI:colorWrite(x, y, text)
 	local currentX, currentY = x, y
 	--	Stack of previous markup codes, starting with default
 	local markupStack = {Global.defaultColor}
+	curses.attr(curses[Global.defaultColor])
 
 	--	Write string to screen while processing newlines.
 	local function write(str)

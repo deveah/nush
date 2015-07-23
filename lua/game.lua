@@ -157,15 +157,15 @@ function Game:start()
 	UI:message("Welcome to {{green}}Nush{{pop}}! Please do not die often.")
 
 	curses.clear()
-	local xOffset, yOffset = UI:centeredWindow(60, 12)
-	UI:writeCentered(yOffset, "Welcome to {{green}}Nush{{pop}}!")
-	UI:colorWrite(xOffset + 1, yOffset + 2, "You are a treasure hunter in the search for one last hit")
-	UI:colorWrite(xOffset + 1, yOffset + 3, "to assure your safe retirement. Stories tell about a")
-	UI:colorWrite(xOffset + 1, yOffset + 4, "abandoned distant human colony, home to a research base,")
-	UI:colorWrite(xOffset + 1, yOffset + 5, "said to hold technologies beyond imagination. After a")
-	UI:colorWrite(xOffset + 1, yOffset + 6, "long journey, you finally land on the planet. You take")
-	UI:colorWrite(xOffset + 1, yOffset + 7, "a deep breath and enter through a rusty trap door...")
-	UI:colorWrite(xOffset + 1, yOffset + 9, "Press `any' key to continue.")
+	UI:drawMessageBox("Welcome to {{green}}Nush{{pop}}!",
+		{"You are a treasure hunter in the search for one last hit",
+		 "to assure your safe retirement. Stories tell about a",
+		 "abandoned distant human colony, home to a research base,",
+		 "said to hold technologies beyond imagination. After a",
+		 "long journey, you finally land on the planet. You take",
+		 "a deep breath and enter through a rusty trap door...",
+		 "",
+		 "Press `any' key to continue."})
 	curses.getch()
 
 	Log:write("Game initialization successfully completed.")
