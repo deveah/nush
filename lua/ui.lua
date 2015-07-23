@@ -399,26 +399,47 @@ function UI:wrapString(text, width)
 	local numLines = 0
 
 	--	First split into lines according to newlines already in the text, and
-	--	then wrap each of those.
+	--	then wrap each of those independently
 	local fullLines = Util.stringSplit(text, "\n")
 	for lineNum, line in ipairs(fullLines) do
 		--	Add back newlines stripped by stringSplit()
 		if lineNum > 1 then ret = ret .. "\n" end
 
-		--	Split on the last space of the line
-		while #line > width do
-			--	Don't allow words almost as long as a line, only look for spaces in 2nd half
-			local pos = Util.stringLastMatch(line, "() ", math.floor(width/2), width + 2)
-			if not pos then
-				--	No spaces, just cut through a word
-				ret = ret .. line:sub(1, width) .. "\n"
-				pos = width
-			else
-				--	Remove the last space
-				ret = ret .. line:sub(1, pos - 1) .. "\n"
+		--	Iterate through this line looking for points at which to wrap it.
+		local idx = 1   --	current offset
+		local lastSpace --	offset of last seen space
+		while idx <= #line do
+			--	Only check whether need to wrap when we reach a space or the end, so
+			--	that we don't	call removeMarkup() in the middle of a {{tag}}.
+			local isSpace = line:byte(idx) == 32
+			if isSpace or idx == #line then
+
+				--	Calling removeMarkup() so often is inefficient, but the prefix is short
+				local stripped = self:removeMarkup(line:sub(1, idx))
+				if #stripped <= width then
+					lastSpace = idx
+				else
+					--	Edge case: space just past edge of line
+					if isSpace and #stripped == width + 1 then
+						lastSpace = idx
+					end
+
+					--	Move a prefix of 'line' to 'ret'
+					if not lastSpace then
+						--	No spaces found, just cut through a word (hope it's not markup!)
+						ret = ret .. line:sub(1, width) .. "\n"	
+						line = line:sub(width + 1)
+					else
+						--	Remove the last space
+						ret = ret .. line:sub(1, lastSpace - 1) .. "\n"
+						line = line:sub(lastSpace + 1)
+					end
+					numLines = numLines + 1
+					idx = 0
+					lastSpace = nil
+				end
 			end
-			line = line:sub(pos + 1)
-			numLines = numLines + 1
+			idx = idx + 1
 		end
 
 		ret = ret .. line
