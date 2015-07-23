@@ -188,7 +188,7 @@ function Actor:takeDamage(attacker, quantity, reason)
 		if self:visible() then
 			UI:message("{{red}}The " .. self.name .. " dies!")
 		else
-			UI:message("{{red}}Something died.")
+			UI:message("{{red}}You hear a thud.")
 		end
 
 		--	award experience points to the player
@@ -531,35 +531,66 @@ function Actor:move(x, y)
 	return true
 end
 
+--	Actor:doAttack() - Apply a melee or ranged attack to a target, returns a
+--	bool to say	whether the attack hit.
+--	 ranged:  true if a ranged attack.
+--	(Note: in future we'll likely have to separate out ranged and melee
+--	attacks again, and just share code for the message)
+function Actor:doAttack(defender, weapon, ranged)
+	--	calculate whether attack hit
+	local hit = (math.random() <= weapon.accuracy)
+
+	local damage = math.random(weapon.minDamage, weapon.maxDamage)
+
+	--	Report attack to player
+
+	local extrainfo = ""
+	if hit and Global.debugInfo then
+		extrainfo = " {" .. damage .. " damage}"
+	end
+
+	local attackVerb = weapon.attack
+	if hit == false then
+		if self == Game.player then
+			attackVerb = "miss"
+		else
+			attackVerb = "misses"
+		end
+	end
+
+	local defenderName
+	if defender == Game.player then
+		defenderName = "you"
+	elseif defender:visible() then
+		defenderName = "the " .. defender.name
+	else
+		defenderName = "an unseen foe"
+	end
+
+	if self == Game.player then
+		UI:message("You " .. attackVerb .. " " .. defenderName .. "!" .. extrainfo)
+	elseif self:visible() then
+		UI:message("The " .. self.name .. " " .. attackVerb .. " " .. defenderName .. "." .. extrainfo)
+	elseif defender:visible() and ranged then
+		UI:message("A shot misses " .. defenderName)
+	end
+
+	--	Do effects
+	if hit then
+		defender:takeDamage(self, damage, weapon.attack .. " by " .. self.name)
+	end
+	return hit
+end
+
 --	Actor:meleeAttack() - makes the given actor attack another actor via
---	melee, killing the defending actor in the process; always returns true,
+--	melee, damaging the defending actor in the process; always returns true,
 --	even if the hit was a miss
 function Actor:meleeAttack(defender)
 	local weapon = self.equipment.meleeWeapon
 	if not weapon then
 		weapon = Itemdefs.Fists
 	end
-
-	--	calculate chance to hit
-	if math.random() > weapon.accuracy then
-		if self == Game.player then
-			UI:message("You miss the " .. defender.name .. "!")
-		end
-		return false
-	end
-
-	local damage = math.random(weapon.minDamage, weapon.maxDamage)
-
-	--	Report to player
-	if self == Game.player then
-		local extrainfo = ""
-		if Global.debugInfo then
-			extrainfo = " {" .. damage .. " damage}"
-		end
-		UI:message("You " .. weapon.attack .. " the " .. defender.name .. "." .. extrainfo)
-	end
-
-	defender:takeDamage(self, damage, weapon.attack .. " by " .. self.name)
+	self:doAttack(defender, weapon, false)
 	return true
 end
 
@@ -567,33 +598,7 @@ end
 --	another actor; returns true if the projectile hit (whether or not it caused
 --	damage), false if it flies past.
 function Actor:rangedAttack(defender, weapon)
-	--	Calc hit
-	if math.random() > weapon.accuracy then
-		if self == Game.player then
-			UI:message("You miss the " .. defender.name .. "!")
-		end
-		return false
-	end
-
-	--	Calc damage
-	local damage = math.random(weapon.minDamage, weapon.maxDamage)
-
-	--	Report to player
-	if self == Game.player then
-		local extrainfo = ""
-		if Global.debugInfo then
-			extrainfo = " {" .. damage .. " damage}"
-		end
-
-		if defender:visible() then
-			UI:message("You " .. weapon.attack .. " the " .. defender.name .. "." .. extrainfo)
-		else
-			UI:message("You " .. weapon.attack .. " something." .. extrainfo)
-		end
-	end
-
-	defender:takeDamage(self, damage, "shot by " .. self.name)
-	return true
+	return (self:doAttack(defender, weapon, true))
 end
 
 --	Actor:fireWeapon() - actor fires their weapon in some direction. Animates
@@ -613,7 +618,10 @@ function Actor:fireWeapon(direction)
 	if weapon.ammo then
 		local slot = self:hasItem(weapon.ammo)
 		if not slot then
-			UI:message("You are out of ammo!")
+			if self == Game.player then
+				UI:message("You are out of ammo!")
+			end
+			Log:write("...failed, out of ammo " .. weapon.ammo)
 			return false
 		else
 			local ammo = self.inventory[slot]
@@ -626,7 +634,7 @@ function Actor:fireWeapon(direction)
 
 	if direction == "." then
 		UI:message("You shoot yourself in the foot!")
-		self:takeDamage(1, "shot self in foot")
+		self:takeDamage(3, "shot self in foot")
 		return true
 	end
 
