@@ -274,14 +274,19 @@ end
 --	 text: either a list of lines, or a single string. If it's a string
 --	       then it's wrapped, choosing box width automatically.
 --	 bottomLine (optional): string displayed on bottom-left edge
-function UI:drawMessageBox(title, text, bottomLine, minWidth)
+--	 minWidth/minHeight (optional)
+function UI:drawMessageBox(title, text, bottomLine, minWidth, minHeight)
 	local lines, wrapped, numLines
 	local x, y, width, height
-	width = minWidth or 30
+	width = minWidth or 35
+	if bottomLine then
+		width = math.max(#bottomLine + 4, width)
+	end
+	minHeight = minHeight or 0
 
 	if type(text) == "table" then
 		--	Already split into a list of lines, no wrapping done
-		height = #text + 2
+		height = math.max(minHeight, #text + 2)
 		for i = 1, #text do
 			width = math.max(width, #text[i] + 4)
 		end
@@ -293,9 +298,8 @@ function UI:drawMessageBox(title, text, bottomLine, minWidth)
 		for wid = width, Global.screenWidth, 6 do
 			width = wid
 			wrapped, numLines = self:wrapString(text, width - 4)
-			height = numLines + 2
-			Log:write("wudth " .. width ..  " height " .. height)
-			if height < Global.screenHeight - 2 and 2.5 * height < width then
+			height = math.max(minHeight, numLines + 2)
+			if height <= Global.screenHeight - 2 and 2 * height < width then
 				break
 			end
 		end
@@ -308,7 +312,7 @@ function UI:drawMessageBox(title, text, bottomLine, minWidth)
 	end
 	self:colorWrite(xOffset + 2, yOffset + 1, wrapped)
 	if bottomLine then
-		self:colorWrite(xOffset + 2, yOffset + height - 1, bottomLine)
+		self:colorWrite(xOffset + 3, yOffset + height - 1, bottomLine)
 	end
 
 	return x, y, width, height
@@ -393,7 +397,7 @@ end
 
 --	UI:wrapString() - Wraps a string around so that no line is longer than
 --	width characters; returns (wrapped, numLines), where wrapped is a string
---	with "\n"s added and numLines is the number of \n characters + 1.
+--	wgit ith "\n"s added and numLines is the number of \n characters + 1.
 function UI:wrapString(text, width)
 	local ret = ""
 	local numLines = 0
@@ -593,21 +597,21 @@ function UI:itemMenu(actor, item)
 	end
 
 	--	Draw display while preserving whatever is already on-screen
-	--	(TODO: size should probably be auto-adjusting)
-	local width, height = 50, 8
-	local xOffset, yOffset = self:centeredWindow(width, height)
-	self:writeCentered(yOffset, item:describe())
+	local contents = ""
 	if item.info then
-		self:colorWrite(xOffset + 1, yOffset + 1, UI:wrapString(item.info, width - 2))
+		contents = contents .. item.info .. "\n\n"
 	end
 	if item.equipped then
-		self:colorWrite(xOffset + 1, yOffset + 3, "Equipped as " .. item.equipSlot)
+		contents = contents .. "Equipped as " .. item.equipSlot .. "\n"
 	end
 	if item.examine then
-		self:colorWrite(xOffset + 1, yOffset + 4, item:examine())
+		contents = contents .. item:examine() .. "\n"
 	end
+	contents = contents .. "\n" .. actionString 
 
-	self:colorWrite(xOffset + 1, yOffset + 6, actionString)
+	self:drawMessageBox(item:describe(), contents, " {{cyan}}other{{pop}} exit ")
+	curses.cursor(0)
+	--local width, height = 50, 8
 
 	--	Controls
 	local key = curses.getch()
@@ -790,21 +794,22 @@ end
 --	UI:skillPointScreen() - display a screen on which the player can assign
 --	skill points; does not return anything
 function UI:skillPointScreen()
-	local width, height = 50, 15
-
 	local function displayPointDialog()
-		local xOffset, yOffset = self:centeredWindow(width, height)
-		self:writeCentered(yOffset, "Assign skill points")
-
+		local text
 		if Game.player.spendableExperience == 0 then
-			self:colorWrite(xOffset + 2, yOffset + 2, "You have no experience points to assign.")
+			text = "\nYou have no experience points to assign.\n"
 		else
-			self:colorWrite(xOffset + 2, yOffset + 2,"You have {{green}}" .. Game.player.spendableExperience .. "{{pop}} assignable skill points.")
-			self:colorWrite(xOffset + 2, yOffset + 3, "You may upgrade the following skills:")
-			self:colorWrite(xOffset + 2, yOffset + 5, "[{{YELLOW}}a{{pop}}] melee (" .. Game.player.skills.melee .. ")")
-			self:colorWrite(xOffset + 2, yOffset + 6, "[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.skills.handguns .. ")")
+			text =
+				"You have {{green}}" .. Game.player.spendableExperience .. "{{pop}} assignable skill points.\n" ..
+				"You may upgrade the following skills:\n" ..
+				"[{{YELLOW}}a{{pop}}] melee (" .. Game.player.skills.melee .. ")\n" ..
+				"[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.skills.handguns .. ")"
 		end
-		self:colorWrite(xOffset + 2, yOffset + 14, " {{cyan}}ESC{{pop}} exit ")
+
+		self:drawScreen()
+		self:drawMessageBox("Assign skill points", text, " {{cyan}}other{{pop}} exit ", 45)
+		--	hide the cursor
+		curses.cursor(0)
 	end
 
 	local canUpgrade
