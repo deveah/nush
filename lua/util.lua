@@ -69,6 +69,12 @@ function Util.anticlockwise(dir, n)
 	return Util.clockwise(dir, -n)
 end
 
+--	Util.isalpha() - whether the first character of a string is in [a-zA-Z]
+function Util.isalpha(char)
+	char = char:byte()
+	return (char >= 97 and char <= 122) or (char >= 65 and char <= 90)
+end
+
 --	Util.stringSplit() - Given a string, returns a list of pieces split by a
 --	delimiter, which is a pattern.
 function Util.stringSplit(str, delimiter)

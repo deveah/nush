@@ -815,9 +815,7 @@ function UI:skillPointScreen()
 	local canUpgrade
 	local key
 
-	--	hide the cursor
-	curses.cursor(0)
-	repeat
+	while true do
 		canUpgrade = Game.player.spendableExperience > 0
 		displayPointDialog()
 		key = curses.getch()
@@ -832,7 +830,12 @@ function UI:skillPointScreen()
 			Game.player.skills.handguns = Game.player.skills.handguns + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
-	until key == "escape"
+
+		--	Exit if not a letter in the range of skill keys
+		if not (#key == 1 and "a" <= key and key <= "b") then
+			break
+		end
+	end
 
 	--	restore visibility to the cursor
 	curses.cursor(1)
