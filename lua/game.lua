@@ -148,7 +148,12 @@ function Game:start()
 	self.player:setName(playerName)
 	self.player:setMap(self.mapList[1])
 	self.player:setPosition(self.player.map:findRandomEmptySpace())
-	self.player:addItem(Itemdefs.Phaser:new())
+
+	--	Give initial equipment
+	local phaser = Itemdefs.Phaser:new()
+	self.player:addItem(phaser)
+	self.player:equip(phaser)
+	self.player:addItem(Itemdefs.EnergyCell:new(10))
 
 	--	allow the event loop to run
 	self.running = true

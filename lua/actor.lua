@@ -355,9 +355,12 @@ end
 function Actor:die(reason)
 	Log:write(self, " has died.")
 	self.alive = false
+
 	--	By default, everything they were carrying is dropped.
-	for _, item in pairs(self.inventory) do
-		self:dropItem(item)
+	if self ~= Game.player then
+		for _, item in pairs(self.inventory) do
+			self:dropItem(item)
+		end
 	end
 
 	--	drop a corpse; the player character doesn't drop a corpse
