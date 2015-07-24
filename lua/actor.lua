@@ -924,7 +924,7 @@ function Actor:handleKey(key)
 	end
 
 	--  message log
-	if key == "p" then
+	if key == "P" then
 		UI:messageLogScreen()
 		return false  -- no time taken.
 	end
@@ -955,6 +955,17 @@ function Actor:handleKey(key)
 		local dir, dirx, diry = UI:promptDirection("Close where?")
 		if dir then
 			return self:closeDoor(self.x + dirx, self.y + diry)
+		elseif self == Game.player then
+			UI:message("Okay, then.")	-- signal that no action has been taken
+			return false
+		end
+	end
+
+	--	pick door lock
+	if key == "p" then
+		local dir, dirx, diry = UI:promptDirection("Pick lock where?")
+		if dir then
+			return self:pickDoor(self.x + dirx, self.y + diry)
 		elseif self == Game.player then
 			UI:message("Okay, then.")	-- signal that no action has been taken
 			return false
@@ -1123,6 +1134,50 @@ function Actor:unlockDoor(x, y)
 			UI:message("The door requires a `" .. self.map.tile[x][y].locked .. "' keycard, which you do not have.")
 		end
 		return false
+	end
+end
+
+--	Actor:pickDoor() - makes the given actor pick the locked door at a given
+--	location; returns true if the action has been taken (a failed attempt still
+--	counts as a spent turn), and false otherwise
+function Actor:pickDoor(x, y)
+	if not self.map:isInBounds(x, y) then
+		return false
+	end
+
+	--	only doors can be picked
+	if self.map.tile[x][y].role ~= "door" then
+		if self == Game.player then
+			UI:message("There's no door there!")
+		end
+		return false
+	end
+
+	--	only locked doors can be picked
+	if not self.map.tile[x][y].locked then
+		if self == Game.player then
+			UI:message("That door isn't locked!")
+		end
+		return false
+	end
+
+	--	calculate the pick chance depending on the player's lockpick skill
+	--	current formula: chance = lockpick skill / 10
+	--		min: 0
+	--		max: unbounded (TODO)
+	local pickChance = self.skills.lockpick / 10
+
+	if math.random() < pickChance then
+		self.map.tile[x][y] = Tile.closedDoor
+		if self == Game.player then
+			UI:message("{{green}}You successfully pick the lock!")
+		end
+		return true
+	else
+		if self == Game.player then
+			UI:message("You fail to pick the lock.")
+		end
+		return true
 	end
 end
 

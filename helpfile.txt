@@ -24,9 +24,10 @@ to open it. Opening a locked door requires a matching key.
   `<' or `>' - Ascend/descend stairs
   `g' or `,' - Pick up items
        `c' - Close door
+			 `p' - Pick locked door
        `i' - Inventory
 `Q' or `Esc' - Quit
-       `p' - Show message log
+       `P' - Show message log
  `F1' or `?' - This screen
        `@' - Show player information screen
        `!' - Show skill point assignment screen
