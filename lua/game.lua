@@ -186,7 +186,6 @@ function Game:loop()
 		--	loop through all the actors and make them take their turns
 		for i = 1, #(self.actorList) do
 			local currentActor = self.actorList[i]
-			Log:write("Current acting actor: " .. currentActor:toString() .. ")")
 
 			--	award action points equal to the actor's agility score, divided by 10;
 			--	this way, actions which take small amount of action points can be
@@ -198,6 +197,8 @@ function Game:loop()
 			--	the act() method returns the number of action points spent to make
 			--	a specific action
 			while currentActor.alive and currentActor.actionPoints >= 0 do
+				Log:write("Current acting actor: " .. currentActor:toString() ..
+					" actionpoints: " .. currentActor.actionPoints)
 				currentActor.actionPoints = currentActor.actionPoints - currentActor:act()
 			end
 
