@@ -46,9 +46,9 @@ end
 
 -------------------------------- Utility functions ---------------------------
 
---	Map:toString() - returns a string describing the Map object
-function Map:toString()
-	return "<map " .. self.num .. " " .. tostring(self) .. ">"
+--	Map:__tostring() - returns a string describing the Map object for debugging
+function Map:__tostring()
+	return "<map #" .. self.num .. " " .. self.name .. ">"
 end
 
 --	Map:isInBounds() - returns true if the given pair of coordinates (x, y)
@@ -600,7 +600,7 @@ function Map:linkWith(what)
 	what.tile[x][y] = Util.copyTable(Tile.downStairs)
 	what.tile[x][y]["destination-map"] = self
 
-	Log:write("Linked maps: " .. self:toString() .. " and " .. what:toString())
+	Log:write("Linked maps: ", self, " and ", what)
 end
 
 --	Map:spawnMachinery() - spawns a given number of broken machinery

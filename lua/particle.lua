@@ -12,6 +12,8 @@
 local Log = require "lua/log"
 local Game = require "lua/game"
 
+local _nextId = 0
+
 local Particle = {}
 Particle.__index = Particle
 
@@ -21,6 +23,9 @@ Particle.__index = Particle
 function Particle.new()
 	local a = {}
 	setmetatable(a, Particle)
+	--	Assign unique id
+	a._id = _nextId
+	_nextId = _nextId + 1
 
 	--	initialize members
 	a.face = ""
@@ -31,36 +36,36 @@ function Particle.new()
 	return a
 end
 
---	Particle:toString() - returns a string describing the Particle object
-function Particle:toString()
-	return "<particle " .. tostring(self) .. " " .. self.face .. ">"
+--	Particle:__tostring() - return a string describing a Particle for debugging
+function Particle:__tostring()
+	return "<particle #" .. tostring(self._id) .. " " .. self.face .. ">"
 end
 
 --	Particle:setFace() - sets the face of the given Particle object; does not
 --	return anything
 function Particle:setFace(face)
-	Log:write(self:toString() .. " changed face to '" .. face .. "'.")
+	Log:write(self, " changed face to '" .. face .. "'.")
 	self.face = face
 end
 
 --	Particle:setColor() - sets the color of the given Particle object; does not
 --	return anything
 function Particle:setColor(color)
-	Log:write(self:toString() .. " changed color to '" .. color .. "'.")
+	Log:write(self, " changed color to '" .. color .. "'.")
 	self.color = color
 end
 
 --	Particle:setMap() - sets the map of the given Particle object; does not
 --	return anything
 function Particle:setMap(map)
-	Log:write(self:toString() .. " has been placed on " .. map:toString())
+	Log:write(self, " has been placed on ", map)
 	self.map = map
 end
 
 --	Particle:setPosition() - sets the (x, y) position of the given Particle;
 --	does not return anything
 function Particle:setPosition(x, y)
-	Log:write(self:toString() .. " placed at (" .. x .. ", " .. y .. ").")
+	Log:write(self, " placed at (" .. x .. ", " .. y .. ").")
 	self.x = x
 	self.y = y
 end

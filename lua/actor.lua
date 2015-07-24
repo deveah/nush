@@ -40,11 +40,16 @@ local Tile = require "lua/tile"
 local Util = require "lua/util"
 local Itemdefs = require "lua/itemdefs"
 
+local _nextId = 0
+
 --	Actor:new() - creates a new Actor object, initializing its members with
 --	default data; returns the created Actor object
 function Actor:new()
 	local a = {}
-	setmetatable(a, {__index = self})
+	setmetatable(a, {__index = self, __tostring = Actor.__tostring})
+	--	Assign unique id
+	a._id = _nextId
+	_nextId = _nextId + 1
 
 	--	initialize members
 	a.map = nil
@@ -69,16 +74,15 @@ function Actor:new()
 	return a
 end
 
---	Actor:toString() - returns a string describing the Actor object
-function Actor:toString()
-	return "<actor " .. tostring(self) .. " (" .. self.name .. ")>"
+--	Actor:__tostring() - returns a string describing an Actor for debugging
+function Actor:__tostring()
+	return "<actor #" .. tostring(self._id) .. " (" .. self.name .. ")>"
 end
 
 --	Actor:setName() - sets the name of the given Actor object; does not
 --	return anything
 function Actor:setName(name)
-	Log:write("Actor " .. self:toString() ..
-		" was renamed to " .. name .. ".")
+	Log:write(self, " was renamed to " .. name .. ".")
 	
 	self.name = name
 end
@@ -86,8 +90,7 @@ end
 --	Actor:setFace() - sets the face of the given Actor object; does not
 --	return anything
 function Actor:setFace(face)
-	Log:write("Actor " .. self:toString() ..
-		" has changed its face to '" .. face .. "'.")
+	Log:write(self, " has changed its face to '" .. face .. "'.")
 
 	self.face = face
 end
@@ -95,8 +98,7 @@ end
 --	Actor:setColor() - sets the color of the given Actor object; does not
 --	return anything
 function Actor:setColor(color)
-	Log:write("Actor " .. self:toString() ..
-		" has changed its color to '" .. color .. "'.")
+	Log:write(self, " has changed its color to '" .. color .. "'.")
 	
 	self.color = color
 end
@@ -104,8 +106,7 @@ end
 --	Actor:setMap() - sets the map of the given Actor object; does not
 --	return anything
 function Actor:setMap(map)
-	Log:write("Actor " .. self:toString() ..
-		" has been placed on " .. map:toString() .. ".")
+	Log:write(self, " has been placed on ", map, ".")
 
 	self.map = map
 end
@@ -113,8 +114,7 @@ end
 --	Actor:setPosition() - sets the (x, y) position of the given Actor object;
 --	does not return anything
 function Actor:setPosition(x, y)
-	Log:write("Actor " .. self:toString() ..
-		" has been placed at (" .. x .. ", " .. y .. ").")
+	Log:write(self, " has been placed at (" .. x .. ", " .. y .. ").")
 
 	self.x = x
 	self.y = y
@@ -146,7 +146,7 @@ end
 
 --	Actor:setHp() - sets the hp of a given actor; returns nothing
 function Actor:setHp(val)
-	Log:write("Actor " .. self:toString() .. " set hp to " .. val)
+	Log:write(self, " set hp to ", val)
 	self.hp = val
 end
 
@@ -291,7 +291,7 @@ end
 --	calls owner:removeItem()
 function Actor:removeItem(item)
 	local slot = self:findItem(item)
-	Log:write(self:toString() .. ":removeItem(" .. item:toString() .. ") from slot " .. tostring(slot))
+	Log:write(self, ":removeItem(", item, ") from slot ", slot)
 	if slot then
 		self:unequip(item)  --	noop if not equipped
 
@@ -299,13 +299,13 @@ function Actor:removeItem(item)
 		self.inventory[slot] = nil
 		return
 	end
-	error(item:toString() .. " not in inventory")
+	error(tostring(item) .. " not in inventory")
 end
 
 --	Actor:equip() - Equips an item in the inventory in the slot item.equipSlot,
 --	after unequipping existing equipment. Does not return anything.
 function Actor:equip(item)
-	Log:write(self:toString() .. " equipping " .. item:toString() .. " in " .. item.equipSlot)
+	Log:write(self, " equipping ", item, " in ", item.equipSlot)
 
 	--	unequip existing
 	if self.equipment[item.equipSlot] then
@@ -327,7 +327,7 @@ end
 --	Actor:unequip() - Unequip an equipped item if it is equipped (otherwise
 --	does nothing), ending any effects, etc. Returns true if it was unequipped.
 function Actor:unequip(item)
-	Log:write(self:toString() .. " unequipping " .. item:toString())
+	Log:write(self, " unequipping ", item)
 	local eqslot = Util.tableFind(self.equipment, item)
 	if not eqslot then
 		Log:write("...not equipped")
@@ -353,7 +353,7 @@ end
 --	'reason' is an optional parameter which is used to trace the cause of death;
 --	does not return anything
 function Actor:die(reason)
-	Log:write("Actor " .. self:toString() .. " has died.")
+	Log:write(self, " has died.")
 	self.alive = false
 	--	By default, everything they were carrying is dropped.
 	for _, item in pairs(self.inventory) do
@@ -452,7 +452,7 @@ function Actor:updateSight()
 		end
 	end
 
-	Log:write("Sight map calculated for " .. self:toString())
+	Log:write("Sight map calculated for ", self)
 end
 
 
@@ -476,7 +476,7 @@ end
 function Actor:move(x, y)
 	--	No movement (e.g. pressed ./numpad5) counts as waiting
 	if x == self.x and y == self.y then
-		Log:write("Actor " .. self:toString() .. " waiting.")
+		Log:write(self, " waiting.")
 		if self == Game.player then
 			UI:message("You wait.")
 		end
@@ -485,15 +485,13 @@ function Actor:move(x, y)
 
 	--	the actor must have a map to move on
 	if not self.map then
-		Log:write("Actor " .. self:toString() ..
-			" attempted to move without an attached map!")
+		Log:write(self, " attempted to move without an attached map!")
 		return 0
 	end
 
 	--	the actor's movements must keep it inside the boundaries of the map
 	if not self.map:isInBounds(x, y) then
-		Log:write("Actor " .. self:toString() ..
-			" attempted to move to an out-of-bounds location!")
+		Log:write(self, " attempted to move to an out-of-bounds location!")
 		return 0
 	end
 
@@ -519,8 +517,7 @@ function Actor:move(x, y)
 
 	--	the actor cannot move onto a solid tile
 	if self.map:isSolid(x, y) then
-		Log:write("Actor " .. self:toString() ..
-			" attempted to move onto a solid tile!")
+		Log:write(self, " attempted to move onto a solid tile!")
 		return 0
 	end
 
@@ -612,7 +609,7 @@ end
 function Actor:fireWeapon(direction)
 	local weapon = self.equipment.rangedWeapon
 
-	Log:write(self:toString() .. " firing weapon " .. tostring(weapon) .. " in direction " .. direction)
+	Log:write(self, " firing weapon ", weapon, " in direction ", direction)
 	if not weapon then
 		--	self should not be Player, as Actor:playerFires() already checks
 		--	whether nothing is equipped
@@ -745,19 +742,19 @@ function Actor:tryPickupItem(item)
 	local slot = self:addItem(item)
 	if slot then
 		if item.stackable then
-			Log:write(self:toString() .. " picked up " .. item:toString() .. " (now " .. self.inventory[slot].count .. ")")
+			Log:write(self, " picked up ", item, " (now " .. self.inventory[slot].count .. ")")
 			if self == Game.player then
 				UI:message("Picked up {{yellow}}" .. slot .. "{{pop}} - " .. item:describe() .. ". You now have " .. self.inventory[slot].count .. ".")
 			end
 		else
-			Log:write(self:toString() .. " picked up " .. item:toString())
+			Log:write(self, " picked up ", item)
 			if self == Game.player then
 				UI:message("Picked up {{yellow}}" .. slot .. "{{pop}} - " .. item:describe())
 			end
 		end
 		return Global.actionCost.pickupItem
 	end
-	Log:write(self:toString() .. " failed to pickup " .. self.inventory[slot]:toString())
+	Log:write(self, " failed to pickup ", self.inventory[slot])
 	if self == Game.player then
 		UI:message("Your inventory is already full!")
 	end
@@ -781,7 +778,7 @@ end
 --	until encountering something. Returns the number of action points spent.
 function Actor:straightMovement()
 	local dirx, diry = Util.xyFromDirection(self.runDir)
-	Log:write("player:straightMovement() continuing run in direction " .. self.runDir)
+	Log:write(self, ":straightMovement() continuing run in direction " .. self.runDir)
 
 	--	Stop if any adjacent tile has something 'interesting' on it
 	for x, y in self.map:neighbours(self.x, self.y) do
@@ -980,7 +977,7 @@ function Actor:handleKey(key)
 	--	pick up
 	if key == "," or key == "g" then
 		local items = self.map:itemsAtTile(self.x, self.y)
-		Log:write("Trying to pickup: items:" .. tostring(items))
+		Log:write("Trying to pickup: items:", items)
 		if #items == 0 then
 			UI:message("There's nothing here to pick up!")
 			return 0	-- no time taken.

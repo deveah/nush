@@ -240,7 +240,7 @@ function Util.dumpGlobals()
 end
 
 function Util.debugDumpMap(map)
-	Log:write("Dumping map " .. map:toString())
+	Log:write("Dumping map ", map)
 	for j = 1, Global.mapHeight do
 		for i = 1, Global.mapWidth do
 			Log.file:write(map.tile[i][j].face)

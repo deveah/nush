@@ -197,7 +197,7 @@ function Game:loop()
 			--	the act() method returns the number of action points spent to make
 			--	a specific action
 			while currentActor.alive and currentActor.actionPoints >= 0 do
-				Log:write("Current acting actor: " .. currentActor:toString() ..
+				Log:write("Currently acting: " .. tostring(currentActor) ..
 					" actionpoints: " .. currentActor.actionPoints)
 				currentActor.actionPoints = currentActor.actionPoints - currentActor:act()
 			end
@@ -228,7 +228,7 @@ end
 --	does not return anything
 function Game:addActor(actor)
 	table.insert(self.actorList, actor)
-	Log:write("Added actor " .. actor:toString() .. " to actorList.")
+	Log:write("Added ", actor, " to actorList.")
 end
 
 --	Game:removeActor() - removes an item from the global actorList in case it
@@ -236,32 +236,32 @@ end
 --	Does not return anything
 function Game:removeActor(actor)
 	if not Util.seqRemove(self.actorList, actor) then
-		error("bad call Game:removeActor(" .. actor:toString() .. ")")
+		error("bad call Game:removeActor(" .. tostring(actor) .. ")")
 	end
-	Log:write("Remove actor " .. actor:toString() .. " from actorList.")
+	Log:write("Remove ", actor, " from actorList.")
 end
 
 --	Game:addParticle() - adds a Particle object into the list of living
 --	actors;	does not return anything
 function Game:addParticle(particle)
 	table.insert(self.particleList, particle)
-	Log:write("Added particle " .. particle:toString() .. " to particleList.")
+	Log:write("Added ", particle, " to particleList.")
 end
 
 --	Game:removeParticle() - removes a particle from the global particleList.
 --	Does not return anything
 function Game:removeParticle(particle)
 	if not Util.seqRemove(self.particleList, particle) then
-		error("bad call Game:removeParticle(" .. particle:toString() .. ")")
+		error("bad call Game:removeParticle(" .. tostring(particle) .. ")")
 	end
-	Log:write("Remove particle " .. particle:toString() .. " from particleList.")
+	Log:write("Remove ", particle, " from particleList.")
 end
 
 --	Game:addItem() - adds an Item object into the global list of items;
 --	does not return anything
 function Game:addItem(item)
 	table.insert(self.itemList, item)
-	Log:write("Added item " .. item:toString() .. " to itemList.")
+	Log:write("Added ", item, " to itemList.")
 end
 
 --	Game:removeItem() - removes an item from the global itemList in case it is
@@ -269,16 +269,16 @@ end
 --	Does not return anything
 function Game:removeItem(item)
 	if not Util.seqRemove(self.itemList, item) then
-		error("bad call Game:removeItem(" .. item:toString() .. ")")
+		error("bad call Game:removeItem(" .. tostring(item) .. ")")
 	end
-	Log:write("Remove item " .. item:toString() .. " from itemList.")
+	Log:write("Remove ", item, " from itemList.")
 end
 
 --	Game:addMap() - adds a Map object into the list of dungeon levels;
 --	does not return anything
 function Game:addMap(map)
 	table.insert(self.mapList, map)
-	Log:write("Added map " .. map:toString() .. " to mapList.")
+	Log:write("Added ", map, " to mapList.")
 end
 
 --	Game:halt() - makes the game terminate with a given reason;
