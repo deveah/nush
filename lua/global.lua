@@ -54,6 +54,7 @@ Global.actionCost = {
 	openDoor = 3,
 	closeDoor = 3,
 	pickDoor = 15,
+	unlockDoor = 5,
 	wait = 10,
 	takeStairs = 10,
 	pickupItem = 2,

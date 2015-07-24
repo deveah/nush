@@ -984,9 +984,28 @@ function Actor:handleKey(key)
 		if #items == 0 then
 			UI:message("There's nothing here to pick up!")
 			return 0	-- no time taken.
+		elseif #items == 1 then
+			return (self:tryPickupItem(items[1]))
 		else
-			--	TODO: handle more than one item
-			self:tryPickupItem(items[1])
+			while true do
+				local text = ""
+				for idx, item in pairs(items) do
+					text = text .. "[{{yellow}}" .. string.char(string.byte('a') + idx - 1) ..
+						"{{pop}}] " .. item:describe() .. "\n"
+				end
+
+				UI:drawMessageBox("Pick up multiple items", text, " {{cyan}}ESC{{pop}} cancel ", 30, 2)
+				
+				local key = curses.getch()
+				local keyId = string.byte(key) - string.byte('a') + 1
+				if keyId > 0 and keyId <= #items then
+					return (self:tryPickupItem(items[keyId]))
+				end
+
+				if key == "escape" then
+					return 0	-- no action taken
+				end
+			end
 		end
 	end
 
@@ -1046,11 +1065,10 @@ function Actor:teleportToMap(map)
 end
 
 --	Actor:openDoor() - makes the given actor open a door at a given location;
---	returns true if the action has been successfully completed, and false
---	otherwise
+--	returns the number of action points spent
 function Actor:openDoor(x, y)
 	if not self.map:isInBounds(x, y) then
-		return false
+		return 0	-- no time taken
 	end
 
 	--	only closed doors can be opened
@@ -1058,7 +1076,7 @@ function Actor:openDoor(x, y)
 		if self == Game.player then
 			UI:message("There's no closed door there!")
 		end
-		return false
+		return 0
 	end
 
 	if self == Game.player then
@@ -1071,7 +1089,7 @@ function Actor:openDoor(x, y)
 	self:updateSight()
 
 	--	the action has been completed successfully
-	return true
+	return Global.actionCost.openDoor
 end
 
 --	Actor:closeDoor() - makes the given actor close a door at a given location;
@@ -1079,7 +1097,7 @@ end
 --	otherwise
 function Actor:closeDoor(x, y)
 	if not self.map:isInBounds(x, y) then
-		return false
+		return 0
 	end
 
 	--	only open doors can be closed
@@ -1087,7 +1105,7 @@ function Actor:closeDoor(x, y)
 		if self == Game.player then
 			UI:message("There's no open door there!")
 		end
-		return false
+		return 0
 	end
 
 	if self == Game.player then
@@ -1100,7 +1118,7 @@ function Actor:closeDoor(x, y)
 	self:updateSight()
 
 	--	the action has been completed successfully
-	return true
+	return Game.actionCost.closeDoor
 end
 
 --	Actor:unlockDoor() - makes the given actor unlock the door at a given
@@ -1108,7 +1126,7 @@ end
 --	and false otherwise
 function Actor:unlockDoor(x, y)
 	if not self.map:isInBounds(x, y) then
-		return false
+		return 0
 	end
 
 	--	only doors can be unlocked
@@ -1116,7 +1134,7 @@ function Actor:unlockDoor(x, y)
 		if self == Game.player then
 			UI:message("There's no door there!")
 		end
-		return false
+		return 0
 	end
 
 	--	only locked doors can be unlocked
@@ -1124,7 +1142,7 @@ function Actor:unlockDoor(x, y)
 		if self == Game.player then
 			UI:message("That door isn't locked!")
 		end
-		return false
+		return 0
 	end
 
 	--	check to see if the actor has the right keycard
@@ -1134,12 +1152,12 @@ function Actor:unlockDoor(x, y)
 				self.map.tile[x][y].locked .. "{{pop}} keycard.")
 		end
 		self.map.tile[x][y] = Tile.openDoor
-		return true
+		return Game.actionCost.unlockDoor
 	else
 		if self == Game.player then
 			UI:message("The door requires a `" .. self.map.tile[x][y].locked .. "' keycard, which you do not have.")
 		end
-		return false
+		return 0
 	end
 end
 

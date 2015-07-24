@@ -308,6 +308,7 @@ function UI:drawMessageBox(title, text, bottomLine, minWidth, minHeight)
 	end
 
 	--	Draw
+	curses.cursor(0)
 	local xOffset, yOffset = self:centeredWindow(width, height)
 	if title then
 		self:writeCentered(yOffset, "{{WHITE}}" .. title)
