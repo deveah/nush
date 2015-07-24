@@ -720,13 +720,14 @@ function UI:highscoreScreen()
 	local f = csv.open("scores.csv")
 	local text = {}
 	
-	table.insert(text, "{{YELLOW}}  # Name        Place       Reason of death{{pop}}")
+	table.insert(text, "{{YELLOW}}  # Name        Score Place       Reason of death{{pop}}")
 
 	--	TODO: sort entries by score
 	for i = 2, #f.data do
 		local line = 
 			string.format("%3i", i-1) .. " " ..
 			f.data[i]["playerName"] .. string.rep(" ", 12 - f.data[i]["playerName"]:len()) ..
+			string.format("%5i", tonumber(f.data[i]["score"])) .. " " ..
 			f.data[i]["placeOfDeath"] .. string.rep(" ", 12 - f.data[i]["placeOfDeath"]:len()) ..
 			f.data[i]["reasonOfDeath"]
 
@@ -759,7 +760,7 @@ function UI:playerScreen()
 			Game.player.maxHp .. " hit points."
 	end
 	table.insert(text, healthStatus)
-	table.insert(text, "You have {{GREEN}}" .. Game.player.experience .. "{{pop}} experience points.")
+	table.insert(text, "You have {{GREEN}}" .. Game.player.spendableExperience .. "{{pop}} spendable experience points, out of " .. Game.player.totalExperience .. " total gained.")
 	table.insert(text, "")
 
 	table.insert(text, "{{WHITE}}Equipment:{{pop}}")
@@ -795,10 +796,10 @@ function UI:skillPointScreen()
 		local xOffset, yOffset = self:centeredWindow(width, height)
 		self:writeCentered(yOffset, "Assign skill points")
 
-		if Game.player.experience == 0 then
+		if Game.player.spendableExperience == 0 then
 			self:colorWrite(xOffset + 2, yOffset + 2, "You have no experience points to assign.")
 		else
-			self:colorWrite(xOffset + 2, yOffset + 2,"You have {{green}}" .. Game.player.experience .. "{{pop}} assignable skill points.")
+			self:colorWrite(xOffset + 2, yOffset + 2,"You have {{green}}" .. Game.player.spendableExperience .. "{{pop}} assignable skill points.")
 			self:colorWrite(xOffset + 2, yOffset + 3, "You may upgrade the following skills:")
 			self:colorWrite(xOffset + 2, yOffset + 5, "[{{YELLOW}}a{{pop}}] melee (" .. Game.player.skills.melee .. ")")
 			self:colorWrite(xOffset + 2, yOffset + 6, "[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.skills.handguns .. ")")
@@ -812,19 +813,19 @@ function UI:skillPointScreen()
 	--	hide the cursor
 	curses.cursor(0)
 	repeat
-		canUpgrade = Game.player.experience > 0
+		canUpgrade = Game.player.spendableExperience > 0
 		displayPointDialog()
 		key = curses.getch()
 
 		--	upgrade melee
 		if canUpgrade and key == "a" then
 			Game.player.skills.melee = Game.player.skills.melee + 1
-			Game.player.experience = Game.player.experience - 1
+			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
 		if canUpgrade and key == "b" then
 			Game.player.skills.handguns = Game.player.skills.handguns + 1
-			Game.player.experience = Game.player.experience - 1
+			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 	until key == "escape"
 

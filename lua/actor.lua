@@ -148,7 +148,8 @@ end
 
 --	Actor:addExperience() - adds an amount of experience points to the actor
 function Actor:addExperience(val)
-	self.experience = self.experience + val
+	self.spendableExperience = self.spendableExperience + val
+	self.totalExperience = self.totalExperience + val
 	--	TODO: is this check necessary? only the player is awarded experience points
 	if self == Game.player then
 		UI:message("{{WHITE}}You gain {{GREEN}}" .. val .. "{{pop}} experience points!")
@@ -381,12 +382,12 @@ function Actor:dumpToHighscoreFile(reasonOfDeath)
 	--	if the file doesn't exist, write the header
 	if not Util.fileExists("scores.csv") then
 		local f = io.open("scores.csv", "w")
-		f:write("playerName,placeOfDeath,reasonOfDeath\n")
+		f:write("playerName,score,placeOfDeath,reasonOfDeath\n")
 		f:close()
 	end
 
 	local f = io.open("scores.csv", "a")
-	f:write(self.name .. "," .. self.map.name .. "," .. reasonOfDeath .. "\n")
+	f:write(self.name .. "," .. self.totalExperience .. "," .. self.map.name .. "," .. reasonOfDeath .. "\n")
 	f:close()
 end
 
