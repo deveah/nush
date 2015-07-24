@@ -1162,11 +1162,11 @@ function Actor:unlockDoor(x, y)
 end
 
 --	Actor:pickDoor() - makes the given actor pick the locked door at a given
---	location; returns true if the action has been taken (a failed attempt still
---	counts as a spent turn), and false otherwise
+--	location; returns the number of action points spent (a failed attempt at
+--	picking a door still counts as a spent turn)
 function Actor:pickDoor(x, y)
 	if not self.map:isInBounds(x, y) then
-		return false
+		return 0
 	end
 
 	--	only doors can be picked
@@ -1174,7 +1174,7 @@ function Actor:pickDoor(x, y)
 		if self == Game.player then
 			UI:message("There's no door there!")
 		end
-		return false
+		return 0
 	end
 
 	--	only locked doors can be picked
@@ -1182,7 +1182,7 @@ function Actor:pickDoor(x, y)
 		if self == Game.player then
 			UI:message("That door isn't locked!")
 		end
-		return false
+		return 0
 	end
 
 	--	calculate the pick chance depending on the player's lockpick skill
@@ -1196,12 +1196,12 @@ function Actor:pickDoor(x, y)
 		if self == Game.player then
 			UI:message("{{green}}You successfully pick the lock!")
 		end
-		return true
+		return Global.actionCost.pickDoor
 	else
 		if self == Game.player then
 			UI:message("You fail to pick the lock.")
 		end
-		return true
+		return Global.actionCost.pickDoor
 	end
 end
 
