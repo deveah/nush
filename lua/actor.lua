@@ -196,8 +196,8 @@ function Actor:takeDamage(attacker, quantity, reason)
 			UI:message("{{red}}You hear a thud.")
 		end
 
-		--	award experience points to the player
-		if attacker == Game.player then
+		--	award experience points to the player unless they killed themselves
+		if attacker == Game.player and self ~= Game.player then
 			--	TODO: fixed number of experience points for now
 			Game.player:addExperience(10)
 		end
@@ -634,7 +634,7 @@ function Actor:fireWeapon(direction)
 
 	if direction == "." then
 		UI:message("You shoot yourself in the foot!")
-		self:takeDamage(3, "shot self in foot")
+		self:takeDamage(self, 3, "shot self in foot")
 		return Global.actionCost.rangedAttack
 	end
 
@@ -987,7 +987,7 @@ function Actor:handleKey(key)
 	if key == "c" then
 		local dir, dirx, diry = UI:promptDirection("Close where?")
 		if dir then
-			return self:closeDoor(self.x + dirx, self.y + diry)
+			return (self:closeDoor(self.x + dirx, self.y + diry))
 		elseif self == Game.player then
 			UI:message("Okay, then.")	-- signal that no action has been taken
 			return 0	-- no time taken.
@@ -1146,7 +1146,7 @@ function Actor:closeDoor(x, y)
 	self:updateSight()
 
 	--	the action has been completed successfully
-	return Game.actionCost.closeDoor
+	return Global.actionCost.closeDoor
 end
 
 --	Actor:unlockDoor() - makes the given actor unlock the door at a given

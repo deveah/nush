@@ -759,19 +759,19 @@ function UI:playerScreen()
 	table.insert(text, "{{YELLOW}}" .. Game.player.name)
 	table.insert(text, "")
 	
-	local healthStatus
+	local healthColor
 	if Game.player.hp == Game.player.maxHp then
-		healthStatus = "You have {{GREEN}}" .. Game.player.hp .. "{{pop}} out of " ..
-			Game.player.maxHp .. " hit points."
+		healthColor = "{{GREEN}}"
 	elseif Game.player.hp <= math.floor(Game.player.maxHp / 4) then
-		healthStatus = "You have {{RED}}" .. Game.player.hp .. "{{pop}} out of " ..
-			Game.player.maxHp .. " hit points."
+		healthColor = "{{RED}}"
 	else
-		healthStatus = "You have " .. Game.player.hp .. " out of " ..
-			Game.player.maxHp .. " hit points."
+		healthColor = "{{white}}"
 	end
-	table.insert(text, healthStatus)
-	table.insert(text, "You have {{GREEN}}" .. Game.player.spendableExperience .. "{{pop}} spendable experience points, out of " .. Game.player.totalExperience .. " total gained.")
+	healthStatus = ""
+	table.insert(text, "You have " .. healthColor .. Game.player.hp .. "{{pop}} out of " ..
+			Game.player.maxHp .. " hit points.")
+	table.insert(text, "You have {{GREEN}}" .. Game.player.spendableExperience ..
+			"{{pop}} unspent experience points, out of " .. Game.player.totalExperience .. " total gained.")
 	table.insert(text, "")
 
 	table.insert(text, "{{WHITE}}Equipment:{{pop}}")
