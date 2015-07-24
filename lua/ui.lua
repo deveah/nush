@@ -805,7 +805,8 @@ function UI:skillPointScreen()
 				"You have {{green}}" .. Game.player.spendableExperience .. "{{pop}} assignable skill points.\n" ..
 				"You may upgrade the following skills:\n" ..
 				"[{{YELLOW}}a{{pop}}] melee (" .. Game.player.skills.melee .. ")\n" ..
-				"[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.skills.handguns .. ")"
+				"[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.skills.handguns .. ")\n" ..
+				"[{{YELLOW}}c{{pop}}] lockpick (" .. Game.player.skills.lockpick .. ")"
 		end
 
 		self:drawScreen()
@@ -833,8 +834,13 @@ function UI:skillPointScreen()
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
+		if canUpgrade and key == "c" then
+			Game.player.skills.lockpick = Game.player.skills.lockpick + 1
+			Game.player.spendableExperience = Game.player.spendableExperience - 1
+		end
+
 		--	Exit if not a letter in the range of skill keys
-		if not (#key == 1 and "a" <= key and key <= "b") then
+		if not (#key == 1 and "a" <= key and key <= "c") then
 			break
 		end
 	end
