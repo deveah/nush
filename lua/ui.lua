@@ -260,6 +260,8 @@ end
 --	UI:centeredWindow() - Draw a box in the center of the screen, and
 --	return x,y position of top-left corner
 function UI:centeredWindow(width, height)
+	width = math.min(Global.screenWidth, width)
+	height = math.min(Global.screenHeight, height)
 	local xOffset, yOffset = math.floor((Global.screenWidth - width) / 2), math.floor((Global.screenHeight - height) / 2)
 	curses.move(xOffset, yOffset)
 	curses.clearBox(width, height)
