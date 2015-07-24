@@ -29,14 +29,19 @@ function Log.new(filename, dontDelete)
 	return l
 end
 
---	Log:write() - writes to the attached log file; does not return anything
-function Log:write(data)
+--	Log:write() - converts all arguments to strings, concatenates them, and
+--	writes them to the attached log file; does not return anything.
+function Log:write(...)
 	--	logging only works when debugging is activated
 	if not self.file then
 		return nil
 	end
+	local text = ""
+	for i = 1, select('#', ...) do
+		text = text .. tostring(select(i, ...))
+	end
 
-	self.file:write(os.date() .. ": " .. data .. "\n")
+	self.file:write(os.date() .. ": " .. text .. "\n")
 	self.file:flush()
 end
 
