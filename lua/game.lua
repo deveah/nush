@@ -191,15 +191,10 @@ function Game:loop()
 			--	award action points equal to the actor's agility score
 			currentActor.actionPoints = currentActor.actionPoints + currentActor.agility
 
-			--	the act() method of Actor objects returns true if the actor has spent
-			--	its turn successfully; to prevent wasting turns, the event loop
-			--	must make actors act until they come up with a valid move, and
-			--	completely spent its action points
+			--	the act() method returns the number of action points spent to make
+			--	a specific action
 			while currentActor.alive and currentActor.actionPoints >= 0 do
-				if currentActor:act() then
-					--	substract spent action points (TODO: fixed action cost?)
-					currentActor.actionPoints = currentActor.actionPoints - 10
-				end
+				currentActor.actionPoints = currentActor.actionPoints - currentActor:act()
 			end
 
 			--	if something triggered a game halt, cancel the rest of the actions

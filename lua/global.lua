@@ -46,4 +46,18 @@ Global.mapHeight =	20
 --	Depth of the dungeon (how many maps it contains)
 Global.dungeonDepth = 10
 
+--	Cost of individual actions in action points
+Global.actionCost = {
+	meleeAttack = 6,
+	rangedAttack = 5,
+	move = 8,
+	openDoor = 3,
+	closeDoor = 3,
+	pickDoor = 15,
+	wait = 10,
+	takeStairs = 10,
+	pickupItem = 2,
+	dropItem = 4,
+}
+
 return Global

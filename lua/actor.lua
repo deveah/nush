@@ -471,8 +471,8 @@ end
 
 --	Actor:move() - attempts to move the given Actor object onto the tile
 --	at the given pair of coordinates (x, y) of the same map it is currently
---	on; returns either true or false, depending on whether the move was
---	successful
+--	on; returns the number of action points spent, or 0 if the action wasn't
+--	completed
 function Actor:move(x, y)
 	--	No movement (e.g. pressed ./numpad5) counts as waiting
 	if x == self.x and y == self.y then
@@ -480,21 +480,21 @@ function Actor:move(x, y)
 		if self == Game.player then
 			UI:message("You wait.")
 		end
-		return true
+		return Global.actionCost.wait
 	end
 
 	--	the actor must have a map to move on
 	if not self.map then
 		Log:write("Actor " .. self:toString() ..
 			" attempted to move without an attached map!")
-		return false
+		return 0
 	end
 
 	--	the actor's movements must keep it inside the boundaries of the map
 	if not self.map:isInBounds(x, y) then
 		Log:write("Actor " .. self:toString() ..
 			" attempted to move to an out-of-bounds location!")
-		return false
+		return 0
 	end
 
 	--	bumping into a closed door opens it
@@ -514,14 +514,14 @@ function Actor:move(x, y)
 		end
 
 		self.map.tile[x][y] = Tile.closedDoor
-		return true
+		return 0
 	end
 
 	--	the actor cannot move onto a solid tile
 	if self.map:isSolid(x, y) then
 		Log:write("Actor " .. self:toString() ..
 			" attempted to move onto a solid tile!")
-		return false
+		return 0
 	end
 
 	--	the actor cannot move onto a tile that is occupied by another actor;
@@ -533,7 +533,7 @@ function Actor:move(x, y)
 
 	--	if all is well, update the actor's position
 	self:setPosition(x, y)
-	return true
+	return Global.actionCost.move
 end
 
 --	Actor:doAttack() - Apply a melee or ranged attack to a target, returns a
@@ -596,7 +596,7 @@ function Actor:meleeAttack(defender)
 		weapon = Itemdefs.Fists
 	end
 	self:doAttack(defender, weapon, false)
-	return true
+	return Global.actionCost.meleeAttack
 end
 
 --	Actor:rangedAttack() - called when the actor's projectile intercepts
@@ -608,7 +608,7 @@ end
 
 --	Actor:fireWeapon() - actor fires their weapon in some direction. Animates
 --	the weapon firing and calls self:rangedAttack() on all targets.
---	Returns true if a turn was consumed.
+--	Returns the number of action points consumed.
 function Actor:fireWeapon(direction)
 	local weapon = self.equipment.rangedWeapon
 
@@ -616,7 +616,7 @@ function Actor:fireWeapon(direction)
 	if not weapon then
 		--	self should not be Player, as Actor:playerFires() already checks
 		--	whether nothing is equipped
-		return false
+		return 0
 	end
 
 	--	consume ammo if possible
@@ -627,7 +627,7 @@ function Actor:fireWeapon(direction)
 				UI:message("You are out of ammo!")
 			end
 			Log:write("...failed, out of ammo " .. weapon.ammo)
-			return false
+			return 0
 		else
 			local ammo = self.inventory[slot]
 			ammo.count = ammo.count - 1
@@ -640,7 +640,7 @@ function Actor:fireWeapon(direction)
 	if direction == "." then
 		UI:message("You shoot yourself in the foot!")
 		self:takeDamage(3, "shot self in foot")
-		return true
+		return Global.actionCost.rangedAttack
 	end
 
 	local bulletIcons = {
@@ -702,12 +702,12 @@ function Actor:fireWeapon(direction)
 	end
 	Game:removeParticle(bullet)
 
-	return true
+	return Global.actionCost.rangedAttack
 end
 
 --	Actor:takeStairs() - makes the given actor use the stairs underneath it,
---	transferring the actor to another level of the dungeon; returns true if
---	the action was successfully completed, or false otherwise (trying to use
+--	transferring the actor to another level of the dungeon; returns the number
+--	of spent action points, or 0 in case the action fails (trying to use
 --	the stairs when not directly on them may be a cause)
 function Actor:takeStairs()
 	if self.map.tile[self.x][self.y].name == "Stairs down" then
@@ -717,7 +717,7 @@ function Actor:takeStairs()
 		end
 		self.map = self.map.tile[self.x][self.y]["destination-map"]
 		self:updateSight()	-- force update of sight map
-		return true
+		return Global.actionCost.takeStairs
 	end
 
 	if self.map.tile[self.x][self.y].name == "Stairs up" then
@@ -727,7 +727,7 @@ function Actor:takeStairs()
 		end
 		self.map = self.map.tile[self.x][self.y]["destination-map"]
 		self:updateSight()	-- force update of sight map
-		return true
+		return Global.actionCost.takeStairs
 	end
 
 	--	signal that there are no stairs to take
@@ -735,12 +735,12 @@ function Actor:takeStairs()
 		UI:message("There are no stairs here.")
 	end
 
-	--	no action has been taken, so return false
-	return false
+	--	no action has been taken, so return 0
+	return 0
 end
 
 --	Actor:tryPickupItem() - Transfers an item to this actor's inventory if
---	there is room; returns true on success, else false
+--	there is room; returns the number of action points spent
 function Actor:tryPickupItem(item)
 	local slot = self:addItem(item)
 	if slot then
@@ -755,17 +755,17 @@ function Actor:tryPickupItem(item)
 				UI:message("Picked up {{yellow}}" .. slot .. "{{pop}} - " .. item:describe())
 			end
 		end
-		return true
+		return Global.actionCost.pickupItem
 	end
 	Log:write(self:toString() .. " failed to pickup " .. self.inventory[slot]:toString())
 	if self == Game.player then
 		UI:message("Your inventory is already full!")
 	end
-	return false
+	return 0
 end
 
 --	Actor:dropItem() - Removes an item from the inventory, places it on the
---	floor below the actor; returns nothing
+--	floor below the actor; returns the number of action points spent
 function Actor:dropItem(item)
 	--	This unequips the item if needed
 	self:removeItem(item)
@@ -774,10 +774,11 @@ function Actor:dropItem(item)
 	if self == Game.player and self.alive then
 		UI:message("You drop the " .. item:describe())
 	end
+	return Global.actionCost.dropItem
 end
 
 --	Actor:straightMovement() - continue moving in a straight line (aka running)
---	until encountering something. Returns true if turn taken.
+--	until encountering something. Returns the number of action points spent.
 function Actor:straightMovement()
 	local dirx, diry = Util.xyFromDirection(self.runDir)
 	Log:write("player:straightMovement() continuing run in direction " .. self.runDir)
@@ -791,7 +792,7 @@ function Actor:straightMovement()
 					self.map.tile[x][y].role == "stairs" or
 					self.map.tile[x][y].role == "door" then
 				self.runDir = nil
-				return false
+				return 0
 			end
 		end
 	end
@@ -809,7 +810,7 @@ function Actor:straightMovement()
 
 	--	Cancel if couldn't move
 	self.runDir = nil
-	return false
+	return 0
 end
 
 --	Actor:act() - makes the given Actor object spend its turn; if the actor
@@ -838,7 +839,7 @@ function Actor:act()
 	else
 		--	the actor is not player-controlled, so let the AI functions take over
 		--	(not implemented, so return that the turn was successfully spent)
-		return true
+		return 10
 	end
 end
 
@@ -899,9 +900,9 @@ function Actor:handleKey(key)
 			self:dumpToHighscoreFile("quit")
 			UI:highscoreScreen()
 
-			return true	--	an exit request still spends a turn
+			return 100	--	an exit request still spends a turn
 		else
-			return false
+			return 0
 		end
 	end
 
@@ -909,28 +910,28 @@ function Actor:handleKey(key)
 	if key == "R" or  key == "\x12" or key == "\x0c" then  -- ^R or ^L
 		UI:drawScreen()
 		curses.redraw()
-		return false	-- no time taken.
+		return 0	-- no time taken.
 	end
 
 	if key == "?" or key == "F1" then
 		UI:helpScreen()
-		return false	-- no time taken.
+		return 0	-- no time taken.
 	end
 
 	if key == "@" then
 		UI:playerScreen()
-		return false	-- no time taken.
+		return 0	-- no time taken.
 	end
 
 	if key == "!" then
 		UI:skillPointScreen()
-		return false
+		return 0	-- no time taken.
 	end
 
 	--  message log
 	if key == "P" then
 		UI:messageLogScreen()
-		return false  -- no time taken.
+		return 0  -- no time taken.
 	end
 
 	--	movement
@@ -941,7 +942,7 @@ function Actor:handleKey(key)
 
 	--	straight-line movement
 	if self:handleRunKey(key) then
-		return false
+		return 0	-- no time taken.
 	end
 
 	--	fire
@@ -961,7 +962,7 @@ function Actor:handleKey(key)
 			return self:closeDoor(self.x + dirx, self.y + diry)
 		elseif self == Game.player then
 			UI:message("Okay, then.")	-- signal that no action has been taken
-			return false
+			return 0	-- no time taken.
 		end
 	end
 
@@ -972,7 +973,7 @@ function Actor:handleKey(key)
 			return self:pickDoor(self.x + dirx, self.y + diry)
 		elseif self == Game.player then
 			UI:message("Okay, then.")	-- signal that no action has been taken
-			return false
+			return 0	-- no time taken.
 		end
 	end
 
@@ -982,7 +983,7 @@ function Actor:handleKey(key)
 		Log:write("Trying to pickup: items:" .. tostring(items))
 		if #items == 0 then
 			UI:message("There's nothing here to pick up!")
-			return false
+			return 0	-- no time taken.
 		else
 			--	TODO: handle more than one item
 			self:tryPickupItem(items[1])
@@ -992,7 +993,7 @@ function Actor:handleKey(key)
 	--	show inventory
 	if key == "i" then
 		UI:inventoryScreen(Game.player)
-		return false
+		return 0	-- no time taken.
 	end
 
 	--	debug keys
@@ -1000,13 +1001,13 @@ function Actor:handleKey(key)
 	if key == "F2" then
 		UI:message("{{red}}(DEBUG) Dumped globals to logfile.")
 		Util.dumpGlobals()
-		return false
+		return 0	-- no time taken.
 	end
 
 	--	test graphics
 	if key == "F3" then
 		UI:testScreen()
-		return false
+		return 0	-- no time taken.
 	end
 
 	--	make the whole map temporarily visible to the player
@@ -1017,6 +1018,7 @@ function Actor:handleKey(key)
 				Game.player.sightMap[i][j] = true
 			end
 		end
+		return 0	-- no time taken.
 	end
 
 	--	teleport player to next/previous map
@@ -1031,7 +1033,7 @@ function Actor:handleKey(key)
 
 	--	there was no known action corresponding to the given key, so signal that
 	--	there hasn't been taken any action to spend the turn with
-	return false
+	return 0
 end
 
 --	Actor:teleportToMap() - place the actor on a random tile of the map (mainly
