@@ -846,19 +846,19 @@ end
 
 ------------------------------- Player control --------------------------------
 
---	Actor:playerFires() - handle the player wanting to shoot, returns whether
---	successful.
+--	Actor:playerFires() - handle the player wanting to shoot, returns action
+--	points cost
 --	TODO: allow proper targetting rather than only firing in a direction
 function Actor:playerFires()
 	local weapon = self.equipment.rangedWeapon
 	if not weapon then
 		UI:message("You don't have a gun equipped!")
-		return false
+		return 0
 	end
 
 	local dir = UI:promptDirection("Fire in which direction?")
 	if not dir then
-		return false
+		return 0
 	end
 	return (self:fireWeapon(dir))
 end
