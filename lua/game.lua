@@ -188,10 +188,19 @@ function Game:loop()
 			local currentActor = self.actorList[i]
 			Log:write("Current acting actor: " .. currentActor:toString() .. ")")
 
+			--	award action points equal to the actor's agility score
+			currentActor.actionPoints = currentActor.actionPoints + currentActor.agility
+
 			--	the act() method of Actor objects returns true if the actor has spent
 			--	its turn successfully; to prevent wasting turns, the event loop
-			--	must make actors act until they come up with a valid move
-			while currentActor.alive and not currentActor:act() do end
+			--	must make actors act until they come up with a valid move, and
+			--	completely spent its action points
+			while currentActor.alive and currentActor.actionPoints >= 0 do
+				if currentActor:act() then
+					--	substract spent action points (TODO: fixed action cost?)
+					currentActor.actionPoints = currentActor.actionPoints - 10
+				end
+			end
 
 			--	if something triggered a game halt, cancel the rest of the actions
 			--	of the remaining actors

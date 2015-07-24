@@ -20,6 +20,8 @@
 --	* inventory (table) - Mapping from inventory slot (letter) to Items
 --	* equipment (table) - Mapping from equipment slot to Items.
 --	*	alive (boolean)   - true if the actor can act
+--	* actionPoints (int) - the number of action points the actor currently has
+--	* agility (int) - the number of action points the actor is awarded with each turn
 --
 --  Also, Actor has the following enums:
 --	* InventorySlots    - List of inventory slots (e.g. "a")
@@ -53,6 +55,8 @@ function Actor:new()
 	a.inventory = {}
 	a.equipment = {}
 	a.sightRange = 5
+	a.actionPoints = 0
+	a.agility = 10
 
 	a.sightMap = {}
 	for i = 1, Global.mapWidth do
