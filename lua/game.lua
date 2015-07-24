@@ -188,8 +188,12 @@ function Game:loop()
 			local currentActor = self.actorList[i]
 			Log:write("Current acting actor: " .. currentActor:toString() .. ")")
 
-			--	award action points equal to the actor's agility score
-			currentActor.actionPoints = currentActor.actionPoints + currentActor.agility
+			--	award action points equal to the actor's agility score, divided by 10;
+			--	this way, actions which take small amount of action points can be
+			--	done by actors in alternating order;
+			--	the number of action points awarded each turn to the actors should be
+			--	smaller than the lowest cost of an action
+			currentActor.actionPoints = currentActor.actionPoints + currentActor.agility / 10
 
 			--	the act() method returns the number of action points spent to make
 			--	a specific action
