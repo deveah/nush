@@ -24,6 +24,11 @@
 	increases the effectiveness of the player's attacks against enemies from
 	the same category
 
+*	should lockpicking require lockpicks?
+*	an unsuccessful attempt at picking a lock should have the chance of
+	triggering an alarm, which alerts all the enemies on the level of your
+	position
+
 *	skills:
 	*	offensive: unarmed, melee, handguns, shotguns, rifles, explosive, exotic
 	*	defensive: sneak, dodge
