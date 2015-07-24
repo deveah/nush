@@ -611,8 +611,8 @@ function Actor:fireWeapon(direction)
 
 	Log:write(self, " firing weapon ", weapon, " in direction ", direction)
 	if not weapon then
-		--	self should not be Player, as Actor:playerFires() already checks
-		--	whether nothing is equipped
+		--	Impossible if canFireWeapon() was checked (don't need player message)
+		Log:write("...failed, no weapon")
 		return 0
 	end
 
@@ -620,9 +620,7 @@ function Actor:fireWeapon(direction)
 	if weapon.ammo then
 		local slot = self:hasItem(weapon.ammo)
 		if not slot then
-			if self == Game.player then
-				UI:message("You are out of ammo!")
-			end
+			--	Impossible if canFireWeapon() was checked (don't need player message)
 			Log:write("...failed, out of ammo " .. weapon.ammo)
 			return 0
 		else
@@ -700,6 +698,28 @@ function Actor:fireWeapon(direction)
 	Game:removeParticle(bullet)
 
 	return Global.actionCost.rangedAttack
+end
+
+--	Actor:canFireWeapon() - A unified function to check whether the player or
+--	an AI can shoot with their weapon. Returns either true, or (false, reason),
+--	where	reason is the message to give to the player.
+function Actor:canFireWeapon()
+	local weapon = self.equipment.rangedWeapon
+	if not weapon then
+		Log:write(actor, " can't shoot, no rangedWeapon")
+		return false, "You don't have a gun equipped!"
+	end
+
+	--	Ammo requirements
+	if weapon.ammo then
+		local slot = self:hasItem(weapon.ammo)
+		if not slot then
+			Log:write(actor, " can't shoot, out of ammo", weapon.ammo)
+			return false, "You are out of ammo!"
+		end
+	end
+
+	return true
 end
 
 --	Actor:takeStairs() - makes the given actor use the stairs underneath it,
@@ -840,16 +860,18 @@ function Actor:act()
 	end
 end
 
-
 ------------------------------- Player control --------------------------------
 
 --	Actor:playerFires() - handle the player wanting to shoot, returns action
 --	points cost
 --	TODO: allow proper targetting rather than only firing in a direction
 function Actor:playerFires()
-	local weapon = self.equipment.rangedWeapon
-	if not weapon then
-		UI:message("You don't have a gun equipped!")
+	assert(self == Game.player)
+
+	--	Check ability to fire before prompting (but the gun may still jam, etc.)
+	local canShoot, reason = self:canFireWeapon()
+	if not canShoot then
+		UI:message(reason)
 		return 0
 	end
 
