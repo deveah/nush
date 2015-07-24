@@ -722,6 +722,15 @@ function Actor:canFireWeapon()
 	return true
 end
 
+--	Actor:ammoAmount() - Returns amount of ammo this actor has for this weapon
+function Actor:ammoAmount(weapon)
+	local slot = self:hasItem(weapon.ammo)
+	if slot then
+		return self.inventory[slot].count
+	end
+	return 0
+end
+
 --	Actor:takeStairs() - makes the given actor use the stairs underneath it,
 --	transferring the actor to another level of the dungeon; returns the number
 --	of spent action points, or 0 in case the action fails (trying to use

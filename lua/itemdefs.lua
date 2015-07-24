@@ -58,7 +58,14 @@ Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
 		else
 			ret = ret .. "Range: " .. self.range
 		end
-		return ret .. "   Damage: " .. self.minDamage .. "-" .. self.maxDamage
+		ret = ret .. "   Damage: " .. self.minDamage .. "-" .. self.maxDamage
+		if self.ammo then
+			ret = ret .. "\nAmmo: " .. self.ammo
+			if self.owner == Game.player then
+				ret = ret .. " (you have " .. self.owner:ammoAmount(self) .. ")"
+			end
+		end
+		return ret
 	end
 })
 

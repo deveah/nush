@@ -111,19 +111,23 @@ function UI:drawScreen()
 	curses.clearLine(23)
 	curses.clearLine(24)
 	curses.write(Global.screenWidth - Game.player.map.name:len(), 23, Game.player.map.name)
+
+	--	Describe a weapon and its ammo
+	local function describeWeapon(weapon)
+		if weapon then
+			local ret = weapon:describe()
+			if weapon.ammo then
+				ret = ret .. " [" .. Game.player:ammoAmount(weapon) .. " shots]"
+			end
+			return ret
+		else
+			return "None"
+		end
+	end
+
 	local equip = Game.player.equipment
-	local weaponry = "Weapon: "
-	if equip.meleeWeapon then
-		weaponry = weaponry .. equip.meleeWeapon:describe()
-	else
-		weaponry = weaponry .. "None"
-	end
-	weaponry = weaponry .. "/"
-	if equip.rangedWeapon then
-		weaponry = weaponry .. equip.rangedWeapon:describe()
-	else
-		weaponry = weaponry .. "None"
-	end
+	local weaponry = "Weapons: " .. describeWeapon(equip.meleeWeapon) .. "/"
+		.. describeWeapon(equip.rangedWeapon)
 	curses.write(0, 24, weaponry)
 
 	local healthStatus
@@ -612,7 +616,7 @@ function UI:itemMenu(actor, item)
 	end
 	contents = contents .. "\n" .. actionString 
 
-	self:drawMessageBox(item:describe(), contents, " {{cyan}}other{{pop}} exit ")
+	self:drawMessageBox(item:describe(), contents, " {{cyan}}other{{pop}} exit ", 45)
 	curses.cursor(0)
 	--local width, height = 50, 8
 
