@@ -903,9 +903,13 @@ function UI:examineScreen()
 	local currentActorIdx = 1
 	local visibleActors = {}
 
-	for _, actor in pairs(Game.actorList) do
+	for idx, actor in pairs(Game.actorList) do
 		if actor:visible() and actor.alive then
 			table.insert(visibleActors, actor)
+		end
+
+		if actor == Game.player then
+			currentActorIdx = idx
 		end
 	end
 	Log:write(#visibleActors .. " visible actors")
