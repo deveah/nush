@@ -874,7 +874,7 @@ function UI:examineScreen()
 		curses.attr(curses.WHITE)
 		curses.box(30, 10)
 		self:colorWrite(dialogX + 10, dialogY, "{{WHITE}} Examine ")
-		self:colorWrite(dialogX + 1, dialogY + 9, " {{cyan}}ESC{{pop}} exit ")
+		self:colorWrite(dialogX + 1, dialogY + 9, " {{cyan}}ESC{{pop}} exit {{cyan}}TAB{{pop}} cycle ")
 
 		if Game.player.sightMap[cursorX][cursorY] then
 			local tile = Game.player.map.tile[cursorX][cursorY]
@@ -900,19 +900,24 @@ function UI:examineScreen()
 		end
 	end
 
-	local currentActorIdx = 1
-	local visibleActors = {}
+	local currentObjectIdx = 1
+	local visibleObjects = {}
 
 	for idx, actor in pairs(Game.actorList) do
 		if actor:visible() and actor.alive then
-			table.insert(visibleActors, actor)
+			table.insert(visibleObjects, actor)
 		end
 
 		if actor == Game.player then
 			currentActorIdx = idx
 		end
 	end
-	Log:write(#visibleActors .. " visible actors")
+
+	for idx, item in pairs(Game.itemList) do
+		if item.map == Game.player.map and Game.player.sightMap[item.x][item.y] then
+			table.insert(visibleObjects, item)
+		end
+	end
 
 	while running do
 		drawExamineDialog()
@@ -925,12 +930,11 @@ function UI:examineScreen()
 		end
 
 		if k == "\t" then
-			currentActorIdx = (currentActorIdx + 1) % (#visibleActors + 1)
-			if currentActorIdx == 0 then currentActorIdx = 1 end
-			Log:write("examining actor " .. currentActorIdx)
-			local currentActor = visibleActors[currentActorIdx]
-			cursorX = currentActor.x
-			cursorY = currentActor.y
+			currentObjectIdx = (currentObjectIdx + 1) % (#visibleObjects + 1)
+			if currentObjectIdx == 0 then currentObjectIdx = 1 end
+			local currentObject = visibleObjects[currentObjectIdx]
+			cursorX = currentObject.x
+			cursorY = currentObject.y
 		end
 
 		local dir, xOff, yOff = UI:directionFromKey(k)
