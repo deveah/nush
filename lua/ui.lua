@@ -904,7 +904,7 @@ function UI:examineScreen()
 	local visibleActors = {}
 
 	for _, actor in pairs(Game.actorList) do
-		if actor:visible() then
+		if actor:visible() and actor.alive then
 			table.insert(visibleActors, actor)
 		end
 	end
