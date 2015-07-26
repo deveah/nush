@@ -917,7 +917,8 @@ function UI:examineScreen()
 
 	for idx, item in pairs(Game.itemList) do
 		if	item.map == Game.player.map and Game.player.sightMap[item.x][item.y] and
-				not addedTiles[item.x .. ":" .. item.y] then
+				not addedTiles[item.x .. ":" .. item.y] and
+				not (item.x == Game.player.x and item.y == Game.player.y) then
 			table.insert(visibleObjects, {x = item.x, y = item.y})
 			addedTiles[item.x .. ":" .. item.y] = true
 		end
