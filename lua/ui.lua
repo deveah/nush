@@ -855,5 +855,87 @@ function UI:skillPointScreen()
 	curses.cursor(1)
 end
 
+--	UI:examineScreen() - toggles examination mode
+function UI:examineScreen()
+	local running = true
+	local cursorX, cursorY = Game.player.x, Game.player.y
+
+	local function drawExamineDialog()
+		local dialogX, dialogY
+		self:drawScreen()
+		curses.cursor(0)
+		if cursorX > math.floor(Global.screenWidth / 2) then
+			dialogX, dialogY = 0, 3
+		else
+			dialogX, dialogY = 50, 3
+		end
+		curses.move(dialogX, dialogY)
+		curses.clearBox(30, 10)
+		curses.attr(curses.WHITE)
+		curses.box(30, 10)
+		self:colorWrite(dialogX + 10, dialogY, "{{WHITE}} Examine ")
+		self:colorWrite(dialogX + 1, dialogY + 9, " {{cyan}}ESC{{pop}} exit ")
+
+		if Game.player.sightMap[cursorX][cursorY] then
+			local tile = Game.player.map.tile[cursorX][cursorY]
+			curses.attr(tile.color)
+			curses.write(dialogX + 2, dialogY + 2, tile.face)
+			self:colorWrite(dialogX + 4, dialogY + 2, tile.name)
+
+			local actor = Game.player.map:isOccupied(cursorX, cursorY)
+			if actor then
+				curses.attr(actor.color)
+				curses.write(dialogX + 2, dialogY + 3, actor.face)
+				self:colorWrite(dialogX + 4, dialogY + 3, actor.name)
+			end
+
+			local items = Game.player.map:itemsAtTile(cursorX, cursorY)
+			for idx, item in pairs(items) do
+				curses.attr(item.color)
+				curses.write(dialogX + 2, dialogY + 3 + idx, item.face)
+				self:colorWrite(dialogX + 4, dialogY + 3 + idx, item.name)
+			end
+		else
+			self:colorWrite(dialogX + 2, dialogY + 2, "You can't see there.")
+		end
+	end
+
+	local currentActorIdx = 1
+	local visibleActors = {}
+
+	for _, actor in pairs(Game.actorList) do
+		if actor:visible() then
+			table.insert(visibleActors, actor)
+		end
+	end
+	Log:write(#visibleActors .. " visible actors")
+
+	while running do
+		drawExamineDialog()
+		curses.move(cursorX - 1, cursorY + 2)
+		curses.cursor(1)
+
+		local k = curses.getch()
+		if k == "escape" then
+			running = false
+		end
+
+		if k == "\t" then
+			currentActorIdx = (currentActorIdx + 1) % (#visibleActors + 1)
+			if currentActorIdx == 0 then currentActorIdx = 1 end
+			Log:write("examining actor " .. currentActorIdx)
+			local currentActor = visibleActors[currentActorIdx]
+			cursorX = currentActor.x
+			cursorY = currentActor.y
+		end
+
+		local dir, xOff, yOff = UI:directionFromKey(k)
+		if dir and Game.player.map:isInBounds(cursorX + xOff, cursorY + yOff) then
+			cursorX = cursorX + xOff
+			cursorY = cursorY + yOff
+		end
+	end
+end
+
 return UI
 

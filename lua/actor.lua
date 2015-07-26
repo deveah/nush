@@ -965,6 +965,12 @@ function Actor:handleKey(key)
 		return 0  -- no time taken.
 	end
 
+	--	examine dialog
+	if key == "\t" then
+		UI:examineScreen()
+		return 0	-- no time taken.
+	end
+
 	--	movement
 	local dir, dirx, diry = UI:directionFromKey(key)
 	if dir then
