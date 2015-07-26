@@ -900,12 +900,14 @@ function UI:examineScreen()
 		end
 	end
 
-	local currentObjectIdx = 1
+	local currentObjectIdx = 0
 	local visibleObjects = {}
+	local addedTiles = {}
 
 	for idx, actor in pairs(Game.actorList) do
-		if actor:visible() and actor.alive then
-			table.insert(visibleObjects, actor)
+		if actor:visible() and actor.alive and actor ~= Game.player then
+			table.insert(visibleObjects, {x = actor.x, y = actor.y})
+			addedTiles[actor.x .. ":" .. actor.y] = true
 		end
 
 		if actor == Game.player then
@@ -914,10 +916,14 @@ function UI:examineScreen()
 	end
 
 	for idx, item in pairs(Game.itemList) do
-		if item.map == Game.player.map and Game.player.sightMap[item.x][item.y] then
-			table.insert(visibleObjects, item)
+		if	item.map == Game.player.map and Game.player.sightMap[item.x][item.y] and
+				not addedTiles[item.x .. ":" .. item.y] then
+			table.insert(visibleObjects, {x = item.x, y = item.y})
+			addedTiles[item.x .. ":" .. item.y] = true
 		end
 	end
+
+	visibleObjects[0] = Game.player
 
 	while running do
 		drawExamineDialog()
@@ -931,7 +937,6 @@ function UI:examineScreen()
 
 		if k == "\t" then
 			currentObjectIdx = (currentObjectIdx + 1) % (#visibleObjects + 1)
-			if currentObjectIdx == 0 then currentObjectIdx = 1 end
 			local currentObject = visibleObjects[currentObjectIdx]
 			cursorX = currentObject.x
 			cursorY = currentObject.y
