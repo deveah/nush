@@ -11,6 +11,10 @@
 	#include <lauxlib.h>
 #endif
 
+/*	Lua 5.1 doesn't have lua_len(), but instead lua_objlen() */
+#if !defined(lua_len)
+	#define lua_len lua_objlen
+#endif
 
 /* In nush.c */
 extern long long microseconds();
