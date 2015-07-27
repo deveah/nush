@@ -197,6 +197,7 @@ static int curses_init( lua_State *L )
 static void exit_curses()
 {
 	if ( curses_running ) {
+		curs_set( 1 );
 		/* clear and refresh needed for pdcurses */
 		clear();
 		refresh();
@@ -739,8 +740,12 @@ int main( int argc, char **argv )
 		r = luaL_dofile( L, argv[1] );
 	}
 
+	log_printf("Shutting down.");
 	if( curses_running )
+	{
+		log_printf("Unclean exit, exiting curses");
 		exit_curses();
+	}
 
 	/* This should only happen when the error handler throws an error */
 	if( r )

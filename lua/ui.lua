@@ -590,7 +590,6 @@ function UI:drawTitleScreen()
 	curses.cursor(1)
 	curses.move(10, 11)
 	local name = curses.getstr()
-	curses.cursor(0)
 
 	if name == "" then
 		return Global.defaultName
