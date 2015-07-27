@@ -1,6 +1,6 @@
 
 CC = gcc
-CFLAGS = -Wall -Wextra -g
+CFLAGS = -Wall -Wextra -g -O1
 # Whether to link with cursew for unicode support
 CURSESW = 1
 ifeq ($(OS),Windows_NT)

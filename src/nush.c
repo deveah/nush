@@ -52,24 +52,22 @@ int num_interrupts = 0;
 
 /******************************** Utility Functions *************************/
 
-/* milliseconds since some arbitrary reference point */
+/* microseconds since some arbitrary reference point */
+long long microseconds() {
 #ifdef __WIN32
-long long milliseconds() {
 	FILETIME systime;
 	GetSystemTimeAsFileTime( &systime );
 	return (((long long)systime.dwHighDateTime << 32)
-		+ systime.dwLowDateTime) / 10000LL;
-}
+		+ systime.dwLowDateTime) / 10LL;
 #else
-long long milliseconds() {
 	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
-}
+	gettimeofday( &tv, NULL );
+	return tv.tv_sec * 1000000LL + tv.tv_usec;
 #endif
+}
 
 /* Logs to the same file as Log:write() */
-static void log_printf( char *fmt, ... )
+void log_printf( char *fmt, ... )
 {
 	FILE *file = fopen( LOGFILE, "a" );
 	if ( !file )
