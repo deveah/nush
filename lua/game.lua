@@ -207,6 +207,13 @@ function Game:loop()
 				currentActor.actionPoints = currentActor.actionPoints - currentActor:act()
 			end
 
+			--	The sightMap may be out of date as soon as the next actor acts;
+			--	Game.player.sightMapStale is set when this happens but other actors
+			--	aren't tracked, so be cautious!
+			if currentActor ~= Game.player then
+				currentActor.sightMapStale = true
+			end
+
 			--	if something triggered a game halt, cancel the rest of the actions
 			--	of the remaining actors
 			if not self.running then

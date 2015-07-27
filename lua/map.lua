@@ -171,6 +171,14 @@ function Map:findRandomEmptySpace()
 	return x, y
 end
 
+--	Map:markChanged() - Call to indicate that the map has been changed
+--	and therefore FoVs may be out of date.
+function Map:markChanged()
+	if self == Game.player.map then
+		Game.player.sightMapStale = true
+	end
+end
+
 --------------------------------- Map generation -----------------------------
 
 --	Map:generateDummy() - generates a dummy map filled with floor tiles, and

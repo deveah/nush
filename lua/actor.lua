@@ -14,8 +14,9 @@
 --	                      direction the player is moving in a straight line
 --	* runStartX, runStartY  (integers, optional)
 --	                    - (player only) From where running started
---	*	sightMap (2D boolean table) - a map showing the tiles
---	                      currently visible to the actor
+--	* sightMap (2D bool table) - a map showing the tiles visible to the actor.
+--	                      Computed at the start of a turn, stale after acting!
+--	* sightMapStale (bool) - True if sightMap may be out of date.
 --	* sightRange (int)  - Number of tiles the actor can see
 --	* inventory (table) - Mapping from inventory slot (letter) to Items
 --	* equipment (table) - Mapping from equipment slot to Items.
@@ -63,6 +64,7 @@ function Actor:new()
 	a.actionPoints = 0
 	a.agility = 10
 
+	a.sightMapStale = true
 	a.sightMap = {}
 	for i = 1, Global.mapWidth do
 		a.sightMap[i] = {}
@@ -140,8 +142,8 @@ function Actor:setPosition(x, y)
 		end
 	end
 
-	--	each repositioning triggers the recalculation of the sight map
-	self:updateSight()
+	--	each repositioning means the sight map is out of date
+	self.sightMapStale = true
 end
 
 --	Actor:setHp() - sets the hp of a given actor; returns nothing
@@ -160,8 +162,12 @@ function Actor:addExperience(val)
 	end
 end
 
---	Actor:visible() - returns whether this actor is visible to the player
+--	Actor:visible() - returns whether this actor is visible to the player.
 function Actor:visible()
+	--	Recompute player sightMap as needed
+	if Game.player.sightMapStale then
+		Game.player:updateSight()
+	end
 	return self.map == Game.player.map and Game.player.sightMap[self.x][self.y]
 end
 
@@ -455,6 +461,7 @@ function Actor:updateSight()
 		end
 	end
 
+	self.sightMapStale = false
 	Log:write("Sight map calculated for ", self)
 end
 
@@ -745,7 +752,7 @@ function Actor:takeStairs()
 			UI:message("You descend the stairs.")
 		end
 		self.map = self.map.tile[self.x][self.y]["destination-map"]
-		self:updateSight()	-- force update of sight map
+		self.sightMapStale = true
 		return Global.actionCost.takeStairs
 	end
 
@@ -755,7 +762,7 @@ function Actor:takeStairs()
 			UI:message("You ascend the stairs.")
 		end
 		self.map = self.map.tile[self.x][self.y]["destination-map"]
-		self:updateSight()	-- force update of sight map
+		self.sightMapStale = true
 		return Global.actionCost.takeStairs
 	end
 
@@ -848,6 +855,12 @@ end
 --	dispatches the reasoning to the AI functions; returns true or false,
 --	depending on whether or not the turn was spent
 function Actor:act()
+	--	Update field of view at beginning of turn (assuming actors on other maps
+	--	don't act)
+	if self.map == Game.player.map and self.sightMapStale then
+		self:updateSight()
+	end
+
 	if self == Game.player then
 		--	the actor is player controlled, so first inform the player of the
 		--	current state of the game, even if running (redrawing the screen for
@@ -868,6 +881,7 @@ function Actor:act()
 	else
 		--	the actor is not player-controlled, so let the AI functions take over
 		--	(not implemented, so return that the turn was successfully spent)
+
 		return 10
 	end
 end
@@ -1074,6 +1088,9 @@ function Actor:handleKey(key)
 				Game.player.sightMap[i][j] = true
 			end
 		end
+		-- UI:drawScreen()
+		-- curses.getch()
+		-- Game.player.sightMapStale = true
 		return 0	-- no time taken.
 	end
 
@@ -1127,8 +1144,9 @@ function Actor:openDoor(x, y)
 
 	self.map.tile[x][y] = Tile.openDoor
 
-	--	force the update of the field of view
-	self:updateSight()
+	--	the field of view may change
+	self.map:markChanged()
+	self.sightMapStale = true
 
 	--	the action has been completed successfully
 	return Global.actionCost.openDoor
@@ -1156,8 +1174,9 @@ function Actor:closeDoor(x, y)
 
 	self.map.tile[x][y] = Tile.closedDoor
 
-	--	force the update of the field of view
-	self:updateSight()
+	--	the field of view may change
+	self.map:markChanged()
+	self.sightMapStale = true
 
 	--	the action has been completed successfully
 	return Global.actionCost.closeDoor
