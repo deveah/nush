@@ -1077,6 +1077,11 @@ function Actor:handleKey(key)
 		return 0	-- no time taken.
 	end
 
+	--	Show distance to the player
+	if key == "%" then
+		UI:drawDijkstraMap()
+	end
+
 	--	teleport player to next/previous map
 	if key == ")" then
 		UI:message("{{red}}(DEBUG) Teleported to next level.")

@@ -5,18 +5,6 @@
 	#define _XOPEN_SOURCE_EXTENDED 1
 #endif
 
-#ifdef USE_LUAJIT
-	#include <luajit-2.0/lua.h>
-	#include <luajit-2.0/lualib.h>
-	#include <luajit-2.0/lauxlib.h>
-#endif
-
-#if defined(USE_LUA52) || defined(USE_LUA51)
-	#include <lua.h>
-	#include <lualib.h>
-	#include <lauxlib.h>
-#endif
-
 #ifdef __WIN32
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
@@ -39,6 +27,8 @@
 	/* bool defined by PDcurses */
 	#include <stdbool.h>
 #endif
+
+#include "nush.h"
 
 #define ERROR_STRING 		"Error: %s"
 #define MAX_STRING_LENGTH 	80
@@ -588,7 +578,49 @@ static int clib_sleep( lua_State *L )
    unlike lua's os.time() which has seconds precision. */
 static int clib_time( lua_State *L )
 {
-	lua_pushnumber( L, 1e-3 * milliseconds() );
+	lua_pushnumber( L, 1e-6 * microseconds() );
+
+	return 1;
+}
+
+/* clib.dijkstraMap(tiles, x, y, maxcost) - Given a 2D grid of Tiles, return a
+   2D grid of ints giving the distance from (x,y) to every tile < maxcost away.
+   Unreached tiles have the value maxcost. */
+static int clib_dijkstramap( lua_State *L )
+{
+	long long spent_us = microseconds();
+
+	int tiles_index = 1; /* first arg */
+	luaL_checktype( L, tiles_index, LUA_TTABLE );
+
+	/* Find map width and height */
+	lua_len( L, tiles_index );
+	int w = lua_tointeger( L, -1 );  /* w = #tiles */
+	lua_rawgeti( L, tiles_index, 1); /* tiles[1] */
+	luaL_checktype( L, -1, LUA_TTABLE );
+	lua_len( L, -1 );
+	int h = lua_tointeger( L, -1 );  /* h = #tiles[1] */
+	lua_pop( L, 3 );
+	if ( h > 255 || w > 255 )
+		luaL_error( L, "maps larger than 255*255 are unsupported" );
+
+	int x = luaL_checkint( L, 2 );
+	int y = luaL_checkint( L, 3 );
+	int maxcost = luaL_checkint( L, 4 );
+
+	/* Member of Tile used for cost of a tile,
+	   which should be either a bool or int */
+	lua_pushstring( L, "solid" );
+	int key_index = lua_gettop( L );
+
+	LuaMap *map = LuaMap_new( tiles_index, w, h, key_index, 0 );
+	LuaMap *dijkstra = compute_dijkstra_map( map, x, y, maxcost );
+	LuaMap_push( dijkstra );
+	LuaMap_free( dijkstra );
+	LuaMap_free( map );
+
+	spent_us = microseconds() - spent_us;
+	log_printf("dijkstraMap done in %fs", spent_us * 1e-6);
 
 	return 1;
 }
@@ -597,8 +629,13 @@ static int clib_time( lua_State *L )
 luaL_Reg clib[] = {
 	{	"sleep",		clib_sleep },
 	{	"time",			clib_time },
+	{	"dijkstraMap",		clib_dijkstramap },
 	{	NULL,			NULL }
 };
+
+
+/************************************ main() ********************************/
+
 
 /*
 static void lstop( lua_State *L, lua_Debug *ar ) {
@@ -607,9 +644,6 @@ static void lstop( lua_State *L, lua_Debug *ar ) {
 	luaL_error( L, "interrupted!" );
 }
 */
-
-
-/************************************ main() ********************************/
 
 #ifndef __WIN32
 void interrupt_handler( int i )

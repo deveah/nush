@@ -16,7 +16,7 @@ LUA52_LIBS = -llua
 LUA51_LIBS = -llua
 LUAJIT_LIBS = -lluajit-5.1
 
-SOURCE = src/nush.c
+SOURCE = src/nush.c src/pathing.c
 EXECUTABLE = nush
 KEYTEST_EXE = keytest
 
