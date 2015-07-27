@@ -964,14 +964,8 @@ function UI:examineScreen()
 		if k == "B" then xOff, yOff = -6,  6 end
 		if k == "N" then xOff, yOff =  6,  6 end
 		if (xOff or yOff) then
-			if Game.player.map:isInBounds(cursorX + xOff, cursorY + yOff) then
-				cursorX = cursorX + xOff
-				cursorY = cursorY + yOff
-			else
-				--	move the cursor to the edge of the map
-				cursorX = Util.clamp(cursorX + xOff, 1, Global.mapWidth)
-				cursorY = Util.clamp(cursorY + yOff, 1, Global.mapHeight)
-			end
+			cursorX = Util.clamp(cursorX + xOff, 1, Global.mapWidth)
+			cursorY = Util.clamp(cursorY + yOff, 1, Global.mapHeight)
 		end
 	end
 end
