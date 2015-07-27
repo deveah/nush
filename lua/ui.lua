@@ -884,9 +884,17 @@ function UI:examineScreen()
 
 			local actor = Game.player.map:isOccupied(cursorX, cursorY)
 			if actor then
+				local healthStatus
+				if actor.hp == actor.maxHp then
+					healthStatus = " ({{green}}healthy{{pop}})"
+				elseif actor.hp <= math.max(1, actor.maxHp / 4) then
+					healthStatus = " ({{red}}nearly dead{{pop}})"
+				else
+					healthStatus = " (damaged)"
+				end
 				curses.attr(actor.color)
 				curses.write(dialogX + 2, dialogY + 3, actor.face)
-				self:colorWrite(dialogX + 4, dialogY + 3, actor.name)
+				self:colorWrite(dialogX + 4, dialogY + 3, actor.name .. healthStatus)
 			end
 
 			local items = Game.player.map:itemsAtTile(cursorX, cursorY)
