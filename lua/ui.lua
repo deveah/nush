@@ -898,7 +898,7 @@ function UI:examineScreen()
 		curses.attr(curses.WHITE)
 		curses.box(30, 10)
 		self:colorWrite(dialogX + 10, dialogY, "{{WHITE}} Examine ")
-		self:colorWrite(dialogX + 1, dialogY + 9, " {{cyan}}ESC{{pop}} exit {{cyan}}TAB{{pop}} cycle ")
+		self:colorWrite(dialogX + 1, dialogY + 9, " {{cyan}}Move keys{{pop}} move {{cyan}}TAB{{pop}} cycle ")
 
 		if Game.player.sightMap[cursorX][cursorY] then
 			local tile = Game.player.map.tile[cursorX][cursorY]
@@ -965,10 +965,8 @@ function UI:examineScreen()
 
 		local k = curses.getch()
 		
-		--	exit examination mode
-		if k == "escape" then
-			running = false
-		end
+		--	exit examination mode on unrecognised key
+		running = false
 
 		--	cycle through visible actors and items
 		if k == "\t" then
@@ -976,6 +974,7 @@ function UI:examineScreen()
 			local currentObject = visibleObjects[currentObjectIdx]
 			cursorX = currentObject.x
 			cursorY = currentObject.y
+			running = true
 		end
 
 		--	movement
@@ -983,10 +982,11 @@ function UI:examineScreen()
 		if dir and Game.player.map:isInBounds(cursorX + xOff, cursorY + yOff) then
 			cursorX = cursorX + xOff
 			cursorY = cursorY + yOff
+			running = true
 		end
 
 		--	jump movement
-		xOff, yOff = 0, 0
+		xOff, yOff = nil, nil
 		if k == "H" then xOff, yOff = -6,  0 end
 		if k == "J" then xOff, yOff =  0,  6 end
 		if k == "K" then xOff, yOff =  0, -6 end
@@ -998,6 +998,7 @@ function UI:examineScreen()
 		if (xOff or yOff) then
 			cursorX = Util.clamp(cursorX + xOff, 1, Global.mapWidth)
 			cursorY = Util.clamp(cursorY + yOff, 1, Global.mapHeight)
+			running = true
 		end
 	end
 end

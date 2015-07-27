@@ -20,11 +20,13 @@ Move onto an enemy to perform a melee attack, or onto a closed door
 to open it. Opening a locked door requires a matching key.
 
        `/' - Followed by direction: move in straight line until hitting a wall
+     `Tab' - Examine a the map. Movement keys to select a tile, Tab to cycle
+           through enemies and items, HJKLYUBN to move 6 tiles at a time.
        `f' - Fire weapon
   `<' or `>' - Ascend/descend stairs
   `g' or `,' - Pick up items
        `c' - Close door
-			 `p' - Pick locked door
+       `p' - Pick locked door
        `i' - Inventory
 `Q' or `Esc' - Quit
        `P' - Show message log
