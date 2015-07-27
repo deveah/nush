@@ -932,10 +932,13 @@ function UI:examineScreen()
 		curses.cursor(1)
 
 		local k = curses.getch()
+		
+		--	exit examination mode
 		if k == "escape" then
 			running = false
 		end
 
+		--	cycle through visible actors and items
 		if k == "\t" then
 			currentObjectIdx = (currentObjectIdx + 1) % (#visibleObjects + 1)
 			local currentObject = visibleObjects[currentObjectIdx]
@@ -943,10 +946,32 @@ function UI:examineScreen()
 			cursorY = currentObject.y
 		end
 
+		--	movement
 		local dir, xOff, yOff = UI:directionFromKey(k)
 		if dir and Game.player.map:isInBounds(cursorX + xOff, cursorY + yOff) then
 			cursorX = cursorX + xOff
 			cursorY = cursorY + yOff
+		end
+
+		--	jump movement
+		xOff, yOff = 0, 0
+		if k == "H" then xOff, yOff = -6,  0 end
+		if k == "J" then xOff, yOff =  0,  6 end
+		if k == "K" then xOff, yOff =  0, -6 end
+		if k == "L" then xOff, yOff =  6,  0 end
+		if k == "Y" then xOff, yOff = -6, -6 end
+		if k == "U" then xOff, yOff =  6, -6 end
+		if k == "B" then xOff, yOff = -6,  6 end
+		if k == "N" then xOff, yOff =  6,  6 end
+		if (xOff or yOff) then
+			if Game.player.map:isInBounds(cursorX + xOff, cursorY + yOff) then
+				cursorX = cursorX + xOff
+				cursorY = cursorY + yOff
+			else
+				--	move the cursor to the edge of the map
+				cursorX = Util.clamp(cursorX + xOff, 1, Global.mapWidth)
+				cursorY = Util.clamp(cursorY + yOff, 1, Global.mapHeight)
+			end
 		end
 	end
 end
