@@ -593,13 +593,10 @@ static int clib_dijkstramap( lua_State *L )
 	luaL_checktype( L, tiles_index, LUA_TTABLE );
 
 	/* Find map width and height */
-	lua_len( L, tiles_index );
-	int w = lua_tointeger( L, -1 );  /* w = #tiles */
+	int w = lua_xlen( L, tiles_index );
 	lua_rawgeti( L, tiles_index, 1); /* tiles[1] */
 	luaL_checktype( L, -1, LUA_TTABLE );
-	lua_len( L, -1 );
-	int h = lua_tointeger( L, -1 );  /* h = #tiles[1] */
-	lua_pop( L, 3 );
+	int h = lua_xlen( L, -1 );
 	if ( h > 255 || w > 255 )
 		luaL_error( L, "maps larger than 255*255 are unsupported" );
 

@@ -12,8 +12,10 @@
 #endif
 
 /*	Lua 5.1 doesn't have lua_len(), but instead lua_objlen() */
-#if !defined(lua_len)
-	#define lua_len lua_objlen
+#if !defined(lua_rawlen)
+	#define lua_xlen lua_objlen
+#else
+	#define lua_xlen lua_rawlen
 #endif
 
 /* In nush.c */
