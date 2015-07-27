@@ -11,11 +11,9 @@
 	#include <lauxlib.h>
 #endif
 
-/*	Lua 5.1 doesn't have lua_len(), but instead lua_objlen() */
-#if !defined(lua_rawlen)
-	#define lua_xlen lua_objlen
-#else
-	#define lua_xlen lua_rawlen
+/*	Lua 5.1 doesn't have lua_rawlen(), but instead lua_objlen() */
+#if LUA_VERSION_NUM < 502
+	#define lua_rawlen lua_objlen
 #endif
 
 /* In nush.c */
