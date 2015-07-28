@@ -212,5 +212,26 @@ Tile.brokenMachinery = {
 	["opaque"] = false
 }
 
+Tile.alarmTrap = {
+	["name"] = "Alarm trap",
+	["face"] = "^",
+	["color"] = curses.WHITE,
+	["solid"] = false,
+	["opaque"] = false,
+	["on-walk"] = function(actor)
+		--	only the player can trigger traps
+		if actor ~= Game.player then
+			return
+		end
+		--	alert all enemies (which are on the same map as the player) of the player's location
+		for _, enemy in pairs(Game.actorList) do
+			if enemy ~= Game.player and enemy.map == Game.player.map then
+				enemy.aiState = "chase"
+			end
+		end
+		UI:message("{{RED}}You hear a loud alarming sound! You have triggered a trap!")
+	end
+}
+
 return Tile
 

@@ -74,8 +74,10 @@ function Game:start()
 		elseif levelType < 0.8 then
 			map:generateRoomsAndCorridors(15, 4, 5)
 			map:spawnMachinery(20, 0.1)
+			map:spawnTraps(2)
 		else
 			map:generateBSP()
+			map:spawnTraps(2)
 		end
 		self:addMap(map)
 

@@ -694,6 +694,21 @@ function Map:spawnPatchesOfGrass(nPatches, chanceToSpread)
 	end
 end
 
+--	Map:spawnTraps() - spawns a given number of traps on the given map;
+--	does not return anything
+function Map:spawnTraps(nTraps)
+	for i = 1, nTraps do
+		local x, y
+		repeat
+			x = math.random(1, Global.mapWidth)
+			y = math.random(1, Global.mapHeight)
+		until self.tile[x][y] == Tile.roomFloor
+
+		self.tile[x][y] = Tile.alarmTrap
+	end
+end
+
+--	TODO: document, add parameters
 function Map:generateBSP()
 	local rooms = {}
 	local doors = {}
