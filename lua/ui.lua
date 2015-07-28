@@ -165,7 +165,7 @@ function UI:drawDijkstraMap()
 			local dist = dists[x][y]
 			if dist < maxcost then
 				curses.attr(cols[math.min(#cols, math.floor(dist/10 + 1))])
-				curses.write(x + xOffset, y + yOffset, tostring(dist % 10))
+				curses.write(x + xOffset, y + yOffset, string.format("%d", dist % 10))
 			end
 		end
 	end

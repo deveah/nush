@@ -601,9 +601,9 @@ static int clib_dijkstramap( lua_State *L )
 	if ( h > 255 || w > 255 )
 		luaL_error( L, "maps larger than 255*255 are unsupported" );
 
-	int x = luaL_checkint( L, 2 );
-	int y = luaL_checkint( L, 3 );
-	int maxcost = luaL_checkint( L, 4 );
+	int x = luaL_checkinteger( L, 2 );
+	int y = luaL_checkinteger( L, 3 );
+	int maxcost = luaL_checkinteger( L, 4 );
 
 	/* Member of Tile used for cost of a tile,
 	   which should be either a bool or int */
