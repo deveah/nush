@@ -50,6 +50,7 @@ Actordefs.Player = defineActor(Actordefs.Humanoid, {
 		lockpick = 0,
 	},
 	aiState = nil,
+	agility = 10,
 })
 
 Actordefs.Savage = defineActor(Actordefs.Humanoid, {
@@ -64,6 +65,14 @@ Actordefs.SavageChief = defineActor(Actordefs.Humanoid, {
 	color = curses.RED,
 	hp = 5,
 	maxHp = 5,
+})
+
+Actordefs.SavageShaman = defineActor(Actordefs.Humanoid, {
+	name = "Savage Shaman",
+	color = curses.green,
+	hp = 5,
+	maxHp = 5,
+	agility = 6
 })
 
 return Actordefs

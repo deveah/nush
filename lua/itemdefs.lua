@@ -216,6 +216,12 @@ Itemdefs["Savage Chief corpse"] = defineItem(Itemdefs.Corpse, {
 	color = curses.red,
 })
 
+Itemdefs["Savage Shaman corpse"] = defineItem(Itemdefs.Corpse, {
+	name = "Savage Shaman corpse",
+	info = "The remaining carcass of a once living Savage Shaman.",
+	color = curses.red
+})
+
 -------------------------------------- Ammo -----------------------------------
 
 Itemdefs.Ammo = defineItem(Itemdefs.BaseItem, {

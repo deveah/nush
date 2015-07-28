@@ -89,10 +89,13 @@ function Game:start()
 		Log:write("Populating level " .. i .. " of the dungeon...")
 		for j = 1, 20 do
 			local actor
-			if math.random() < 0.9 then
+			local wh = math.random()
+			if wh < 0.7 then
 				actor = Actordefs.Savage:new()
-			else
+			elseif wh < 0.9 then
 				actor = Actordefs.SavageChief:new()
+			else
+				actor = Actordefs.SavageShaman:new()
 			end
 			self:addActor(actor)
 			actor:setMap(map)
