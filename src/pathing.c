@@ -9,9 +9,9 @@
 
 /* Dijkstra/A* node */
 typedef struct {
-	short f;   /* sorted by */
-	short g, h;
-	unsigned char x, y;  /* Count from 1! */
+	disttype f;   /* sorted by */
+	disttype g;
+	unsigned short x, y;  /* Count from 1! */
 } Node;
 
 
@@ -117,20 +117,20 @@ void PQueue_push(PQueue *pq, Qelem element)
    caching previous results. */
 
 
-#define CMAP_UNCACHED_TILE -42424242
+#define CMAP_UNCACHED_TILE -424242.
 
 /* See struct LuaMap for arg meanings.
    tiles_index: may be 0 to create a 2D grid, otherwise a lua stack index.
    cost_key:    0 if tiles_index is 0.
    initval: all tiles initialised to this value if tiles_index==0. */
-LuaMap *LuaMap_new(int tiles_index, int w, int h, int cost_key, int initval)
+LuaMap *LuaMap_new(int tiles_index, int w, int h, int cost_key, disttype initval)
 {
 	LuaMap *map = malloc(sizeof(LuaMap));
 	map->tiles_index = tiles_index;
 	map->cost_key = cost_key;
 	map->w = w;
 	map->h = h;
-	map->tiles = malloc(sizeof(int) * (w + 1) * (h + 1));
+	map->tiles = malloc(sizeof(disttype) * (w + 1) * (h + 1));
 	/* Tiles are uncached only if there's a table to read from */
 	int i;
 	for (i = 0; i < (w+1)*(h+1); i++)
@@ -145,7 +145,7 @@ void LuaMap_free(LuaMap *map)
 
 int LuaMap_read(LuaMap *map, int x, int y)
 {
-	int *tile = &map->tiles[(x - 1) + (y - 1) * map->w];
+	disttype *tile = &map->tiles[(x - 1) + (y - 1) * map->w];
 	if (*tile != CMAP_UNCACHED_TILE)
 		return *tile;
 	if (!map->tiles_index)
@@ -163,13 +163,13 @@ int LuaMap_read(LuaMap *map, int x, int y)
 			*tile = 1;
 	}
 	else
-		*tile = lua_tointeger( L, -1 );
+		*tile = lua_tonumber( L, -1 );
 	lua_pop( L, 3 );
 
 	return *tile;
 }
 
-void LuaMap_write(LuaMap *map, int x, int y, int value)
+void LuaMap_write(LuaMap *map, int x, int y, disttype value)
 {
 	map->tiles[(x - 1) + (y - 1) * map->w] = value;
 }
@@ -186,7 +186,7 @@ void LuaMap_push(LuaMap *map)
 		lua_createtable(L, map->h, 0);
 		for (y = 1; y <= map->h; y++)
 		{
-			int value = map->tiles[(x - 1) + (y - 1) * map->w];
+			disttype value = map->tiles[(x - 1) + (y - 1) * map->w];
 			if (value == CMAP_UNCACHED_TILE)
 				lua_pushboolean(L, 0);
 			else
@@ -202,12 +202,17 @@ void LuaMap_push(LuaMap *map)
 
 
 /* compute_dijkstra_map internal */
-static void dijvisit(PQueue *pq, LuaMap *map, LuaMap *dists, int x, int y, int cost)
+static void dijvisit(PQueue *pq, LuaMap *map, LuaMap *dists, Node parent, int xoff, int yoff)
 {
+	int x = parent.x + xoff, y = parent.y + yoff;
 	if (x < 1 || x > map->w || y < 1 || y > map->h)
 		return;
 
-	cost += LuaMap_read(map, x, y);
+	disttype cost = parent.f + LuaMap_read(map, x, y);
+	/* Give a slight penalty to diagonal moves, to prevent unnecessary zig-zagging */
+	if (xoff && yoff)
+		cost += 0.001;
+
 	/* Check against best known cost both before and after pushing/popping from PQ */
 	if (cost < LuaMap_read(dists, x, y))
 	{
@@ -220,7 +225,7 @@ static void dijvisit(PQueue *pq, LuaMap *map, LuaMap *dists, int x, int y, int c
 
 /* Computes a LuaMap giving the weighted shortest-path distance from (x,y) to
    every tile up to maxcost cost away. Unreached tiles have the value maxcost. */
-LuaMap *compute_dijkstra_map( LuaMap *map, int x, int y, int maxcost )
+LuaMap *compute_dijkstra_map( LuaMap *map, int x, int y, disttype maxcost )
 {
 	PQueue *pq = PQueue_new();
 	LuaMap *dists = LuaMap_new(0, map->w, map->h, 0, maxcost);
@@ -244,7 +249,7 @@ LuaMap *compute_dijkstra_map( LuaMap *map, int x, int y, int maxcost )
 			for (yoff = -1; yoff <= 1; yoff++)
 			{
 				if (xoff || yoff)
-					dijvisit(pq, map, dists, node.x + xoff, node.y + yoff, node.f);
+					dijvisit(pq, map, dists, node, xoff, yoff);
 			}
 		}
 	}
