@@ -1219,7 +1219,7 @@ function Actor:unlockDoor(x, y)
 				self.map.tile[x][y].locked .. "{{pop}} keycard.")
 		end
 		self.map.tile[x][y] = Tile.openDoor
-		return Game.actionCost.unlockDoor
+		return Global.actionCost.unlockDoor
 	else
 		if self == Game.player then
 			UI:message("The door requires a `" .. self.map.tile[x][y].locked .. "' keycard, which you do not have.")
