@@ -48,6 +48,7 @@ Actordefs.Player = defineActor(Actordefs.Humanoid, {
 		melee = 0,
 		handguns = 0,
 		lockpick = 0,
+		stealth = 0,
 	},
 	aiState = nil,
 	agility = 10,

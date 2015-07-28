@@ -819,6 +819,7 @@ function UI:playerScreen()
 	table.insert(text, "     melee: " .. Game.player.skills.melee)
 	table.insert(text, "  handguns: " .. Game.player.skills.handguns)
 	table.insert(text, "  lockpick: " .. Game.player.skills.lockpick)
+	table.insert(text, "   stealth: " .. Game.player.skills.stealth)
 
 	UI:scrollableTextScreen("Player info", text, false)
 end
@@ -836,7 +837,8 @@ function UI:skillPointScreen()
 				"You may upgrade the following skills:\n" ..
 				"[{{YELLOW}}a{{pop}}] melee (" .. Game.player.skills.melee .. ")\n" ..
 				"[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.skills.handguns .. ")\n" ..
-				"[{{YELLOW}}c{{pop}}] lockpick (" .. Game.player.skills.lockpick .. ")"
+				"[{{YELLOW}}c{{pop}}] lockpick (" .. Game.player.skills.lockpick .. ")\n" ..
+				"[{{YELLOW}}d{{pop}}] stealth (" .. Game.player.skills.stealth .. ")"
 		end
 
 		self:drawScreen()
@@ -859,18 +861,26 @@ function UI:skillPointScreen()
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
+		--	upgrade handguns
 		if canUpgrade and key == "b" then
 			Game.player.skills.handguns = Game.player.skills.handguns + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
+		--	upgrade lockpick
 		if canUpgrade and key == "c" then
 			Game.player.skills.lockpick = Game.player.skills.lockpick + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
+		--	upgrade stealth
+		if canUpgrade and key == "d" then
+			Game.player.skills.stealth = Game.player.skills.stealth + 1
+			Game.player.spendableExperience = Game.player.spendableExperience - 1
+		end
+
 		--	Exit if not a letter in the range of skill keys
-		if not (#key == 1 and "a" <= key and key <= "c") then
+		if not (#key == 1 and "a" <= key and key <= "d") then
 			break
 		end
 	end

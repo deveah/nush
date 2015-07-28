@@ -612,6 +612,13 @@ function Actor:meleeAttack(defender)
 	if not weapon then
 		weapon = Itemdefs.Fists
 	end
+
+	--	even though the player may have been undetected until now, a melee attack
+	--	makes the enemy notice the player
+	if self == Game.player and defender ~= Game.player then
+		defender.aiState = "chase"
+	end
+
 	self:doAttack(defender, weapon, false)
 	return Global.actionCost.meleeAttack
 end
@@ -1283,8 +1290,10 @@ function Actor:aiAct()
 	end
 
 	if self.aiState == "wait" then
-		--	Activate when it sees the player
-		if self.sightMap[Game.player.x][Game.player.y] then
+		--	Activate when it sees the player;
+		--	the 'stealth' skill decides whether the player makes him/herself visible
+		if		self.sightMap[Game.player.x][Game.player.y]
+			and (Game.player.skills.stealth / 10) < math.random() then
 			self.aiState = "chase"
 		else
 			return Global.actionCost.wait
