@@ -3,8 +3,12 @@ High Priority:
 	* actor stats
 	* enemy AI
 	* winning condition and endgame
+	* symmetric field of view
+	* traps - when enemies are alerted, but have no path towards the player,
+	  they seem to move randomly (?)
 
 Low Priority:
 	* concatenate messages within the same turn into one big message
 	* diversify loot
 	* fixed dungeon structure?
+	* AI with different intelligence - for example, humanoid enemies may open doors
