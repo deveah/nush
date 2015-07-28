@@ -25,6 +25,9 @@ Actordefs.BaseActor = defineActor(Actor, {
 	name = "",
 	face = "",
 	color = curses.white,
+	aiState = "wait",
+	agility = 10,
+	sightRange = 5,
 })
 
 ----------------------------------- Humanoids ---------------------------------
@@ -46,6 +49,7 @@ Actordefs.Player = defineActor(Actordefs.Humanoid, {
 		handguns = 0,
 		lockpick = 0,
 	},
+	aiState = nil,
 })
 
 Actordefs.Savage = defineActor(Actordefs.Humanoid, {

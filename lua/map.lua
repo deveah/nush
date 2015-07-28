@@ -171,11 +171,12 @@ function Map:findRandomEmptySpace()
 	return x, y
 end
 
---	Map:markChanged() - Call to indicate that the map has been changed
---	and therefore FoVs may be out of date.
+--	Map:markChanged() - Must be called after the map has been changed (e.g. a
+--	door opened) and therefore FoVs may be out of date.
 function Map:markChanged()
 	if self == Game.player.map then
 		Game.player.sightMapStale = true
+		Game.playerDistMap = nil
 	end
 end
 

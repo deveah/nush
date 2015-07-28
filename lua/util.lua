@@ -159,6 +159,16 @@ function Util.seqRemove(seq, item)
 	return true
 end
 
+--	Util.seqShuffle() - randomly shuffle a sequence inplace and returns it
+function Util.seqShuffle(seq)
+	local len = #seq
+	for i = 1, len - 1 do
+		local j = math.random(i, len)
+		seq[i], seq[j] = seq[j], seq[i]
+	end
+	return seq
+end
+
 --	Util.tableFind() - Search for a value in a table, returning its key if
 --	found, otherwise nil.
 function Util.tableFind(tbl, value)

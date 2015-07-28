@@ -300,4 +300,15 @@ function Game:halt(reason)
 	self.running = false
 end
 
+--	Game:getPlayerDistMap() - return a cached 2D map of distances in tiles from
+--	the player.
+function Game:getPlayerDistMap()
+	if not self.playerDistMap then
+		self.playerDistMap =
+			clib.dijkstraMap(Game.player.map.tile, Game.player.x, Game.player.y, 999)
+	end
+	return self.playerDistMap
+end
+
+
 return Game

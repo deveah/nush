@@ -17,6 +17,7 @@
 --	* sightMap (2D bool table) - a map showing the tiles visible to the actor.
 --	                      Computed at the start of a turn, stale after acting!
 --	* sightMapStale (bool) - True if sightMap may be out of date.
+--	* aiState (any?)    - (nonplayer only) Indicates current state of AI
 --	* sightRange (int)  - Number of tiles the actor can see
 --	* inventory (table) - Mapping from inventory slot (letter) to Items
 --	* equipment (table) - Mapping from equipment slot to Items.
@@ -60,9 +61,7 @@ function Actor:new()
 	a.alive = true
 	a.inventory = {}
 	a.equipment = {}
-	a.sightRange = 5
 	a.actionPoints = 0
-	a.agility = 10
 
 	a.sightMapStale = true
 	a.sightMap = {}
@@ -111,6 +110,13 @@ function Actor:setMap(map)
 	Log:write(self, " has been placed on ", map, ".")
 
 	self.map = map
+
+	self.sightMapStale = true
+
+	--	when the player moves the player distance map becomes stale
+	if self == Game.player then
+		Game.playerDistMap = nil
+	end
 end
 
 --	Actor:setPosition() - sets the (x, y) position of the given Actor object;
@@ -120,6 +126,13 @@ function Actor:setPosition(x, y)
 
 	self.x = x
 	self.y = y
+
+	self.sightMapStale = true
+
+	--	when the player moves the player distance map becomes stale
+	if self == Game.player then
+		Game.playerDistMap = nil
+	end
 
 	--	some tiles may trigger special events when being walked on
 	local f = self.map.tile[self.x][self.y]["on-walk"]
@@ -141,9 +154,6 @@ function Actor:setPosition(x, y)
 			UI:message("You see here " .. itemlist .. ".")
 		end
 	end
-
-	--	each repositioning means the sight map is out of date
-	self.sightMapStale = true
 end
 
 --	Actor:setHp() - sets the hp of a given actor; returns nothing
@@ -210,7 +220,7 @@ function Actor:takeDamage(attacker, quantity, reason)
 	end
 end
 
------------------------------------ Inventory --------------------------------
+--------------------------- Inventory and equipment --------------------------
 
 
 --	list of all inventory slots
@@ -751,8 +761,7 @@ function Actor:takeStairs()
 		if self == Game.player then
 			UI:message("You descend the stairs.")
 		end
-		self.map = self.map.tile[self.x][self.y]["destination-map"]
-		self.sightMapStale = true
+		self:setMap(self.map.tile[self.x][self.y]["destination-map"])
 		return Global.actionCost.takeStairs
 	end
 
@@ -761,8 +770,7 @@ function Actor:takeStairs()
 		if self == Game.player then
 			UI:message("You ascend the stairs.")
 		end
-		self.map = self.map.tile[self.x][self.y]["destination-map"]
-		self.sightMapStale = true
+		self:setMap(self.map.tile[self.x][self.y]["destination-map"])
 		return Global.actionCost.takeStairs
 	end
 
@@ -837,7 +845,7 @@ function Actor:straightMovement()
 	--	open doors, attack enemies, etc.
 	if self:canMoveTo(self.x + dirx, self.y + diry) then
 		local moved = self:move(self.x + dirx, self.y + diry)
-		if moved then
+		if moved ~= 0 then
 			return moved
 		end
 		--	This unexpected failure probably isn't a bug/error
@@ -880,9 +888,7 @@ function Actor:act()
 		end
 	else
 		--	the actor is not player-controlled, so let the AI functions take over
-		--	(not implemented, so return that the turn was successfully spent)
-
-		return 10
+		return (self:aiAct())
 	end
 end
 
@@ -1118,7 +1124,7 @@ end
 --	for debugging); does not return anything
 function Actor:teleportToMap(map)
 	if map then
-		self.map = map
+		self:setMap(map)
 		self:setPosition(map:findRandomEmptySpace())
 	end
 end
@@ -1264,6 +1270,93 @@ function Actor:pickDoor(x, y)
 		end
 		return Global.actionCost.pickDoor
 	end
+end
+
+
+-------------------------------------- AI -------------------------------------
+
+--	Actor:aiAct() - AI player takes a turn. Returns action points spent.
+function Actor:aiAct()
+	--	Wait if not on the player's map
+	if self.map ~= Game.player.map then
+		return Global.actionCost.wait
+	end
+
+	if self.aiState == "wait" then
+		--	Activate when it sees the player
+		if self.sightMap[Game.player.x][Game.player.y] then
+			self.aiState = "chase"
+		else
+			return Global.actionCost.wait
+		end
+	end
+
+	if self.aiState == "chase" then
+		--	Move towards player
+		return (self:aiChase())
+	end
+
+	--	Wait
+	return Global.actionCost.wait
+end
+
+--	Actor:aiChase() - actor AI state which tries to move towards and melee the
+--	player; returns action points spent.
+function Actor:aiChase()
+	local debug = false
+	local distmap = Game:getPlayerDistMap()
+	local currentDist = distmap[self.x][self.y]
+
+	if debug then Log:write(self, " chasing from ", self.x, ",", self.y, " currentDist=", currentDist) end
+
+	--	list of {distance, x, y} tuples
+	local choices = {}
+
+	--	Consider all movement options (including melee attacks, and in future
+	--	opening doors)
+	for dirnum = 0, 7 do
+		local dir = Util.intToDir[dirnum]
+		local xoff, yoff = Util.xyFromDirection(dir)
+		local x, y = self.x + xoff, self.y + yoff
+
+		local canmove = self:canMoveTo(x, y)
+		local dist = distmap[x][y]
+
+		if debug then Log:write("  considering x,y=", x, ",", y, " canmove=", canmove, " dist=", dist) end
+
+		if x == Game.player.x and y == Game.player.y then
+			canmove = true
+		end
+
+		--	Only consider this tile if it doesn't move away from the goal
+		--	but allow equal cost tiles so there is some chance to move around
+		--	other actors blocking the path (this is very crude)
+		if canmove and dist <= currentDist then
+			table.insert(choices, {dist, x, y})
+		end
+	end
+
+	--	Sort choices into ascending order by distance from goal.
+	--	Randomise the list before sorting it so that enemies don't form lines.
+	Util.seqShuffle(choices)
+	table.sort(choices, function(x, y) return x[1] < y[1] end)
+
+	--	Choose the first allowable movement which moves
+	for idx = 1, #choices do
+		local _, x, y = table.unpack(choices[idx])
+
+		--	Double check we won't melee an ally (shouldn't be in choices)
+		local actor = self.map:isOccupied(x, y)
+		if debug then Log:write("  trying x,y=", x, ",", y, " actor=", actor) end
+		if not actor or actor == Game.player then
+			return (self:move(x, y))
+		end
+	end
+
+	if debug then Log:write("  failed") end
+
+	--	Can't find a helpful action, wait.
+	return Global.actionCost.wait
 end
 
 return Actor
