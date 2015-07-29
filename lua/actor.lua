@@ -1328,7 +1328,12 @@ function Actor:aiChase()
 		local xoff, yoff = Util.xyFromDirection(dir)
 		local x, y = self.x + xoff, self.y + yoff
 
-		local canmove = self:canMoveTo(x, y)
+		--	enemies can open closed doors; this is a side effect of lua's conversion
+		--	of numbers to boolean values - the 'solid' attribute of a tile can be
+		--	either a boolean, or a number value; if it's a number, it represents the
+		--	cost of the movement on that tile;
+		--	TODO: don't know if it's the cleanest way to approach this
+		local canmove = self:canMoveTo(x, y) or self.map.tile[x][y] == Tile.closedDoor
 		local dist = distmap[x][y]
 
 		if debug then Log:write("  considering x,y=", x, ",", y, " canmove=", canmove, " dist=", dist) end

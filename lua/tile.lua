@@ -164,7 +164,7 @@ Tile.closedDoor = {
 	["name"] = "Closed door",
 	["face"] = "+",
 	["color"] = curses.white,
-	["solid"] = true,
+	["solid"] = 10,
 	["opaque"] = true,
 	["role"] = "door"
 }
