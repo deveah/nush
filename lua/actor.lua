@@ -372,18 +372,25 @@ function Actor:die(reason)
 	Log:write(self, " has died.")
 	self.alive = false
 
-	--	By default, everything they were carrying is dropped.
-	if self ~= Game.player then
-		for _, item in pairs(self.inventory) do
-			self:dropItem(item)
-		end
-	end
-
 	--	drop a corpse; the player character doesn't drop a corpse
+	--	the corpse is dropped first, so that items belonging to the actor
+	--	will stack above it, to be more easily noticed
 	if self ~= Game.player then
 		local corpse = Itemdefs[self.name .. " corpse"]:new()
 		corpse:setMap(self.map)
 		corpse:setPosition(self.x, self.y)
+	end
+
+	--	By default, everything they were carrying is dropped.
+	if self ~= Game.player then
+		for _, item in pairs(self.inventory) do
+			self:dropItem(item)
+
+			--	items are removed and then reinserted into Game.itemList, to assure
+			--	that they're drawn after the corpse of the slain enemy
+			Util.seqRemove(Game.itemList, item)
+			Game:addItem(item)
+		end
 	end
 
 	--	check if the dead actor is the player, and if so, terminate the game

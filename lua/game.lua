@@ -99,6 +99,9 @@ function Game:start()
 			else
 				actor = Actordefs.SavageShaman:new()
 			end
+			--	savages carry sticks and stones
+			actor:addItem(Itemdefs.Rock:new(math.random(1, 4)))
+			actor:addItem(Itemdefs.Stick:new(math.random(1, 2)))
 			self:addActor(actor)
 			actor:setMap(map)
 			actor:setPosition(map:findRandomEmptySpace())

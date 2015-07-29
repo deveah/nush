@@ -241,4 +241,26 @@ Itemdefs.EnergyCell = defineItem(Itemdefs.Ammo, {
 	color = curses.cyan,
 })
 
+------------------------------------- Misc ------------------------------------
+
+Itemdefs.Rock = defineItem(Itemdefs.BaseItem, {
+	category = "Misc",
+	name = "Rock",
+	info = "A plain rock - nothing of significance.",
+	face = "*",
+	color = curses.yellow,
+	stackable = true,
+	count = 1,
+})
+
+Itemdefs.Stick = defineItem(Itemdefs.BaseItem, {
+	category = "Misc",
+	name = "Stick",
+	info = "A stick made of wood, often used as a tool by savages.",
+	face = "(",
+	color = curses.yellow,
+	stackable = true,
+	count = 1,
+})
+
 return Itemdefs
