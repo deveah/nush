@@ -20,8 +20,7 @@ SOURCE = src/nush.c src/pathing.c
 EXECUTABLE = nush
 KEYTEST_EXE = keytest
 
-all:
-	make lua52
+all:  lua52
 
 lua52:
 	$(CC) $(SOURCE) -o $(EXECUTABLE) $(CURSES_LIBS) $(LUA52_LIBS) $(CFLAGS) -DUSE_LUA52

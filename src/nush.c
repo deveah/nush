@@ -601,6 +601,8 @@ static int clib_dijkstramap( lua_State *L )
 	if ( h > 65535 || w > 65535 )
 		luaL_error( L, "maps larger than 65535*65535 are unsupported" );
 
+	if ( lua_type( L, 2 ) )
+
 	int x = luaL_checkinteger( L, 2 );
 	int y = luaL_checkinteger( L, 3 );
 	double maxcost = luaL_checknumber( L, 4 );
@@ -608,10 +610,10 @@ static int clib_dijkstramap( lua_State *L )
 	/* Member of Tile used for cost of a tile,
 	   which should be either a bool or int */
 	lua_pushstring( L, "solid" );
-	int key_index = lua_gettop( L );
+	int attr_index = lua_gettop( L );
 
-	LuaMap *map = LuaMap_new( tiles_index, w, h, key_index, 0 );
-	LuaMap *dijkstra = compute_dijkstra_map( map, x, y, maxcost );
+	LuaMap *costmap = LuaMap_new( tiles_index, w, h, attr_index, 0 );
+	LuaMap *dijkstra = compute_dijkstra_map( costmap, x, y, maxcost );
 	LuaMap_push( dijkstra );
 	LuaMap_free( dijkstra );
 	LuaMap_free( map );

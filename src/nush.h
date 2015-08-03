@@ -29,13 +29,13 @@ typedef float disttype;
 /* A 2D array of int read from/written to a 2D grid of Tiles */
 typedef struct {
 	int tiles_index;/* index in lua stack of the table which is the Tiles grid */
-	int cost_key;   /* index in stack of string used as key on Tiles to get the cost */
+	int attr_index; /* index in stack of string used as key on Tiles to get the cost */
 	int w, h;
 	disttype *tiles;/* [w+1][h+1] grid of values with nothing stored at x=0 or y=0;
                            set to CMAP_UNCACHED_TILE if hasn't been loaded from lua */
 } LuaMap;
 
-LuaMap *LuaMap_new(int tiles_index, int w, int h, int cost_key, disttype initval);
+LuaMap *LuaMap_new(int tiles_index, int w, int h, int attr_index, disttype initval);
 void LuaMap_free(LuaMap *map);
 void LuaMap_push(LuaMap *map);
 

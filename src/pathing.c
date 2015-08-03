@@ -121,13 +121,13 @@ void PQueue_push(PQueue *pq, Qelem element)
 
 /* See struct LuaMap for arg meanings.
    tiles_index: may be 0 to create a 2D grid, otherwise a lua stack index.
-   cost_key:    0 if tiles_index is 0.
+   attr_index:    ignored if tiles_index is 0.
    initval: all tiles initialised to this value if tiles_index==0. */
-LuaMap *LuaMap_new(int tiles_index, int w, int h, int cost_key, disttype initval)
+LuaMap *LuaMap_new(int tiles_index, int w, int h, int attr_index, disttype initval)
 {
 	LuaMap *map = malloc(sizeof(LuaMap));
 	map->tiles_index = tiles_index;
-	map->cost_key = cost_key;
+	map->attr_index = attr_index;
 	map->w = w;
 	map->h = h;
 	map->tiles = malloc(sizeof(disttype) * (w + 1) * (h + 1));
@@ -145,6 +145,7 @@ void LuaMap_free(LuaMap *map)
 
 int LuaMap_read(LuaMap *map, int x, int y)
 {
+	int to_pop = 0;
 	disttype *tile = &map->tiles[(x - 1) + (y - 1) * map->w];
 	if (*tile != CMAP_UNCACHED_TILE)
 		return *tile;
@@ -153,18 +154,23 @@ int LuaMap_read(LuaMap *map, int x, int y)
     
 	lua_rawgeti( L, map->tiles_index, x );  /* push tiles[x] */
 	lua_rawgeti( L, -1, y );                /* push tiles[x][y] */
-	lua_pushvalue(L, map->cost_key);
-	lua_rawget(L, -2);                      /* pop key and push cost */
+	to_pop = 2;
+	if (map->attr_index)                    /* get an attribute of tiles[x][y] */
+	{
+		to_pop++;
+		lua_pushvalue(L, map->attr_index);
+		lua_gettable(L, -2);            /* pop key and push cost */
+	}
 	if (lua_type(L, -1) == LUA_TBOOLEAN)    /* tiles[x][y].key */
 	{
 		if (lua_toboolean(L, -1))
-			*tile = 999999;         /* impassable */
+			*tile = 999999;         /* true: impassable */
 		else
 			*tile = 1;
 	}
 	else
-		*tile = lua_tonumber( L, -1 );
-	lua_pop( L, 3 );
+		*tile = lua_tonumber( L, -1 );  /* equal to 0 if nil */
+	lua_pop(L, to_pop);
 
 	return *tile;
 }
@@ -223,25 +229,20 @@ static void dijvisit(PQueue *pq, LuaMap *map, LuaMap *dists, Node parent, int xo
 	}
 }
 
-/* Computes a LuaMap giving the weighted shortest-path distance from (x,y) to
-   every tile up to maxcost cost away. Unreached tiles have the value maxcost. */
-LuaMap *compute_dijkstra_map( LuaMap *map, int x, int y, disttype maxcost )
+/*
+  costmap: a map giving the cost to move to each tile.
+  distmap: . Initial values that make sense are a large constant (maxcost) if unvisited,
+           or a lower value if a goal node.
+ */
+static void compute_dijkstra(PQueue *pq, LuaMap *costmap, LuaMap *distmap)
 {
-	PQueue *pq = PQueue_new();
-	LuaMap *dists = LuaMap_new(0, map->w, map->h, 0, maxcost);
-
-	/* We store the distance in Node.f */
-	Node node;
-	node.f = 0;
-	node.x = x; node.y = y;
-	PQueue_push(pq, node);
-
 	while (PQueue_size(pq))
 	{
 		node = PQueue_pop(pq);
-		if (node.f >= LuaMap_read(dists, node.x, node.y))
+		/* Skip if not better than known */
+		if (node.f >= LuaMap_read(distmap, node.x, node.y))
 			continue;
-		LuaMap_write(dists, node.x, node.y, node.f);
+		LuaMap_write(distmap, node.x, node.y, node.f);
 
 		int xoff, yoff;
 		for (xoff = -1; xoff <= 1; xoff++)
@@ -249,16 +250,63 @@ LuaMap *compute_dijkstra_map( LuaMap *map, int x, int y, disttype maxcost )
 			for (yoff = -1; yoff <= 1; yoff++)
 			{
 				if (xoff || yoff)
-					dijvisit(pq, map, dists, node, xoff, yoff);
+					dijvisit(pq, costmap, distmap, node, xoff, yoff);
 			}
 		}
 	}
+}
 
+/* Computes a LuaMap giving the weighted shortest-path distance from (x,y) to
+   every tile up to maxcost cost away. Unreached tiles have the value maxcost. */
+LuaMap *single_source_dijkstra_map(LuaMap *costmap, int x, int y, disttype maxcost)
+{
+	PQueue *pq = PQueue_new();
+	LuaMap *distmap = LuaMap_new(0, costmap->w, costmap->h, 0, maxcost);
+
+	/* Start node. We store the distance in Node.f */
+	Node node;
+	node.f = 0;
+	node.x = x; node.y = y;
+	PQueue_push(pq, node);
+
+	compute_dijkstra(pq, costmap, distmap);
 	PQueue_free(pq);
 	return dists;
 }
 
+/* Computes the min value of (distance cost from goal tile + cost of goal tile)
+   for each goal tile, for every tile up to value maxcost.
+   The goal tiles are the ones with 
+Given a LuaMap giving the weighted shortest-path distance from (x,y) to
+   every tile up to maxcost cost away. Unreached tiles have the value maxcost. */
+void multiple_source_dijkstra_map(LuaMap *costmap, LuaMap *distmap, disttype maxcost)
+{
+	PQueue *pq = PQueue_new();
 
+	/* Find all sources in distmap and push them onto the queue.
+	   Possible optimisation would be to use lua_next to only visit
+	   tiles that aren't nil. */
+	int x, y;
+	for (x = 1; x <= distmap->w; x++)
+	{
+		for (y = 1; y <= distmap->h; y++)
+		{
+                        int value = LuaMap_read(distmap, x, y);
+                        if (value > 0)
+                        {
+                                Node node;
+                                node.f = value;
+                                node.x = x; node.y = y;
+                                PQueue_push(pq, node);
+                        } else
+				LuaMap_write(distmap, x, y, maxcost);
+                }
+        }
+
+	compute_dijkstra(pq, costmap, distmap);
+	PQueue_free(pq);
+	return;
+}
 
 /*********************************** Testing *********************************/
 
