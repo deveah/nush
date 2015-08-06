@@ -120,7 +120,7 @@ static int curses_init( lua_State *L )
 	keypad( stdscr, TRUE );
 
 #ifdef NCURSES_VERSION
-	log_printf( "ncurses %s.%d  NCURSES_WIDECHAR=%d", NCURSES_VERSION, NCURSES_VERSION_PATCH, NCURSES_WIDECHAR );
+	log_printf( "ncurses %s.%d", NCURSES_VERSION, NCURSES_VERSION_PATCH );
 #elif defined(PDCURSES)
 	log_printf( "pdcurses %d", PDC_BUILD );
 #endif
