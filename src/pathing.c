@@ -154,7 +154,7 @@ void LuaMap_free(LuaMap *map)
 	free(map->tiles);
 }
 
-int LuaMap_read(LuaMap *map, int x, int y)
+disttype LuaMap_read(LuaMap *map, int x, int y)
 {
 	int to_pop = 0;
 	disttype *tile = &map->tiles[(x - 1) + (y - 1) * map->w];
@@ -299,18 +299,22 @@ void multiple_source_dijkstra_map(LuaMap *costmap, LuaMap *distmap, disttype max
 	{
 		for (y = 1; y <= distmap->h; y++)
 		{
-                        int value = LuaMap_read(distmap, x, y);
-                        if (value > 0)
-                        {
-                                Node node;
-                                node.f = value;
-                                node.x = x; node.y = y;
-                                PQueue_push(pq, node);
-                        } else
-				LuaMap_write(distmap, x, y, maxcost);
-                }
-        }
+			disttype value = LuaMap_read(distmap, x, y);
+			if (value > 0 && value < maxcost)
+			{
+				Node node;
+				node.f = value;
+				node.x = x; node.y = y;
+				PQueue_push(pq, node);
+			}
+			/* Write maxcost to this tile even if it's a goal, so
+			   that when it's popped off the queue it isn't
+			   immediately disregarded. */
+			LuaMap_write(distmap, x, y, maxcost);
+		}
+	}
 
+	log_printf("multiple_source_dijkstra_map: found and pushed %d sources", pq->size);
 	compute_dijkstra(pq, costmap, distmap);
 	PQueue_free(pq);
 	return;
