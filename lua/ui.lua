@@ -169,7 +169,7 @@ function UI:drawDijkstraMap(dists)
 					curses.attr(cols[1 + colnum] + curses.reverse)
 				end
 
-				curses.write(x + xOffset, y + yOffset, string.format("%d", dist % 10))
+				curses.write(x + xOffset, y + yOffset, string.format("%d", math.floor(dist) % 10))
 			end
 		end
 	end
