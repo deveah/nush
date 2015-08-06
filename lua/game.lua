@@ -308,6 +308,14 @@ function Game:halt(reason)
 	self.running = false
 end
 
+--	Game:clearPlayerCaches() - Should be called when then player moves or the
+--	map changes. Returns nothing.
+function Game:clearPlayerCaches()
+	self.playerDistMap = nil
+	self.fleeMap = nil
+	self.player.sightMapStale = true
+end
+
 --	Game:getPlayerDistMap() - return a cached 2D map of distances in tiles from
 --	the player.
 function Game:getPlayerDistMap()
@@ -322,7 +330,7 @@ end
 --	Game:getFleeMap() - return a cached 2D map of distances which directs
 --	actors how to flee from the player (does not work yet).
 function Game:getFleeMap()
-	if not self.fleemap then
+	if not self.fleeMap then
 		local dists = self:getPlayerDistMap()
 		local fleemap = {}
 		for i = 1, Global.mapWidth do
@@ -330,15 +338,15 @@ function Game:getFleeMap()
 			for j = 1, Global.mapHeight do
 				local dist = dists[i][j]
 				if dist < 999 then
-					fleemap[i][j] = 50 - 1.4 * dist
-				else
+					fleemap[i][j] = 100 - 1.4 * dist
+				end
 			end
 		end
 		-- Modifies and returns fleemap
-		self.fleemap = clib.dijkstraMap(Game.player.map.tile, fleemap, 999)
-		self.fleemap.maxcost = 999
+		self.fleeMap = clib.dijkstraMap(Game.player.map.tile, fleemap, 999)
+		self.fleeMap.maxcost = 999
 	end
-	return self.fleemap
+	return self.fleeMap
 end
 
 

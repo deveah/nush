@@ -115,7 +115,7 @@ function Actor:setMap(map)
 
 	--	when the player moves the player distance map becomes stale
 	if self == Game.player then
-		Game.playerDistMap = nil
+		Game:clearPlayerCaches()
 	end
 end
 
@@ -131,7 +131,7 @@ function Actor:setPosition(x, y)
 
 	--	when the player moves the player distance map becomes stale
 	if self == Game.player then
-		Game.playerDistMap = nil
+		Game:clearPlayerCaches()
 	end
 
 	--	some tiles may trigger special events when being walked on

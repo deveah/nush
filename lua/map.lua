@@ -175,9 +175,7 @@ end
 --	door opened) and therefore FoVs may be out of date.
 function Map:markChanged()
 	if self == Game.player.map then
-		Game.player.sightMapStale = true
-		Game.playerDistMap = nil
-		Game.fleeMap = nil
+		Game.clearPlayerCaches()
 	end
 end
 
