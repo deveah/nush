@@ -124,8 +124,9 @@ void PQueue_push(PQueue *pq, Qelem element)
 LuaMap *LuaMap_new(int w, int h, disttype initval)
 {
 	LuaMap *map = malloc(sizeof(LuaMap));
-	map->tiles_index = 0;
-	map->attr_index = 0; /* unused */
+	map->tiles_index = 0;   /* marks this LuaMap as not tied to a table */
+	map->attr_index = 0;    /* unused */
+	map->default_value = 0; /* unused */
 	map->w = w;
 	map->h = h;
 	map->tiles = malloc(sizeof(disttype) * (w + 1) * (h + 1));
@@ -136,17 +137,19 @@ LuaMap *LuaMap_new(int w, int h, disttype initval)
 }
 
 /* Create a LuaMap that caches the values in a lua 2D grid (list-of-lists).
-   tiles_index: Lua stack index of the grid.
-   attr_index:  0 if it's a grid of raw values, or the Lua stack index of a
-                string to use as a key.
+   tiles_index:   Lua stack index of the grid.
+   attr_index:    0 if it's a grid of raw values, or the Lua stack index of a
+                  string to use as a key.
+   default_value: Value assigned to 'nil' tiles.
 */
-LuaMap *LuaMap_from_table(int tiles_index, int attr_index, int w, int h)
+LuaMap *LuaMap_from_table(int tiles_index, int attr_index, int w, int h, disttype default_value)
 {
 	/* Tiles start uncached only if there's a table to read from */
-        LuaMap *ret = LuaMap_new(w, h, LUAMAP_UNCACHED_TILE);
-        ret->tiles_index = tiles_index;
+	LuaMap *ret = LuaMap_new(w, h, LUAMAP_UNCACHED_TILE);
+	ret->tiles_index = tiles_index;
 	ret->attr_index = attr_index;
-        return ret;
+	ret->default_value = default_value;
+	return ret;
 }
 
 void LuaMap_free(LuaMap *map)
@@ -162,7 +165,8 @@ disttype LuaMap_read(LuaMap *map, int x, int y)
 		return *tile;
 	if (!map->tiles_index)
 		error("LuaMap_read() called on a LuaMap without a table data source");
-    
+
+	/* Read the value from the map */
 	lua_rawgeti(L, map->tiles_index, x);    /* push tiles[x] */
 	lua_rawgeti(L, -1, y);                  /* push tiles[x][y] */
 	to_pop = 2;
@@ -172,15 +176,19 @@ disttype LuaMap_read(LuaMap *map, int x, int y)
 		lua_pushvalue(L, map->attr_index);
 		lua_gettable(L, -2);            /* pop key and push cost */
 	}
-	if (lua_type(L, -1) == LUA_TBOOLEAN)    /* tiles[x][y].key */
+	/* Convert to value */
+	int type = lua_type(L, -1);
+	if (type == LUA_TBOOLEAN)               /* tiles[x][y].key */
 	{
 		if (lua_toboolean(L, -1))
 			*tile = 999999;         /* true: impassable */
 		else
-			*tile = 1;
+			*tile = 1;              /* cost = 1 for cost maps */
 	}
+	else if (type == LUA_TNIL)
+		*tile = map->default_value;
 	else
-		*tile = lua_tonumber(L, -1);    /* equal to 0 if nil */
+		*tile = lua_tonumber(L, -1);
 	lua_pop(L, to_pop);
 
 	return *tile;
@@ -300,7 +308,7 @@ void multiple_source_dijkstra_map(LuaMap *costmap, LuaMap *distmap, disttype max
 		for (y = 1; y <= distmap->h; y++)
 		{
 			disttype value = LuaMap_read(distmap, x, y);
-			if (value > 0 && value < maxcost)
+			if (value < maxcost)
 			{
 				Node node;
 				node.f = value;

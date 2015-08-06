@@ -582,9 +582,9 @@ static int clib_time( lua_State *L )
 	return 1;
 }
 
-/* clib.dijkstraMap(tilemap, x, y, maxcost)
+/* clib.dijkstraMap(tilemap, maxcost, x, y)
    OR
-   clib.dijkstraMap(tilemap, distmap, maxcost)
+   clib.dijkstraMap(tilemap, maxcost, distmap)
    Given a 2D grid of Tiles, which contains the passability flag in .solid,
    and either a single goal tile (cost 0) or a whole map of goal tiles and
    their costs, returns 2D grid of values giving the minimum cost/distance
@@ -606,27 +606,27 @@ static int clib_dijkstramap( lua_State *L )
 	if ( h > 65535 || w > 65535 )
 		luaL_error( L, "maps larger than 65535*65535 are unsupported" );
 
+	double maxcost = luaL_checknumber( L, 2 );
+
 	/* Get the goal: distmap for multiple source, x,y for single source */
 	LuaMap *distmap = NULL;
 	int goalx = 0, goaly = 0;
-	if ( lua_type( L, 2 ) == LUA_TTABLE )
+	if ( lua_type( L, 3 ) == LUA_TTABLE )
 	{
-		distmap = LuaMap_from_table( 2, 0, w, h );
+		/* Missing values in distmap are maxcost (unvisited/nongoals) */
+		distmap = LuaMap_from_table( 3, 0, w, h, maxcost );
 	}
 	else
 	{
-		goalx = luaL_checkinteger( L, 2 );
-		goaly = luaL_checkinteger( L, 3 );
-		lua_remove( L, 3 ); /* Shift maxcost to slot 3 */
+		goalx = luaL_checkinteger( L, 3 );
+		goaly = luaL_checkinteger( L, 4 );
 	}
-
-	double maxcost = luaL_checknumber( L, 3 );
 
 	/* Member of Tile used for cost of a tile,
 	   which should be either a bool or int */
 	lua_pushstring( L, "solid" );
 	int attr_index = lua_gettop( L );
-	LuaMap *costmap = LuaMap_from_table( tiles_index, attr_index, w, h );
+	LuaMap *costmap = LuaMap_from_table( tiles_index, attr_index, w, h, 1.0 );
 
 	if ( distmap )
 		multiple_source_dijkstra_map( costmap, distmap, maxcost );

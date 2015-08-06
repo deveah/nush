@@ -321,7 +321,7 @@ end
 function Game:getPlayerDistMap()
 	if not self.playerDistMap then
 		self.playerDistMap =
-			clib.dijkstraMap(Game.player.map.tile, Game.player.x, Game.player.y, 999)
+			clib.dijkstraMap(Game.player.map.tile, 999, Game.player.x, Game.player.y)
 		self.playerDistMap.maxcost = 999
 	end
 	return self.playerDistMap
@@ -342,8 +342,7 @@ function Game:getFleeMap()
 				end
 			end
 		end
-		-- Modifies and returns fleemap
-		self.fleeMap = clib.dijkstraMap(Game.player.map.tile, fleemap, 999)
+		self.fleeMap = clib.dijkstraMap(Game.player.map.tile, 999, fleemap)
 		self.fleeMap.maxcost = 999
 	end
 	return self.fleeMap

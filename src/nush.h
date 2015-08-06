@@ -31,6 +31,7 @@ typedef struct {
 	int tiles_index;/* index in lua stack of the table which is the Tiles grid */
 	int attr_index; /* index in stack of string used as key on Tiles to get
 	                   the cost; ignored if tiles_index is 0 */
+	disttype default_value; /* value assigned to 'nil' */
 	int w, h;
 	disttype *tiles;/* [w+1][h+1] grid of values with nothing stored at x=0 or y=0;
                            set to LUAMAP_UNCACHED_TILE if hasn't been loaded from lua */
@@ -38,7 +39,7 @@ typedef struct {
 
 
 LuaMap *LuaMap_new(int w, int h, disttype initval);
-LuaMap *LuaMap_from_table(int tiles_index, int attr_index, int w, int h);
+LuaMap *LuaMap_from_table(int tiles_index, int attr_index, int w, int h, disttype default_value);
 void LuaMap_free(LuaMap *map);
 void LuaMap_push(LuaMap *map);
 disttype LuaMap_read(LuaMap *map, int x, int y);
