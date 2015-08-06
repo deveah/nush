@@ -582,8 +582,13 @@ static int clib_time( lua_State *L )
 	return 1;
 }
 
-/* clib.dijkstraMap(tiles, x, y, maxcost) - Given a 2D grid of Tiles, return a
-   2D grid of ints giving the distance from (x,y) to every tile < maxcost away.
+/* clib.dijkstraMap(tilemap, x, y, maxcost)
+   OR
+   clib.dijkstraMap(tilemap, distmap, maxcost)
+   Given a 2D grid of Tiles, which contains the passability flag in .solid,
+   and either a single goal tile (cost 0) or a whole map of goal tiles and
+   their costs, returns 2D grid of values giving the minimum cost/distance
+   from a goal to every tile < maxcost away.
    Unreached tiles have the value maxcost. */
 static int clib_dijkstramap( lua_State *L )
 {
@@ -601,22 +606,35 @@ static int clib_dijkstramap( lua_State *L )
 	if ( h > 65535 || w > 65535 )
 		luaL_error( L, "maps larger than 65535*65535 are unsupported" );
 
-	if ( lua_type( L, 2 ) )
+	/* Get the goal: distmap for multiple source, x,y for single source */
+	LuaMap *distmap = NULL;
+	int goalx = 0, goaly = 0;
+	if ( lua_type( L, 2 ) == LUA_TTABLE )
+	{
+		distmap = LuaMap_from_table( 2, 0, w, h );
+	}
+	else
+	{
+		goalx = luaL_checkinteger( L, 2 );
+		goaly = luaL_checkinteger( L, 3 );
+		lua_remove( L, 3 ); /* Shift maxcost to slot 3 */
+	}
 
-	int x = luaL_checkinteger( L, 2 );
-	int y = luaL_checkinteger( L, 3 );
-	double maxcost = luaL_checknumber( L, 4 );
+	double maxcost = luaL_checknumber( L, 3 );
 
 	/* Member of Tile used for cost of a tile,
 	   which should be either a bool or int */
 	lua_pushstring( L, "solid" );
 	int attr_index = lua_gettop( L );
+	LuaMap *costmap = LuaMap_from_table( tiles_index, attr_index, w, h );
 
-	LuaMap *costmap = LuaMap_new( tiles_index, w, h, attr_index, 0 );
-	LuaMap *dijkstra = compute_dijkstra_map( costmap, x, y, maxcost );
-	LuaMap_push( dijkstra );
-	LuaMap_free( dijkstra );
-	LuaMap_free( map );
+	if ( distmap )
+		multiple_source_dijkstra_map( costmap, distmap, maxcost );
+	else
+		distmap = single_source_dijkstra_map( costmap, goalx, goaly, maxcost );
+	LuaMap_push( distmap );
+	LuaMap_free( distmap );
+	LuaMap_free( costmap );
 
 	spent_us = microseconds() - spent_us;
 	log_printf("dijkstraMap done in %fs", spent_us * 1e-6);
