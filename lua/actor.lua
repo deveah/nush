@@ -1312,20 +1312,32 @@ function Actor:aiAct()
 		end
 	end
 
+	--	Temporary for testing fleeing
+	if self.hp < self.maxHp then
+		self.aiState = "flee"
+	end
+
 	if self.aiState == "chase" then
 		--	Move towards player
-		return (self:aiChase())
+		local distmap = Game:getPlayerDistMap()
+		return (self:aiApproachGoals(distmap))
+	end
+
+	if self.aiState == "flee" then
+		--	Move away from player
+		local distmap = Game:getFleeMap()
+		return (self:aiApproachGoals(distmap))
 	end
 
 	--	Wait
 	return Global.actionCost.wait
 end
 
---	Actor:aiChase() - actor AI state which tries to move towards and melee the
---	player; returns action points spent.
-function Actor:aiChase()
+--	Actor:aiApproachGoals() - actor AI logic which tries to move towards goals
+--	given as a Dijkstra map, including meleeing the player if it bumps into
+--	the player. Returns action points spent.
+function Actor:aiApproachGoals(distmap)
 	local debug = false
-	local distmap = Game:getPlayerDistMap()
 	local currentDist = distmap[self.x][self.y]
 
 	if debug then Log:write(self, " chasing from ", self.x, ",", self.y, " currentDist=", currentDist) end
