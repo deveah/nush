@@ -160,7 +160,15 @@ function UI:drawDijkstraMap(dists)
 		for y = 1, Global.mapHeight do
 			local dist = dists[x][y]
 			if dist < dists.maxcost then
-				curses.attr(cols[math.min(#cols, math.floor(dist/10 + 1))])
+				--	The colour indicates the multiple of 10, reversed if negative.
+				local colnum = math.min(#cols - 1, math.floor(dist/10))
+				if colnum >= 0 then
+					curses.attr(cols[1 + colnum])
+				else
+					colnum = math.min(#cols - 1, -colnum)
+					curses.attr(cols[1 + colnum] + curses.reverse)
+				end
+
 				curses.write(x + xOffset, y + yOffset, string.format("%d", dist % 10))
 			end
 		end
