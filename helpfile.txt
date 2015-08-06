@@ -37,11 +37,12 @@ to open it. Opening a locked door requires a matching key.
 
 Debug keys:
        `$' - Show map
-       `%' - Show distances from player
        `)' - Teleport to next map
        `(' - Teleport to previous map
       `F2' - Dump globals
       `F3' - Show curses test screen
+      `F4' - Show distances from player
+      `F5' - Show flee map distances
 
    {{YELLOW}} Tips
 

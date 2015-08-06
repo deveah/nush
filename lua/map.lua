@@ -177,6 +177,7 @@ function Map:markChanged()
 	if self == Game.player.map then
 		Game.player.sightMapStale = true
 		Game.playerDistMap = nil
+		Game.fleeMap = nil
 	end
 end
 

@@ -147,23 +147,19 @@ function UI:drawScreen()
 	curses.move(Game.player.x + xOffset, Game.player.y + yOffset)
 end
 
---	UI:drawDijkstraMap() - display a map of distances from the player; returns
---	nothing.
-function UI:drawDijkstraMap()
+--	UI:drawDijkstraMap() - display a map of distances; returns nothing.
+function UI:drawDijkstraMap(dists)
 	--	the offsets from map coordinates to screen coordinates
 	local xOffset, yOffset = -1, 2
 	local cols =
 		{curses.normal, curses.yellow, curses.green, curses.red, curses.magenta,
 		 curses.cyan, curses.WHITE, curses.YELLOW, curses.GREEN, curses.RED}
 
-	local maxcost = 999
-	local dists = clib.dijkstraMap(Game.player.map.tile, Game.player.x, Game.player.y, maxcost)
-
 	--	Draw on top of the map
 	for x = 1, Global.mapWidth do
 		for y = 1, Global.mapHeight do
 			local dist = dists[x][y]
-			if dist < maxcost then
+			if dist < dists.maxcost then
 				curses.attr(cols[math.min(#cols, math.floor(dist/10 + 1))])
 				curses.write(x + xOffset, y + yOffset, string.format("%d", dist % 10))
 			end

@@ -314,8 +314,31 @@ function Game:getPlayerDistMap()
 	if not self.playerDistMap then
 		self.playerDistMap =
 			clib.dijkstraMap(Game.player.map.tile, Game.player.x, Game.player.y, 999)
+		self.playerDistMap.maxcost = 999
 	end
 	return self.playerDistMap
+end
+
+--	Game:getFleeMap() - return a cached 2D map of distances which directs
+--	actors how to flee from the player (does not work yet).
+function Game:getFleeMap()
+	if not self.fleemap then
+		local dists = self:getPlayerDistMap()
+		local fleemap = {}
+		for i = 1, Global.mapWidth do
+			fleemap[i] = {}
+			for j = 1, Global.mapHeight do
+				local dist = dists[i][j]
+				if dist < 999 then
+					fleemap[i][j] = 50 - 1.4 * dist
+				else
+			end
+		end
+		-- Modifies and returns fleemap
+		self.fleemap = clib.dijkstraMap(Game.player.map.tile, fleemap, 999)
+		self.fleemap.maxcost = 999
+	end
+	return self.fleemap
 end
 
 

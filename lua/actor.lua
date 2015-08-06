@@ -1115,8 +1115,13 @@ function Actor:handleKey(key)
 	end
 
 	--	Show distance to the player
-	if key == "%" then
-		UI:drawDijkstraMap()
+	if key == "F4" then
+		UI:drawDijkstraMap(Game:getPlayerDistMap())
+	end
+
+	--	Show flee map
+	if key == "F5" then
+		UI:drawDijkstraMap(Game:getFleeMap())
 	end
 
 	--	teleport player to next/previous map
