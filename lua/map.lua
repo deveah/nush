@@ -175,7 +175,7 @@ end
 --	door opened) and therefore FoVs may be out of date.
 function Map:markChanged()
 	if self == Game.player.map then
-		Game.clearPlayerCaches()
+		Game:clearPlayerCaches()
 	end
 end
 
