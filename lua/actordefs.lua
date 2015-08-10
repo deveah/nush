@@ -55,6 +55,7 @@ Actordefs.Player = defineActor(Actordefs.Humanoid, {
 })
 
 Actordefs.Savage = defineActor(Actordefs.Humanoid, {
+	face = "s",
 	name = "Savage",
 	color = curses.red,
 	hp = 3,
@@ -62,6 +63,7 @@ Actordefs.Savage = defineActor(Actordefs.Humanoid, {
 })
 
 Actordefs.SavageChief = defineActor(Actordefs.Humanoid, {
+	face = "s",
 	name = "Savage Chief",
 	color = curses.RED,
 	hp = 5,
@@ -69,6 +71,7 @@ Actordefs.SavageChief = defineActor(Actordefs.Humanoid, {
 })
 
 Actordefs.SavageShaman = defineActor(Actordefs.Humanoid, {
+	face = "s",
 	name = "Savage Shaman",
 	color = curses.green,
 	hp = 5,
