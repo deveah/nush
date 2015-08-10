@@ -2,6 +2,15 @@
 --	dungeon.lua
 --	Dungeon layout
 --
+--	A level layout consists of the following members:
+--	* generator (string) - the type of map to be generated
+--	*	nEnemies (integer) - number of enemies to spawn
+--	* enemies (table) - a pair of (enemy name) => (chance to spawn)
+--	*	nLoot (integer) - number of items to spawn
+--	*	loot (table) - a pair of either:
+--		(item name) => (chance to spawn), or
+--		(item name) => { (chance to spawn), (min. count), (max. count) }
+--
 
 local Actordefs = require "lua/actordefs"
 local Itemdefs = require "lua/itemdefs"
@@ -22,8 +31,8 @@ Dungeon.layout = {
 			["DilithiumRazor"] = 0.05,
 			["RustyKnife"] = 0.05,
 			["BrassKnuckles"] = 0.05,
-			["Bullet"] = 0.1,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.1, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.2,
 			["SingleShotgun"] = 0.05,
 			["SawedOffShotgun"] = 0.05,
@@ -42,8 +51,8 @@ Dungeon.layout = {
 		loot = {
 			["ShockBaton"] = 0.1,
 			["DilithiumRazor"] = 0.1,
-			["Bullet"] = 0.1,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.1, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.5
 		}
 	},
@@ -59,8 +68,8 @@ Dungeon.layout = {
 		loot = {
 			["ShockBaton"] = 0.1,
 			["DilithiumRazor"] = 0.1,
-			["Bullet"] = 0.1,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.1, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.3,
 			["RedKeycard"] = 0.04,
 			["GreenKeycard"] = 0.04,
@@ -81,8 +90,8 @@ Dungeon.layout = {
 		loot = {
 			["ShockBaton"] = 0.05,
 			["DilithiumRazor"] = 0.1,
-			["Bullet"] = 0.15,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.15, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.3,
 			["RedKeycard"] = 0.04,
 			["GreenKeycard"] = 0.04,
@@ -103,8 +112,8 @@ Dungeon.layout = {
 		loot = {
 			["ShockBaton"] = 0.05,
 			["DilithiumRazor"] = 0.1,
-			["Bullet"] = 0.15,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.15, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.3,
 			["RedKeycard"] = 0.04,
 			["GreenKeycard"] = 0.04,
@@ -125,8 +134,8 @@ Dungeon.layout = {
 		loot = {
 			["ShockBaton"] = 0.05,
 			["DilithiumRazor"] = 0.1,
-			["Bullet"] = 0.15,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.15, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.3,
 			["RedKeycard"] = 0.04,
 			["GreenKeycard"] = 0.04,
@@ -147,8 +156,8 @@ Dungeon.layout = {
 		loot = {
 			["ShockBaton"] = 0.05,
 			["DilithiumRazor"] = 0.1,
-			["Bullet"] = 0.15,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.15, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.3,
 			["RedKeycard"] = 0.04,
 			["GreenKeycard"] = 0.04,
@@ -169,8 +178,8 @@ Dungeon.layout = {
 		loot = {
 			["ShockBaton"] = 0.05,
 			["DilithiumRazor"] = 0.1,
-			["Bullet"] = 0.15,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.15, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.3,
 			["RedKeycard"] = 0.04,
 			["GreenKeycard"] = 0.04,
@@ -191,8 +200,8 @@ Dungeon.layout = {
 		loot = {
 			["ShockBaton"] = 0.05,
 			["DilithiumRazor"] = 0.1,
-			["Bullet"] = 0.15,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.15, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.3,
 			["RedKeycard"] = 0.04,
 			["GreenKeycard"] = 0.04,
@@ -213,8 +222,8 @@ Dungeon.layout = {
 		loot = {
 			["ShockBaton"] = 0.05,
 			["DilithiumRazor"] = 0.1,
-			["Bullet"] = 0.15,
-			["EnergyCell"] = 0.2,
+			["Bullet"] = { 0.15, 1, 10 },
+			["EnergyCell"] = { 0.2, 1, 10 },
 			["SugarBombs"] = 0.3,
 			["RedKeycard"] = 0.04,
 			["GreenKeycard"] = 0.04,

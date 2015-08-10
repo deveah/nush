@@ -112,10 +112,17 @@ function Game:start()
 			local wh = math.random()
 			local acc = 0
 			for k, v in pairs(Dungeon.layout[i].loot) do
-				if wh > acc and wh < acc + v then
-					item = Itemdefs[k]:new()
+				if type(v) == "table" then
+					if wh > acc and wh < acc + v[1] then
+						item = Itemdefs[k]:new(math.random(v[2], v[3]))
+					end
+					acc = acc + v[1]
+				else
+					if wh > acc and wh < acc + v then
+						item = Itemdefs[k]:new()
+					end
+					acc = acc + v
 				end
-				acc = acc + v
 			end
 
 			item:setMap(map)
