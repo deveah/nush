@@ -36,6 +36,7 @@ local Tile = require "lua/tile"
 local Item = require "lua/item"
 local Itemdefs = require "lua/itemdefs"
 local Actordefs = require "lua/actordefs"
+local Dungeon = require "lua/dungeon"
 
 
 --	Game:init() - initialize members of a Game object with default data
@@ -66,12 +67,12 @@ function Game:start()
 	Log:write("Creating the dungeon...")
 	for i = 1, Global.dungeonDepth do
 		local map = Map.new(i, "Dungeon:" .. i)
-		local levelType = math.random()
-		if levelType < 0.3 then
+		local layout = Dungeon.layout[i]
+		if layout.generator == "cave" then
 			map:generateCave(40, 4, 8)
 			map:spawnPoolsOfWater(3, 0.8)
 			map:spawnPatchesOfGrass(1, 0.9)
-		elseif levelType < 0.8 then
+		elseif layout.generator == "rooms" then
 			map:generateRoomsAndCorridors(15, 4, 5)
 			map:spawnMachinery(20, 0.1)
 			map:spawnTraps(2)
@@ -79,6 +80,7 @@ function Game:start()
 			map:generateBSP()
 			map:spawnTraps(2)
 		end
+
 		self:addMap(map)
 
 		--	link with the previously created map (if it exists)
@@ -89,61 +91,33 @@ function Game:start()
 
 		--	populate each map with other actors
 		Log:write("Populating level " .. i .. " of the dungeon...")
-		for j = 1, 20 do
+		for j = 1, Dungeon.layout[i].nEnemies do
 			local actor
 			local wh = math.random()
-			if wh < 0.7 then
-				actor = Actordefs.Savage:new()
-			elseif wh < 0.9 then
-				actor = Actordefs.SavageChief:new()
-			else
-				actor = Actordefs.SavageShaman:new()
+			local acc = 0
+			for k, v in pairs(Dungeon.layout[i].enemies) do
+				if wh > acc and wh < acc + v then
+					actor = Actordefs[k]:new()
+				end
+				acc = acc + v
 			end
-			--	savages carry sticks and stones
-			actor:addItem(Itemdefs.Rock:new(math.random(1, 4)))
-			actor:addItem(Itemdefs.Stick:new(math.random(1, 2)))
 			self:addActor(actor)
 			actor:setMap(map)
 			actor:setPosition(map:findRandomEmptySpace())
 		end
 
 		--	populate each map with a few items
-		for j = 1, 10 do
+		for j = 1, Dungeon.layout[i].nLoot do
 			local item
 			local wh = math.random()
-			if wh < 0.5 then
-				wh = math.random()
-				if wh < 0.1 then
-					item = Itemdefs.RedKeycard:new()
-				elseif wh < 0.2 then
-					item = Itemdefs.GreenKeycard:new()
-				elseif wh < 0.3 then
-					item = Itemdefs.BlueKeycard:new()
-				elseif wh < 0.4 then
-					item = Itemdefs.SilverKeycard:new()
-				elseif wh < 0.5 then
-					item = Itemdefs.GoldKeycard:new()
-				elseif wh < 0.6 then
-					item = Itemdefs.Pistol:new()
-				elseif wh < 0.7 then
-					item = Itemdefs.Phaser:new()
-				elseif wh < 0.8 then
-					item = Itemdefs.ShockBaton:new()
-				else
-					item = Itemdefs.DilithiumRazor:new()
+			local acc = 0
+			for k, v in pairs(Dungeon.layout[i].loot) do
+				if wh > acc and wh < acc + v then
+					item = Itemdefs[k]:new()
 				end
-			elseif wh < 0.9 then
-				wh = math.random()
-				if wh < 0.5 then
-					item = Itemdefs.Bullet:new()
-					item.count = math.random(1, 10)
-				else
-					item = Itemdefs.EnergyCell:new()
-					item.count = math.random(1, 10)
-				end
-			else
-				item = Itemdefs.SugarBombs:new()
+				acc = acc + v
 			end
+
 			item:setMap(map)
 			item:setPosition(map:findRandomEmptySpace())
 		end
