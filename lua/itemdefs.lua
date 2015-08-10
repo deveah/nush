@@ -112,6 +112,23 @@ Itemdefs.DilithiumRazor = defineItem(Itemdefs.MeleeWeapon, {
 	attack = "cut",
 })
 
+Itemdefs.RustyKnife = defineItem(Itemdefs.MeleeWeapon, {
+	name = "Rusty knife",
+	info = "Its corroded blade will surely spawn an infection or two if you poke it into some poor dweller.",
+	minDamage = 1,
+	maxDamage = 3,
+	accuracy = 0.8,
+	attack = "cut",
+})
+
+Itemdefs.BrassKnuckles = defineItem(Itemdefs.MeleeWeapon, {
+	name = "Brass knuckles",
+	info = "If you like punching things, you'll like these a lot.",
+	minDamage = 1,
+	maxDamage = 2,
+	attack = "punched",
+})
+
 Itemdefs.Handgun = defineItem(Itemdefs.RangedWeapon, {
 	class = "Handgun",
 })
@@ -124,6 +141,7 @@ Itemdefs.Pistol = defineItem(Itemdefs.Handgun, {
 	maxDamage = 5,
 	accuracy = 0.6,
 	ammo = "Bullet",
+	attack = "shot",
 })
 
 Itemdefs.Phaser = defineItem(Itemdefs.Handgun, {
@@ -137,6 +155,30 @@ Itemdefs.Phaser = defineItem(Itemdefs.Handgun, {
 	attack = "lasered",
 })
 
+Itemdefs.Shotgun = defineItem(Itemdefs.RangedWeapon, {
+	class = "Shotgun",
+	ammo = "Slug",
+})
+
+Itemdefs.SingleShotgun = defineItem(Itemdefs.Shotgun, {
+	name = "Single shotgun",
+	info = "The weapon of choice of the close range kill afficionado.",
+	range = 4,
+	minDamage = 2,
+	maxDamage = 4,
+	accuracy = 0.6,
+	attack = "shot",
+})
+
+Itemdefs.SawedOffShotgun = defineItem(Itemdefs.Shotgun, {
+	name = "Sawed-off shotgun",
+	info = "More portable, more deadly, less accurate than its cousin.",
+	range = 4,
+	minDamage = 2,
+	maxDamage = 5,
+	accuracy = 0.5,
+	attack = "shot",
+})
 
 --------------------------------- Keycards ------------------------------------
 
@@ -239,6 +281,11 @@ Itemdefs.Bullet = defineItem(Itemdefs.Ammo, {
 Itemdefs.EnergyCell = defineItem(Itemdefs.Ammo, {
 	name = "Energy Cell",
 	color = curses.cyan,
+})
+
+Itemdefs.Slug = defineItem(Itemdefs.Ammo, {
+	name = "Slug",
+	color = curses.red
 })
 
 ------------------------------------- Misc ------------------------------------

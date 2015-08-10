@@ -16,13 +16,18 @@ Dungeon.layout = {
 			["Savage"] = 0.8,
 			["SavageChief"] = 0.2
 		},
-		nLoot = 5,
+		nLoot = 50,
 		loot = {
-			["ShockBaton"] = 0.1,
-			["DilithiumRazor"] = 0.1,
+			["ShockBaton"] = 0.05,
+			["DilithiumRazor"] = 0.05,
+			["RustyKnife"] = 0.05,
+			["BrassKnuckles"] = 0.05,
 			["Bullet"] = 0.1,
 			["EnergyCell"] = 0.2,
-			["SugarBombs"] = 0.5
+			["SugarBombs"] = 0.2,
+			["SingleShotgun"] = 0.05,
+			["SawedOffShotgun"] = 0.05,
+			["Slug"] = 0.2
 		}
 	},
 	{	-- level 2
