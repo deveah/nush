@@ -36,7 +36,7 @@ Dungeon.layout = {
 			["SugarBombs"] = 0.2,
 			["SingleShotgun"] = 0.05,
 			["SawedOffShotgun"] = 0.05,
-			["Slug"] = 0.2
+			["Slug"] = { 0.2, 1, 10 }
 		}
 	},
 	{	-- level 2
