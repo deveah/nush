@@ -323,6 +323,16 @@ end
 function Actor:equip(item)
 	Log:write(self, " equipping ", item, " in ", item.equipSlot)
 
+	--	check if skill requirements are met
+	if item.requires then
+		for k, v in pairs(item.requires) do
+			if self.skills[k] < v then
+				UI:message("You lack the necessary skills to equip " .. item:describe() .. "!")
+				return false
+			end
+		end
+	end
+
 	--	unequip existing
 	if self.equipment[item.equipSlot] then
 		self:unequip(self.equipment[item.equipSlot])

@@ -45,8 +45,9 @@ Actordefs.Player = defineActor(Actordefs.Humanoid, {
 	spendableExperience = 0,
 	totalExperience = 0,
 	skills = {
-		melee = 0,
-		handguns = 0,
+		melee = 2,
+		handguns = 5,
+		shotguns = 0,
 		lockpick = 0,
 		stealth = 0,
 	},

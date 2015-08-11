@@ -841,8 +841,9 @@ function UI:skillPointScreen()
 				"You may upgrade the following skills:\n" ..
 				"[{{YELLOW}}a{{pop}}] melee (" .. Game.player.skills.melee .. ")\n" ..
 				"[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.skills.handguns .. ")\n" ..
-				"[{{YELLOW}}c{{pop}}] lockpick (" .. Game.player.skills.lockpick .. ")\n" ..
-				"[{{YELLOW}}d{{pop}}] stealth (" .. Game.player.skills.stealth .. ")"
+				"[{{YELLOW}}c{{pop}}] shotguns (" .. Game.player.skills.shotguns .. ")\n" ..
+				"[{{YELLOW}}d{{pop}}] lockpick (" .. Game.player.skills.lockpick .. ")\n" ..
+				"[{{YELLOW}}e{{pop}}] stealth (" .. Game.player.skills.stealth .. ")"
 		end
 
 		self:drawScreen()
@@ -871,20 +872,26 @@ function UI:skillPointScreen()
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
-		--	upgrade lockpick
+		--	upgrade shotguns
 		if canUpgrade and key == "c" then
+			Game.player.skills.shotguns = Game.player.skills.shotguns + 1
+			Game.player.spendableExperience = Game.player.spendableExperience - 1
+		end
+
+		--	upgrade lockpick
+		if canUpgrade and key == "d" then
 			Game.player.skills.lockpick = Game.player.skills.lockpick + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
 		--	upgrade stealth
-		if canUpgrade and key == "d" then
+		if canUpgrade and key == "e" then
 			Game.player.skills.stealth = Game.player.skills.stealth + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
 		--	Exit if not a letter in the range of skill keys
-		if not (#key == 1 and "a" <= key and key <= "d") then
+		if not (#key == 1 and "a" <= key and key <= "e") then
 			break
 		end
 	end

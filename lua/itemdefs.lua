@@ -65,6 +65,22 @@ Itemdefs.Weapon = defineItem(Itemdefs.BaseItem, {
 				ret = ret .. " (you have " .. self.owner:ammoAmount(self) .. ")"
 			end
 		end
+		if self.requires then
+			ret = ret .. "\nRequires: "
+			local first = true
+			for k, v in pairs(self.requires) do
+				if not first then ret = ret .. ", " end
+				local color	--	color of the highlighted skill (red if skill requirement
+										--	not met, and green if met)
+				if self.owner.skills[k] < v then
+					color = "{{red}}"
+				else
+					color = "{{green}}"
+				end
+				ret = ret .. color .. k .. ": " .. v .. "{{pop}}"
+				first = false
+			end
+		end
 		return ret
 	end
 })
@@ -101,6 +117,7 @@ Itemdefs.ShockBaton = defineItem(Itemdefs.MeleeWeapon, {
 	minDamage = 1,
 	maxDamage = 3,
 	accuracy = 0.95,
+	requires = { ["melee"] = 2 },
 })
 
 Itemdefs.DilithiumRazor = defineItem(Itemdefs.MeleeWeapon, {
@@ -110,6 +127,7 @@ Itemdefs.DilithiumRazor = defineItem(Itemdefs.MeleeWeapon, {
 	maxDamage = 5,
 	accuracy = 0.9,
 	attack = "cut",
+	requires = { ["melee"] = 4 },
 })
 
 Itemdefs.RustyKnife = defineItem(Itemdefs.MeleeWeapon, {
@@ -142,6 +160,7 @@ Itemdefs.Pistol = defineItem(Itemdefs.Handgun, {
 	accuracy = 0.6,
 	ammo = "Bullet",
 	attack = "shot",
+	requires = { ["handguns"] = 3 },
 })
 
 Itemdefs.Phaser = defineItem(Itemdefs.Handgun, {
@@ -153,6 +172,7 @@ Itemdefs.Phaser = defineItem(Itemdefs.Handgun, {
 	accuracy = 0.7,
 	ammo = "Energy Cell",
 	attack = "lasered",
+	requires = { ["handguns"] = 5 },
 })
 
 Itemdefs.Shotgun = defineItem(Itemdefs.RangedWeapon, {
@@ -168,6 +188,7 @@ Itemdefs.SingleShotgun = defineItem(Itemdefs.Shotgun, {
 	maxDamage = 4,
 	accuracy = 0.6,
 	attack = "shot",
+	requires = { ["shotguns"] = 2 },
 })
 
 Itemdefs.SawedOffShotgun = defineItem(Itemdefs.Shotgun, {
@@ -178,6 +199,7 @@ Itemdefs.SawedOffShotgun = defineItem(Itemdefs.Shotgun, {
 	maxDamage = 5,
 	accuracy = 0.5,
 	attack = "shot",
+	requires = { ["shotguns"] = 2 },
 })
 
 --------------------------------- Keycards ------------------------------------
