@@ -61,6 +61,7 @@ Actordefs.Savage = defineActor(Actordefs.Humanoid, {
 	color = curses.red,
 	hp = 3,
 	maxHp = 3,
+	aiType = "humanoid",
 })
 
 Actordefs.SavageChief = defineActor(Actordefs.Humanoid, {
@@ -69,6 +70,7 @@ Actordefs.SavageChief = defineActor(Actordefs.Humanoid, {
 	color = curses.RED,
 	hp = 5,
 	maxHp = 5,
+	aiType = "humanoid",
 })
 
 Actordefs.SavageShaman = defineActor(Actordefs.Humanoid, {
@@ -77,7 +79,22 @@ Actordefs.SavageShaman = defineActor(Actordefs.Humanoid, {
 	color = curses.green,
 	hp = 5,
 	maxHp = 5,
-	agility = 6
+	agility = 6,
+	aiType = "humanoid",
+})
+
+------------------------------ Beasts -----------------------------------------
+Actordefs.Beast = defineActor(Actordefs.BaseActor, {
+	category = "Beast",
+})
+
+Actordefs.Rat = defineActor(Actordefs.Beast, {
+	face = "r",
+	color = curses.yellow,
+	name = "Rat",
+	hp = 2,
+	maxHp = 2,
+	aiType = "beast",
 })
 
 return Actordefs

@@ -1367,7 +1367,15 @@ function Actor:aiApproachGoals(distmap)
 		--	either a boolean, or a number value; if it's a number, it represents the
 		--	cost of the movement on that tile;
 		--	TODO: don't know if it's the cleanest way to approach this
-		local canmove = self:canMoveTo(x, y) or self.map.tile[x][y] == Tile.closedDoor
+
+		--	only 'humanoid' AI type can open doors
+		local canmove
+		if self.aiType == "humanoid" then
+			canmove = self:canMoveTo(x, y) or self.map.tile[x][y] == Tile.closedDoor
+		else
+			canmove = self:canMoveTo(x, y)
+		end
+
 		local dist = distmap[x][y]
 
 		if debug then Log:write("  considering x,y=", x, ",", y, " canmove=", canmove, " dist=", dist) end
