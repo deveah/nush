@@ -75,6 +75,24 @@ function Actor:new()
 	return a
 end
 
+--	Actor:initInventory() - fills an actor's inventory depending on its
+--	inventory pool; does not return anything
+function Actor:initInventory()
+	if self.inventoryPool then
+		for k, v in pairs(self.inventoryPool) do
+			if type(v) == "table" then
+				if math.random() < v[1] then
+					self:addItem(Itemdefs[k]:new(math.random(v[2], v[3])))
+				end
+			else
+				if math.random() < v then
+					self:addItem(Itemdefs[k]:new())
+				end
+			end
+		end
+	end
+end
+
 --	Actor:__tostring() - returns a string describing an Actor for debugging
 function Actor:__tostring()
 	return "<actor #" .. tostring(self._id) .. " (" .. self.name .. ")>"

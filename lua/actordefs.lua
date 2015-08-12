@@ -62,6 +62,10 @@ Actordefs.Savage = defineActor(Actordefs.Humanoid, {
 	hp = 3,
 	maxHp = 3,
 	aiType = "humanoid",
+	inventoryPool = {
+		["Rock"] = { 0.5, 1, 3 },
+		["Stick"] = { 0.2, 1, 10 },
+	},
 })
 
 Actordefs.SavageChief = defineActor(Actordefs.Humanoid, {
@@ -71,6 +75,10 @@ Actordefs.SavageChief = defineActor(Actordefs.Humanoid, {
 	hp = 5,
 	maxHp = 5,
 	aiType = "humanoid",
+	inventoryPool = {
+		["Rock"] = { 0.5, 1, 3 },
+		["Stick"] = { 0.2, 1, 10 },
+	},
 })
 
 Actordefs.SavageShaman = defineActor(Actordefs.Humanoid, {
@@ -81,6 +89,10 @@ Actordefs.SavageShaman = defineActor(Actordefs.Humanoid, {
 	maxHp = 5,
 	agility = 6,
 	aiType = "humanoid",
+	inventoryPool = {
+		["Rock"] = { 0.5, 1, 3 },
+		["Stick"] = { 0.2, 1, 10 },
+	},
 })
 
 ------------------------------ Beasts -----------------------------------------

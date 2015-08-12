@@ -102,6 +102,7 @@ function Game:start()
 				acc = acc + v
 			end
 			self:addActor(actor)
+			actor:initInventory()
 			actor:setMap(map)
 			actor:setPosition(map:findRandomEmptySpace())
 		end
