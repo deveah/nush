@@ -8,7 +8,15 @@ High Priority:
 	  they seem to move randomly (?)
 
 Low Priority:
+	* sort high score list
 	* concatenate messages within the same turn into one big message
+	* grammar engine for (or at least fixup verbs in) messages
 	* diversify loot
-	* fixed dungeon structure?
+	* tools/augments, e.g. to detect lifeforms through walls
 	* AI with different intelligence - for example, humanoid enemies may open doors
+	* tile cost for dijkstra maps should be calculated using a terrainType attr rather
+	  than .solid, and customisable for different for different actor/AI types
+	* when calculating fleemaps, the cost of stepping onto a tile near the player
+	  should be much higher than normal (requires duplicating Tiles?)
+	* enemies should be able to swap places; currently fleeing and approaching enemies
+	  in a hallway get stuck
