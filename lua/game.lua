@@ -76,9 +76,11 @@ function Game:start()
 			map:generateRoomsAndCorridors(15, 4, 5)
 			map:spawnMachinery(20, 0.1)
 			map:spawnTraps(2)
-		else
+		elseif layout.generator == "bsp" then
 			map:generateBSP()
 			map:spawnTraps(2)
+		else
+			error("Unknown generator " .. layout.generator)
 		end
 
 		self:addMap(map)
@@ -89,12 +91,25 @@ function Game:start()
 		end
 		Util.debugDumpMap(map)
 
+		--  Given spawnList is a table giving drop rates for items/enemies
+		local function totalWeight(spawnList)
+			local total = 0
+			for k, v in pairs(spawnList) do
+				if type(v) == "table" then
+					total = total + v[1]
+				else
+					total = total + v
+				end
+			end
+			return total
+		end
+
 		--	populate each map with other actors
 		Log:write("Populating level " .. i .. " of the dungeon...")
 		for j = 1, Dungeon.layout[i].nEnemies do
 			local actor
-			local wh = math.random()
-			local acc = 0
+			local wh = math.random() * totalWeight(Dungeon.layout[i].enemies)
+			local acc = 0  --	accumulated weight
 			for k, v in pairs(Dungeon.layout[i].enemies) do
 				if wh > acc and wh < acc + v then
 					actor = Actordefs[k]:new()
@@ -109,9 +124,9 @@ function Game:start()
 
 		--	populate each map with a few items
 		for j = 1, Dungeon.layout[i].nLoot do
+			local wh = math.random() * totalWeight(Dungeon.layout[i].loot)
 			local item
-			local wh = math.random()
-			local acc = 0
+			local acc = 0  --	accumulated weight
 			for k, v in pairs(Dungeon.layout[i].loot) do
 				if type(v) == "table" then
 					if wh > acc and wh < acc + v[1] then
