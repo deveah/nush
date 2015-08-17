@@ -65,9 +65,9 @@ function Game:start()
 
 	--	create the dungeon
 	Log:write("Creating the dungeon...")
-	for i = 1, Global.dungeonDepth do
-		local map = Map.new(i, "Dungeon:" .. i)
-		local layout = Dungeon.layout[i]
+	for depth = 1, Global.dungeonDepth do
+		local map = Map.new(depth, "Dungeon:" .. depth)
+		local layout = Dungeon.layout[depth]
 		if layout.generator == "cave" then
 			map:generateCave(40, 4, 8)
 			map:spawnPoolsOfWater(3, 0.8)
@@ -86,8 +86,8 @@ function Game:start()
 		self:addMap(map)
 
 		--	link with the previously created map (if it exists)
-		if i > 1 then
-			map:linkWith(self.mapList[i-1])
+		if depth > 1 then
+			map:linkWith(self.mapList[depth-1])
 		end
 		Util.debugDumpMap(map)
 
@@ -105,12 +105,12 @@ function Game:start()
 		end
 
 		--	populate each map with other actors
-		Log:write("Populating level " .. i .. " of the dungeon...")
-		for j = 1, Dungeon.layout[i].nEnemies do
+		Log:write("Populating level " .. depth .. " of the dungeon...")
+		for j = 1, Dungeon.layout[depth].nEnemies do
 			local actor
-			local wh = math.random() * totalWeight(Dungeon.layout[i].enemies)
+			local wh = math.random() * totalWeight(Dungeon.layout[depth].enemies)
 			local acc = 0  --	accumulated weight
-			for k, v in pairs(Dungeon.layout[i].enemies) do
+			for k, v in pairs(Dungeon.layout[depth].enemies) do
 				if wh > acc and wh < acc + v then
 					actor = Actordefs[k]:new()
 				end
@@ -123,11 +123,11 @@ function Game:start()
 		end
 
 		--	populate each map with a few items
-		for j = 1, Dungeon.layout[i].nLoot do
-			local wh = math.random() * totalWeight(Dungeon.layout[i].loot)
+		for j = 1, Dungeon.layout[depth].nLoot do
+			local wh = math.random() * totalWeight(Dungeon.layout[depth].loot)
 			local item
 			local acc = 0  --	accumulated weight
-			for k, v in pairs(Dungeon.layout[i].loot) do
+			for k, v in pairs(Dungeon.layout[depth].loot) do
 				if type(v) == "table" then
 					if wh > acc and wh < acc + v[1] then
 						item = Itemdefs[k]:new(math.random(v[2], v[3]))
