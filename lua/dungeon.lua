@@ -17,6 +17,23 @@ local Itemdefs = require "lua/itemdefs"
 
 local Dungeon = {}
 
+--	Dungeon.defaultLootWeights() - Returns a table with default item drop rate
+--	at a certain dungeon depth, if not overridden in Dungeon.layout.
+function Dungeon.defaultLootWeights(depth)
+	return {
+		["ShockBaton"] = 0.05,
+		["DilithiumRazor"] = 0.1,
+		["Bullet"] = { 0.15, 1, 10 },
+		["EnergyCell"] = { 0.2, 1, 10 },
+		["SugarBombs"] = 0.3,
+		["RedKeycard"] = 0.04,
+		["GreenKeycard"] = 0.04,
+		["BlueKeycard"] = 0.04,
+		["SilverKeycard"] = 0.04,
+		["GoldKeycard"] = 0.04
+	}
+end
+
 Dungeon.layout = {
 	{	-- level 1
 		generator = "cave",
@@ -69,16 +86,6 @@ Dungeon.layout = {
 		},
 		nLoot = 10,
 		loot = {
-			["ShockBaton"] = 0.1,
-			["DilithiumRazor"] = 0.1,
-			["Bullet"] = { 0.1, 1, 10 },
-			["EnergyCell"] = { 0.2, 1, 10 },
-			["SugarBombs"] = 0.3,
-			["RedKeycard"] = 0.04,
-			["GreenKeycard"] = 0.04,
-			["BlueKeycard"] = 0.04,
-			["SilverKeycard"] = 0.04,
-			["GoldKeycard"] = 0.04
 		}
 	},
 	{	-- level 4
@@ -91,16 +98,6 @@ Dungeon.layout = {
 		},
 		nLoot = 15,
 		loot = {
-			["ShockBaton"] = 0.05,
-			["DilithiumRazor"] = 0.1,
-			["Bullet"] = { 0.15, 1, 10 },
-			["EnergyCell"] = { 0.2, 1, 10 },
-			["SugarBombs"] = 0.3,
-			["RedKeycard"] = 0.04,
-			["GreenKeycard"] = 0.04,
-			["BlueKeycard"] = 0.04,
-			["SilverKeycard"] = 0.04,
-			["GoldKeycard"] = 0.04
 		}
 	},
 	{	-- level 5
@@ -113,16 +110,6 @@ Dungeon.layout = {
 		},
 		nLoot = 15,
 		loot = {
-			["ShockBaton"] = 0.05,
-			["DilithiumRazor"] = 0.1,
-			["Bullet"] = { 0.15, 1, 10 },
-			["EnergyCell"] = { 0.2, 1, 10 },
-			["SugarBombs"] = 0.3,
-			["RedKeycard"] = 0.04,
-			["GreenKeycard"] = 0.04,
-			["BlueKeycard"] = 0.04,
-			["SilverKeycard"] = 0.04,
-			["GoldKeycard"] = 0.04
 		}
 	},
 	{	-- level 6
@@ -135,16 +122,6 @@ Dungeon.layout = {
 		},
 		nLoot = 15,
 		loot = {
-			["ShockBaton"] = 0.05,
-			["DilithiumRazor"] = 0.1,
-			["Bullet"] = { 0.15, 1, 10 },
-			["EnergyCell"] = { 0.2, 1, 10 },
-			["SugarBombs"] = 0.3,
-			["RedKeycard"] = 0.04,
-			["GreenKeycard"] = 0.04,
-			["BlueKeycard"] = 0.04,
-			["SilverKeycard"] = 0.04,
-			["GoldKeycard"] = 0.04
 		}
 	},
 	{	-- level 7
@@ -157,16 +134,6 @@ Dungeon.layout = {
 		},
 		nLoot = 15,
 		loot = {
-			["ShockBaton"] = 0.05,
-			["DilithiumRazor"] = 0.1,
-			["Bullet"] = { 0.15, 1, 10 },
-			["EnergyCell"] = { 0.2, 1, 10 },
-			["SugarBombs"] = 0.3,
-			["RedKeycard"] = 0.04,
-			["GreenKeycard"] = 0.04,
-			["BlueKeycard"] = 0.04,
-			["SilverKeycard"] = 0.04,
-			["GoldKeycard"] = 0.04
 		}
 	},
 	{	-- level 8
@@ -179,16 +146,6 @@ Dungeon.layout = {
 		},
 		nLoot = 15,
 		loot = {
-			["ShockBaton"] = 0.05,
-			["DilithiumRazor"] = 0.1,
-			["Bullet"] = { 0.15, 1, 10 },
-			["EnergyCell"] = { 0.2, 1, 10 },
-			["SugarBombs"] = 0.3,
-			["RedKeycard"] = 0.04,
-			["GreenKeycard"] = 0.04,
-			["BlueKeycard"] = 0.04,
-			["SilverKeycard"] = 0.04,
-			["GoldKeycard"] = 0.04
 		}
 	},
 	{	-- level 9
@@ -201,16 +158,6 @@ Dungeon.layout = {
 		},
 		nLoot = 15,
 		loot = {
-			["ShockBaton"] = 0.05,
-			["DilithiumRazor"] = 0.1,
-			["Bullet"] = { 0.15, 1, 10 },
-			["EnergyCell"] = { 0.2, 1, 10 },
-			["SugarBombs"] = 0.3,
-			["RedKeycard"] = 0.04,
-			["GreenKeycard"] = 0.04,
-			["BlueKeycard"] = 0.04,
-			["SilverKeycard"] = 0.04,
-			["GoldKeycard"] = 0.04
 		}
 	},
 	{	-- level 10
@@ -223,16 +170,6 @@ Dungeon.layout = {
 		},
 		nLoot = 15,
 		loot = {
-			["ShockBaton"] = 0.05,
-			["DilithiumRazor"] = 0.1,
-			["Bullet"] = { 0.15, 1, 10 },
-			["EnergyCell"] = { 0.2, 1, 10 },
-			["SugarBombs"] = 0.3,
-			["RedKeycard"] = 0.04,
-			["GreenKeycard"] = 0.04,
-			["BlueKeycard"] = 0.04,
-			["SilverKeycard"] = 0.04,
-			["GoldKeycard"] = 0.04
 		}
 	}
 }

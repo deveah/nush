@@ -259,6 +259,7 @@ function Util.debugDumpMap(map)
 	end
 end
 
+--	Util.copyTable() - Return copy with nested tables copied recursively.
 function Util.copyTable(tbl)
 	if type(tbl) ~= "table" then
 		return nil
@@ -274,6 +275,17 @@ function Util.copyTable(tbl)
 	end
 	setmetatable(t, getmetatable(tbl))
 	return t
+end
+
+--	Util.mergeTables() - Return a copy of the first table with all contents of
+--	the second added to it. Items in the second override the first. Niether is
+--	modified.
+function Util.mergeTables(baseTable, updatesTable)
+	local ret = Util.copyTable(baseTable)
+	for k, v in pairs(updatesTable) do
+		ret[k] = v
+	end
+	return ret
 end
 
 --	Util.makeStrict() - Sets the metatable of a table so that attempting to

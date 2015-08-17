@@ -111,7 +111,7 @@ function Game:start()
 			local wh = math.random() * totalWeight(Dungeon.layout[depth].enemies)
 			local acc = 0  --	accumulated weight
 			for k, v in pairs(Dungeon.layout[depth].enemies) do
-				if wh > acc and wh < acc + v then
+				if wh >= acc and wh < acc + v then
 					actor = Actordefs[k]:new()
 				end
 				acc = acc + v
@@ -124,17 +124,22 @@ function Game:start()
 
 		--	populate each map with a few items
 		for j = 1, Dungeon.layout[depth].nLoot do
-			local wh = math.random() * totalWeight(Dungeon.layout[depth].loot)
+			--	Combine default weights and overrides
+			local spawnList = Util.mergeTables(
+					Dungeon.defaultLootWeights(depth),
+					Dungeon.layout[depth].loot
+			)
+			local wh = math.random() * totalWeight(spawnList)
 			local item
 			local acc = 0  --	accumulated weight
-			for k, v in pairs(Dungeon.layout[depth].loot) do
+			for k, v in pairs(spawnList) do
 				if type(v) == "table" then
-					if wh > acc and wh < acc + v[1] then
+					if wh >= acc and wh < acc + v[1] then
 						item = Itemdefs[k]:new(math.random(v[2], v[3]))
 					end
 					acc = acc + v[1]
 				else
-					if wh > acc and wh < acc + v then
+					if wh >= acc and wh < acc + v then
 						item = Itemdefs[k]:new()
 					end
 					acc = acc + v
