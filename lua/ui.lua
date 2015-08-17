@@ -117,7 +117,12 @@ function UI:drawScreen()
 		if weapon then
 			local ret = weapon:describe()
 			if weapon.ammo then
-				ret = ret .. " [" .. Game.player:ammoAmount(weapon) .. " shots]"
+				local ammo = Game.player:ammoAmount(weapon)
+				if ammo == 0 then
+					ret = ret .. " [{{red}}0 shots{{pop}}]"
+				else
+					ret = ret .. " [" .. ammo .. " shots]"
+				end
 			end
 			return ret
 		else
@@ -128,7 +133,7 @@ function UI:drawScreen()
 	local equip = Game.player.equipment
 	local weaponry = "Weapons: " .. describeWeapon(equip.meleeWeapon) .. "/"
 		.. describeWeapon(equip.rangedWeapon)
-	curses.write(0, 24, weaponry)
+	self:colorWrite(0, 24, weaponry)
 
 	local healthStatus
 	if Game.player.hp == Game.player.maxHp then
