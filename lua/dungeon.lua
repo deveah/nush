@@ -32,6 +32,48 @@ function Dungeon.defaultLootWeights(depth)
 		["SilverKeycard"] = 0.04,
 		["GoldKeycard"] = 0.04
 	}
+
+--[[
+	--	Proposal for hierarchical item weighting:
+	--	Weights within each category get normalised so they add to the specified
+	--	total weight.
+	--	E.g. this would make ammo 3 times as common as keycards,
+	--	and Bullets 3/4 times as common as Slugs.
+	return {
+		--	Melee weapons
+		{0.1,
+			["ShockBaton"] = 1,
+			["DilithiumRazor"] = 2,
+			["RustyKnife"] = 5,
+			["BrassKnuckles"] = 4,
+		},
+		--	Ranged weapons
+		{0.1,
+			["Pistol"] = 4,
+			["Phaser"] = 1,
+			["SingleShotgun"] = 2,
+			["SawedOffShotgun"] = 2,
+		},
+		--	Ammo
+		{0.3,
+			["Bullet"] = { 3, 1, 10 },
+			["EnergyCell"] = { 4, 1, 10 },
+			["Slug"] = { 4, 1, 10 },
+		},
+		--	Keycards
+		{0.1,
+			["RedKeycard"] = 0.2,
+			["GreenKeycard"] = 0.2,
+			["BlueKeycard"] = 0.2,
+			["SilverKeycard"] = 0.2,
+			["GoldKeycard"] = 0.2,
+		},
+		--	Consumables
+		{0.4,
+			["SugarBombs"] = 1,
+		},
+	}
+]]
 end
 
 Dungeon.layout = {
