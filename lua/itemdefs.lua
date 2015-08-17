@@ -144,6 +144,7 @@ Itemdefs.BrassKnuckles = defineItem(Itemdefs.MeleeWeapon, {
 	info = "If you like punching things, you'll like these a lot.",
 	minDamage = 1,
 	maxDamage = 2,
+	accuracy = 0.8,
 	attack = "punched",
 })
 
