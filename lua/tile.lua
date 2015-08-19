@@ -135,6 +135,13 @@ Tile.shallowWater = {
 		if actor == Game.player then
 			UI:message("{{cyan}}Your feet get cold from the water.")
 		end
+
+		if actor.activeEffects["{{RED}}Burning"] then
+			actor.activeEffects["{{RED}}Burning"] = nil
+			if actor == Game.player then
+				UI:message("{{GREEN}}The water extinguishes your fire.")
+			end
+		end
 	end
 }
 

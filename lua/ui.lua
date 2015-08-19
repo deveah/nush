@@ -149,9 +149,9 @@ function UI:drawScreen()
 
 	--	draw the active status effects
 	local effectLength = 20
-	for _, eff in pairs(Game.player.activeEffects) do
-		UI:colorWrite(effectLength, 23, eff.name)
-		effectLength = effectLength + string.len(eff.name) + 1
+	for name, eff in pairs(Game.player.activeEffects) do
+		UI:colorWrite(effectLength, 23, name)
+		effectLength = effectLength + string.len(name) + 1
 	end
 
 	--	position the cursor on the player, so it may be easily seen

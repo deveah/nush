@@ -79,7 +79,7 @@ end
 
 --	Actor:addEffect() - adds an effect to the player; does not return anything
 function Actor:addEffect(name, effect, timeToLive)
-	table.insert(self.activeEffects, { name = name, effect = effect, timeToLive = timeToLive })
+	self.activeEffects[name] = { effect = effect, timeToLive = timeToLive }
 end
 
 --	Actor:initInventory() - fills an actor's inventory depending on its
@@ -919,12 +919,12 @@ function Actor:act()
 	end
 
 	--	update active effects, removing them if their time-to-live has run out
-	for _, eff in pairs(self.activeEffects) do
+	for name, eff in pairs(self.activeEffects) do
 		eff.effect(self)
 		eff.timeToLive = eff.timeToLive - 1
 		if eff.timeToLive <= 0 then
 			Util.seqRemove(self.activeEffects, eff)
-			UI:message("You are no longer " .. eff.name .. "{{normal}}.")
+			UI:message("You are no longer " .. name .. "{{normal}}.")
 		end
 	end
 
