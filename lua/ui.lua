@@ -147,6 +147,13 @@ function UI:drawScreen()
 	end
 	UI:colorWrite(0, 23, Game.player.name .. " " .. healthStatus)
 
+	--	draw the active status effects
+	local effectLength = 20
+	for _, eff in pairs(Game.player.activeEffects) do
+		UI:colorWrite(effectLength, 23, eff.name)
+		effectLength = effectLength + string.len(eff.name) + 1
+	end
+
 	--	position the cursor on the player, so it may be easily seen
 	curses.cursor(1)
 	curses.move(Game.player.x + xOffset, Game.player.y + yOffset)

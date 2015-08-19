@@ -24,6 +24,7 @@
 --	*	alive (boolean)   - true if the actor can act
 --	* actionPoints (int) - the number of action points the actor currently has
 --	* agility (int) - the number of action points the actor is awarded with each turn
+--	* activeEffects (table) - contains the currently active effects
 --
 --  Also, Actor has the following enums:
 --	* InventorySlots    - List of inventory slots (e.g. "a")
@@ -62,6 +63,7 @@ function Actor:new()
 	a.inventory = {}
 	a.equipment = {}
 	a.actionPoints = 0
+	a.activeEffects = {}
 
 	a.sightMapStale = true
 	a.sightMap = {}
@@ -73,6 +75,11 @@ function Actor:new()
 	end
 
 	return a
+end
+
+--	Actor:addEffect() - adds an effect to the player; does not return anything
+function Actor:addEffect(name, effect, timeToLive)
+	table.insert(self.activeEffects, { name = name, effect = effect, timeToLive = timeToLive })
 end
 
 --	Actor:initInventory() - fills an actor's inventory depending on its
@@ -909,6 +916,16 @@ function Actor:act()
 	--	don't act)
 	if self.map == Game.player.map and self.sightMapStale then
 		self:updateSight()
+	end
+
+	--	update active effects, removing them if their time-to-live has run out
+	for _, eff in pairs(self.activeEffects) do
+		eff.effect(self)
+		eff.timeToLive = eff.timeToLive - 1
+		if eff.timeToLive <= 0 then
+			Util.seqRemove(self.activeEffects, eff)
+			UI:message("You are no longer " .. eff.name .. "{{normal}}.")
+		end
 	end
 
 	if self == Game.player then

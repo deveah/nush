@@ -233,5 +233,24 @@ Tile.alarmTrap = {
 	end
 }
 
+Tile.fire = {
+	["name"] = "Fire",
+	["face"] = "#",
+	["color"] = curses.RED,
+	["solid"] = false,
+	["opaque"] = false,
+	["on-walk"] = function(actor)
+		if actor == Game.player then
+			UI:message("{{RED}}AAARGH! It burns!")
+		end
+		actor:addEffect("{{RED}}Burning", function(a)
+			a:takeDamage(nil, 1, "burned to death")
+			if a == Game.player then
+				UI:message("{{RED}}You take damage from burning.")
+			end
+		end, 5)
+	end
+}
+
 return Tile
 

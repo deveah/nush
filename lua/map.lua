@@ -707,6 +707,20 @@ function Map:spawnTraps(nTraps)
 	end
 end
 
+--	Map:spawnFires() - spawns a given number of fires on the given map;
+--	does not return anything
+function Map:spawnFires(nFires)
+	for i = 1, nFires do
+		local x, y
+		repeat
+			x = math.random(1, Global.mapWidth)
+			y = math.random(1, Global.mapHeight)
+		until self.tile[x][y] == Tile.roomFloor
+
+		self.tile[x][y] = Tile.fire
+	end
+end
+
 --	TODO: document, add parameters
 function Map:generateBSP()
 	local rooms = {}

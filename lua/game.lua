@@ -72,6 +72,7 @@ function Game:start()
 			map:generateCave(40, 4, 8)
 			map:spawnPoolsOfWater(3, 0.8)
 			map:spawnPatchesOfGrass(1, 0.9)
+			map:spawnFires(10)
 		elseif layout.generator == "rooms" then
 			map:generateRoomsAndCorridors(15, 4, 5)
 			map:spawnMachinery(20, 0.1)
