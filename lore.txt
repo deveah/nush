@@ -1,7 +1,7 @@
 
 Humanoids
 
-	s	Savage - A humanoid of unknown evolutionary origin, this creature has
+	s Savage - A humanoid of unknown evolutionary origin, this creature has
 	grown thick patches of hair to protect it from the cold. Having inferior
 	intelligence, Savages have resorted to carrying sticks as melee weapons
 	and rocks as missiles.
