@@ -788,6 +788,15 @@ function Actor:canFireWeapon()
 		end
 	end
 
+	--	skill requirements
+	if weapon.requires then
+		for k, v in pairs(weapon.requires) do
+			if self.skills[k] < v then
+				return false, "You lack the necessary skills to fire " .. weapon:describe() .. "!"
+			end
+		end
+	end
+
 	return true
 end
 
@@ -918,13 +927,23 @@ function Actor:act()
 		self:updateSight()
 	end
 
-	--	update active effects, removing them if their time-to-live has run out
-	for name, eff in pairs(self.activeEffects) do
-		eff.effect(self)
-		eff.timeToLive = eff.timeToLive - 1
-		if eff.timeToLive <= 0 then
-			Util.seqRemove(self.activeEffects, eff)
-			UI:message("You are no longer " .. name .. "{{normal}}.")
+	--	TODO: non-player actors have no skills, making effects unable to work
+	if self == Game.player then
+		--	update skills to match base skills, before applying effects
+		self.skills.melee = self.baseSkills.melee
+		self.skills.handguns = self.baseSkills.handguns
+		self.skills.shotguns = self.baseSkills.shotguns
+		self.skills.lockpick = self.baseSkills.lockpick
+		self.skills.stealth = self.baseSkills.stealth
+
+		--	update active effects, removing them if their time-to-live has run out
+		for name, eff in pairs(self.activeEffects) do
+			eff.effect(self)
+			eff.timeToLive = eff.timeToLive - 1
+			if eff.timeToLive <= 0 then
+				self.activeEffects[name] = nil
+				UI:message("You are no longer " .. name .. "{{normal}}.")
+			end
 		end
 	end
 

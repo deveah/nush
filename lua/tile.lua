@@ -251,10 +251,16 @@ Tile.fire = {
 			UI:message("{{RED}}AAARGH! It burns!")
 		end
 		actor:addEffect("{{RED}}Burning", function(a)
+			--	a burning actor takes 1 point of damage per turn
 			a:takeDamage(nil, 1, "burned to death")
 			if a == Game.player then
 				UI:message("{{RED}}You take damage from burning.")
 			end
+
+			--	burning also makes you unable to effectively use your weapons
+			a.skills.melee = 0
+			a.skills.handguns = 0
+			a.skills.shotguns = 0
 		end, 5)
 	end
 }
