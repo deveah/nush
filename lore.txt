@@ -1,0 +1,48 @@
+
+Humanoids
+
+	s	Savage - A humanoid of unknown evolutionary origin, this creature has
+	grown thick patches of hair to protect it from the cold. Having inferior
+	intelligence, Savages have resorted to carrying sticks as melee weapons
+	and rocks as missiles.
+
+	s Savage Chief - Of slightly higher intellect than the average Savage,
+	Savage Chiefs are known to posess the ability of rallying nearby
+	Savages, making them faster and stronger.
+	
+	s Savage Shaman - The weakest of the Savage kind, the Savage Shaman
+	uses poisonous darts to attack its enemies. Having inferior strength,
+	the Shaman likes to keep its distance from potential threats.
+
+	h Former Human - No one knows how these humans survived until now, but
+	what's certain is that they lost their humanity long ago. They now
+	lurk in the dungeons, wielding ancient weaponry and shouting ancient
+	slang in the dark.
+
+Beasts
+
+	r Rat - A squeaky little thing, but it'll chew off your feet in the
+	dark. They like to hide under piles of debris, making surprise attacks.
+	
+	d Savage Dog - A Savage's best friend, these creatures are known to
+	alert nearby Savages if they notice any strange presence in the dungeon.
+	
+	l Slime Lurker - An abomination which lives in and feeds of pools of
+	slime. It likes to hide in slime pits, surprising its enemies. Be warned
+	that they may spit radioactive slime on you!
+
+	f Radioactive Fly - An immense insect, the Radioactive Fly likes to wander
+	the dungeon in the search for slime pits, on which it feeds off. These
+	Flies are known to spit radioactive goo at wanderers.
+
+Robots
+
+	e Eyebot - A passive robotic entity, wandering the dungeons and triggering
+	alarms if something doesn't fit the scenery.
+
+	c Cleaning Robot - Another passive robotic entity, the Cleaning Robot keeps
+	the dungeon squeaky clean by wandering around and eating loot off the ground.
+
+	t Turret - An ancient method of securing areas, Turrets are stationary robots
+	that shoot every enemy in sight.
+
