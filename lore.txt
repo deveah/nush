@@ -34,6 +34,9 @@ Beasts
 	f Radioactive Fly - An immense insect, the Radioactive Fly likes to wander
 	the dungeon in the search for slime pits, on which it feeds off. These
 	Flies are known to spit radioactive goo at wanderers.
+	
+	F Poisonous Fungi - A patch of fungus which emits poisonous gas whenever
+	it senses movement nearby.
 
 Robots
 
