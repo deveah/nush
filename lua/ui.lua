@@ -834,6 +834,7 @@ function UI:playerScreen()
 	table.insert(text, "{{WHITE}}Skills:{{pop}}")
 	table.insert(text, "     melee: " .. Game.player.skills.melee)
 	table.insert(text, "  handguns: " .. Game.player.skills.handguns)
+	table.insert(text, "  shotguns: " .. Game.player.skills.shotguns)
 	table.insert(text, "  lockpick: " .. Game.player.skills.lockpick)
 	table.insert(text, "   stealth: " .. Game.player.skills.stealth)
 
