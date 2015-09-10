@@ -833,11 +833,11 @@ function UI:playerScreen()
 	table.insert(text, "")
 
 	table.insert(text, "{{WHITE}}Skills:{{pop}}")
-	table.insert(text, "     melee: " .. Game.player.skills.melee)
-	table.insert(text, "  handguns: " .. Game.player.skills.handguns)
-	table.insert(text, "  shotguns: " .. Game.player.skills.shotguns)
-	table.insert(text, "  lockpick: " .. Game.player.skills.lockpick)
-	table.insert(text, "   stealth: " .. Game.player.skills.stealth)
+	table.insert(text, "     melee: " .. Game.player.baseSkills.melee)
+	table.insert(text, "  handguns: " .. Game.player.baseSkills.handguns)
+	table.insert(text, "  shotguns: " .. Game.player.baseSkills.shotguns)
+	table.insert(text, "  lockpick: " .. Game.player.baseSkills.lockpick)
+	table.insert(text, "   stealth: " .. Game.player.baseSkills.stealth)
 
 	UI:scrollableTextScreen("Player info", text, false)
 end
@@ -853,11 +853,11 @@ function UI:skillPointScreen()
 			text =
 				"You have {{green}}" .. Game.player.spendableExperience .. "{{pop}} assignable skill points.\n" ..
 				"You may upgrade the following skills:\n" ..
-				"[{{YELLOW}}a{{pop}}] melee (" .. Game.player.skills.melee .. ")\n" ..
-				"[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.skills.handguns .. ")\n" ..
-				"[{{YELLOW}}c{{pop}}] shotguns (" .. Game.player.skills.shotguns .. ")\n" ..
-				"[{{YELLOW}}d{{pop}}] lockpick (" .. Game.player.skills.lockpick .. ")\n" ..
-				"[{{YELLOW}}e{{pop}}] stealth (" .. Game.player.skills.stealth .. ")"
+				"[{{YELLOW}}a{{pop}}] melee (" .. Game.player.baseSkills.melee .. ")\n" ..
+				"[{{YELLOW}}b{{pop}}] handguns (" .. Game.player.baseSkills.handguns .. ")\n" ..
+				"[{{YELLOW}}c{{pop}}] shotguns (" .. Game.player.baseSkills.shotguns .. ")\n" ..
+				"[{{YELLOW}}d{{pop}}] lockpick (" .. Game.player.baseSkills.lockpick .. ")\n" ..
+				"[{{YELLOW}}e{{pop}}] stealth (" .. Game.player.baseSkills.stealth .. ")"
 		end
 
 		self:drawScreen()
@@ -876,31 +876,31 @@ function UI:skillPointScreen()
 
 		--	upgrade melee
 		if canUpgrade and key == "a" then
-			Game.player.skills.melee = Game.player.skills.melee + 1
+			Game.player.baseSkills.melee = Game.player.baseSkills.melee + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
 		--	upgrade handguns
 		if canUpgrade and key == "b" then
-			Game.player.skills.handguns = Game.player.skills.handguns + 1
+			Game.player.baseSkills.handguns = Game.player.baseSkills.handguns + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
 		--	upgrade shotguns
 		if canUpgrade and key == "c" then
-			Game.player.skills.shotguns = Game.player.skills.shotguns + 1
+			Game.player.baseSkills.shotguns = Game.player.baseSkills.shotguns + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
 		--	upgrade lockpick
 		if canUpgrade and key == "d" then
-			Game.player.skills.lockpick = Game.player.skills.lockpick + 1
+			Game.player.baseSkills.lockpick = Game.player.baseSkills.lockpick + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
 		--	upgrade stealth
 		if canUpgrade and key == "e" then
-			Game.player.skills.stealth = Game.player.skills.stealth + 1
+			Game.player.baseSkills.stealth = Game.player.baseSkills.stealth + 1
 			Game.player.spendableExperience = Game.player.spendableExperience - 1
 		end
 
