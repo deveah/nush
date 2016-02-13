@@ -705,19 +705,9 @@ int main( int argc, char **argv )
 	log_printf( "Character set %s", codeset );
 #endif
 
-	#ifdef USE_LUAJIT
-		L = lua_open();
-	#endif
+	L = luaL_newstate();
 
-	#ifdef USE_LUA52
-		L = luaL_newstate();
-	#endif
-
-	#ifdef USE_LUA51
-		L = lua_open();
-	#endif
-
-	log_printf("Initialized lua.");
+	log_printf("Initialized lua. " LUA_RELEASE);
 
 	luaL_openlibs( L );
 	log_printf("Initialized lua libraries.");
@@ -725,6 +715,7 @@ int main( int argc, char **argv )
 	#if defined(USE_LUAJIT) || defined(USE_LUA51)
 		luaL_register( L, "curses", curses );
 		luaL_register( L, "clib", clib );
+		lua_pop( L, 2 );
 	#endif
 
 	#ifdef USE_LUA52
